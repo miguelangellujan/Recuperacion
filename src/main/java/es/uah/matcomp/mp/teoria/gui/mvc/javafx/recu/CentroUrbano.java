@@ -218,6 +218,24 @@ public class CentroUrbano {
         }
     }
 
+    public String obtenerIdsAldeanos(){
+        synchronized (aldeanos){
+            return aldeanos.stream().map(Aldeano :: getIdAldeano).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+        }
+    }
+
+    public String obtenerIdsGuerreros(){
+        synchronized (guerreros){
+            return guerreros.stream().map(Guerrero :: getIdGuerrero).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+        }
+    }
+
+    public String obtenerIdsBarbaros(){
+        synchronized (barbaros){
+            return barbaros.stream().map(Barbaro :: getIdBarbaro).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+        }
+    }
+
     public ZonaPreparacionBarbaros getZonaPreparacion() {
         return zonaPreparacion;
     }

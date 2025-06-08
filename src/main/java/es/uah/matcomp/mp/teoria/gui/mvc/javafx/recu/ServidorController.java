@@ -2,61 +2,62 @@ package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import java.util.Random;
 
 public class ServidorController {
     @FXML
-    private TextField ComidaRecursos;
+    private Label lblComidaRecursos;
     @FXML
-    private TextField MaderaRecursos;
+    private Label lblMaderaRecursos;
     @FXML
-    private TextField OroRecursos;
+    private Label lblOroRecursos;
     @FXML
-    private TextField ComidaGuerreros;
+    private Label lblComidaGuerreros;
     @FXML
-    private TextField MaderaGuerreros;
+    private Label lblMaderaGuerreros;
     @FXML
-    private TextField OroGuerreros;
+    private Label lblOroGuerreros;
     @FXML
-    private TextField ComidaAldeanos;
+    private Label lblComidaAldeanos;
     @FXML
-    private TextField MaderaHerramientas;
+    private Label lblMaderaHerramientas;
     @FXML
-    private TextField OroHerramientas;
+    private Label lblOroHerramientas;
     @FXML
-    private TextField ComidaArmas;
+    private Label lblComidaArmas;
     @FXML
-    private TextField OroArmas;
+    private Label lblOroArmas;
     @FXML
-    private TextField OroAlmacenM;
+    private Label lblOroAlmacenM;
     @FXML
-    private TextField MaderaAlmacenM;
+    private Label lblMaderaAlmacenM;
     @FXML
-    private TextField ZonaPreparacion;
+    private Label lblZonaPreparacion;
     @FXML
-    private TextField CampamentoBarbaro;
+    private Label lblCampamentoBarbaro;
     @FXML
-    private TextField Mina;
+    private Label lblMina;
     @FXML
-    private TextField Bosque;
+    private Label lblBosque;
     @FXML
-    private TextField Granja;
+    private Label lblGranja;
     @FXML
-    private TextField Tesoreria;
+    private Label lblTesoreria;
     @FXML
-    private TextField Aserradero;
+    private Label lblAserradero;
     @FXML
-    private TextField Granero;
+    private Label lblGranero;
     @FXML
-    private TextField Cuartel;
+    private Label lblCuartel;
     @FXML
-    private TextField PlazaCentral;
+    private Label lblPlazaCentral;
     @FXML
-    private TextField AreaRecuperacion;
+    private Label lblAreaRecuperacion;
     @FXML
-    private TextField CasaPrincipal;
+    private Label lblCasaPrincipal;
 
     private CentroUrbano centro = new CentroUrbano(); // crea 2 aldeanos iniciales
 
@@ -104,25 +105,30 @@ public class ServidorController {
 
     private void actualizarInterfaz() {
         Platform.runLater(() -> {
-            // Actualiza los contadores de recursos
-            ComidaRecursos.setText(String.valueOf(centro.getRecurso("Comida").get()));
-            MaderaRecursos.setText(String.valueOf(centro.getRecurso("Madera").get()));
-            OroRecursos.setText(String.valueOf(centro.getRecurso("Oro").get()));
+            // Actualización de recursos
+            lblComidaRecursos.setText("Comida: " + centro.getRecurso("COMIDA").get());
+            lblMaderaRecursos.setText("Madera: " + centro.getRecurso("MADERA").get());
+            lblOroRecursos.setText("Oro: " + centro.getRecurso("ORO").get());
 
-            // Actualiza los almacenes mostrando la cantidad actual / capacidad máxima
-            Granero.setText("Granero: " + centro.getGranero().getCantidadActual() + "/" + centro.getGranero().getCapacidadMaxima());
-            Aserradero.setText("Aserradero: " + centro.getAserradero().getCantidadActual() + "/" + centro.getAserradero().getCapacidadMaxima());
-            Tesoreria.setText("Tesorería: " + centro.getTesoreria().getCantidadActual() + "/" + centro.getTesoreria().getCapacidadMaxima());
+            // Estado de los almacenes
+            lblGranero.setText();
+            lblAserradero.setText();
+            lblTesoreria.setText();
 
-            // Actualiza el estado de las unidades
-            CasaPrincipal.setText("Casa Principal: " + centro.contarAldeanos() + " aldeanos");
-            Cuartel.setText("Cuartel: " + centro.contarGuerreros() + " guerreros");
-            PlazaCentral.setText("Plaza Central: activo");
-            AreaRecuperacion.setText("Área Recuperación");
+            // Estado del centro urbano
+            lblCasaPrincipal.setText(centro.obtenerIdsAldeanos());
+            lblCuartel.setText(centro.obtenerIdsGuerreros());
+            lblPlazaCentral.setText();
+            lblAreaRecuperacion.setText();
 
-            // Actualiza los indicadores de bárbaros: en preparación y en campamento
-            ZonaPreparacion.setText("Preparación: " + centro.getZonaPreparacion().getBarbarosEnPreparacion());
-            CampamentoBarbaro.setText("Campamento: " + centro.contarBarbarosCampamento());
+            // Estado de los bárbaros
+            lblZonaPreparacion.setText(centro.getZonaPreparacion().obtenerIdsEnPreparacion());
+            lblCampamentoBarbaro.setText(centro.obtenerIdsBarbaros());
+
+            // Áreas de recursos
+            lblMina.setText();
+            lblBosque.setText();
+            lblGranja.setText();
         });
     }
 

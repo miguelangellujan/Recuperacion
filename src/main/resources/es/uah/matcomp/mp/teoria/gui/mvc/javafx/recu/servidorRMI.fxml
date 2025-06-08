@@ -5,174 +5,176 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="698.0" prefWidth="1455.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu.ServidorController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="698.0" prefWidth="1455.0" scaleX="0.9" scaleY="0.9" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu.ServidorController">
    <children>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff4ba8" height="378.0" layoutX="1080.0" layoutY="306.0" stroke="BLACK" strokeType="INSIDE" width="347.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9cff8f" height="285.0" layoutX="1080.0" layoutY="14.0" stroke="BLACK" strokeType="INSIDE" width="347.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d0d8df" height="548.0" layoutX="797.0" layoutY="136.0" stroke="WHITE" strokeType="INSIDE" width="270.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d0d8df" height="548.0" layoutX="14.0" layoutY="136.0" stroke="BLACK" strokeType="INSIDE" width="270.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#289bff" height="548.0" layoutX="294.0" layoutY="136.0" stroke="BLACK" strokeType="INSIDE" width="493.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#efc3da" height="115.0" layoutX="14.0" layoutY="14.0" stroke="BLACK" strokeType="INSIDE" width="1051.0" />
 
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9bcfff" height="225.0" layoutX="549.0" layoutY="442.0" stroke="BLACK" strokeType="INSIDE" width="222.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9bcfff" height="225.0" layoutX="311.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="222.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9bcfff" height="225.0" layoutX="549.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="222.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9bcfff" height="225.0" layoutX="311.0" layoutY="442.0" stroke="BLACK" strokeType="INSIDE" width="222.0" />
-
-      <Label layoutX="458.0" layoutY="150.0" prefHeight="35.0" prefWidth="176.0" text="Centro Urbano" textAlignment="CENTER" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="24.0" />
-         </font>
-      </Label>
-      <Label fx:id="lblCasaPrincipal" layoutX="566.0" layoutY="503.0" prefHeight="142.0" prefWidth="187.0" />
-      <Label fx:id="lblCuartel" layoutX="328.0" layoutY="259.0" prefHeight="142.0" prefWidth="187.0" />
-      <Label fx:id="lblPlazaCentral" layoutX="566.0" layoutY="259.0" prefHeight="142.0" prefWidth="187.0" />
-      <Label fx:id="lblAreaRecuperacion" layoutX="328.0" layoutY="503.0" prefHeight="142.0" prefWidth="187.0" />
-      <Label fx:id="lblZonaPreparacion" layoutX="1113.0" layoutY="405.0" prefHeight="58.0" prefWidth="280.0" />
-      <Label fx:id="lblCampamentoBarbaro" layoutX="1112.0" layoutY="536.0" prefHeight="108.0" prefWidth="280.0" />
-      <Label layoutX="390.0" layoutY="218.0" text="Cuartel">
-         <font>
-            <Font size="20.0" />
-         </font>
-      </Label>
-      <Label layoutX="603.0" layoutY="218.0" text="Plaza Central">
-         <font>
-            <Font size="20.0" />
-         </font>
-      </Label>
-      <Label layoutX="335.0" layoutY="464.0" text="Área de Recuperación">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-      <Label layoutX="599.0" layoutY="461.0" text="Casa Principal">
-         <font>
-            <Font size="20.0" />
-         </font>
-      </Label>
-
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9cff9a" height="149.0" layoutX="26.0" layoutY="524.0" stroke="BLACK" strokeType="INSIDE" width="245.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#faff97" height="149.0" layoutX="26.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="245.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffe39b" height="149.0" layoutX="26.0" layoutY="361.0" stroke="BLACK" strokeType="INSIDE" width="245.0" />
-      <Label layoutX="89.0" layoutY="150.0" text="Almacenes" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="24.0" />
-         </font>
-      </Label>
-      <Label layoutX="112.0" layoutY="213.0" text="Tesorería">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-      <Label layoutX="103.0" layoutY="377.0" text="Aserradero">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-      <Label layoutX="114.0" layoutY="539.0" text="Granero">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#efc3da" height="115.0" layoutX="14.0" layoutY="14.0" stroke="WHITE" strokeType="INSIDE" width="1051.0" />
       <Label layoutX="97.0" layoutY="54.0" text="Recursos" textFill="WHITE">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9cff9a" height="149.0" layoutX="810.0" layoutY="524.0" stroke="BLACK" strokeType="INSIDE" width="245.0" />
-       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#faff97" height="149.0" layoutX="810.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="245.0" />
-       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffe39b" height="149.0" layoutX="810.0" layoutY="361.0" stroke="BLACK" strokeType="INSIDE" width="245.0" />
-       <Label layoutX="831.0" layoutY="150.0" text="Áreas de Recursos" textFill="WHITE">
-           <font>
-               <Font name="System Bold" size="24.0" />
-           </font>
-       </Label>
-       <Label layoutX="912.0" layoutY="213.0" text="Mina">
-           <font>
-               <Font size="18.0" />
-           </font>
-       </Label>
-       <Label layoutX="903.0" layoutY="377.0" text="Bosque">
-           <font>
-               <Font size="18.0" />
-           </font>
-       </Label>
-       <Label layoutX="906.0" layoutY="539.0" text="Granja">
-           <font>
-               <Font size="18.0" />
-           </font>
-       </Label>
-       <Label layoutX="97.0" layoutY="54.0" text="Recursos" textFill="WHITE">
-           <font>
-               <Font name="System Bold" size="24.0" />
-           </font>
-       </Label>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffd4ea" height="115.0" layoutX="1094.0" layoutY="363.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffd4ea" height="175.0" layoutX="1094.0" layoutY="493.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
-      <Label layoutX="1202.0" layoutY="319.0" text="Bárbaros" textFill="WHITE">
+      <Label fx:id="lblOroRecursos" layoutX="520.0" layoutY="59.0" prefHeight="35.0" prefWidth="71.0" />
+      <Label fx:id="lblMaderaRecursos" layoutX="580.0" layoutY="59.0" prefHeight="35.0" prefWidth="71.0" />
+      <Label fx:id="lblComidaRecursos" layoutX="660.0" layoutY="59.0" prefHeight="35.0" prefWidth="71.0" />
+      <Button layoutX="763.0" layoutY="48.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="114.0" text="Campana" />
+      <Button layoutX="913.0" layoutY="49.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="101.0" text="Pausa" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d0d8df" height="548.0" layoutX="14.0" layoutY="136.0" stroke="WHITE" strokeType="INSIDE" width="270.0" />
+      <Label layoutX="89.0" layoutY="150.0" text="Almacenes" textFill="WHITE">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="1171.0" layoutY="372.0" text="Zona de Preparación">
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#faff97" height="149.0" layoutX="26.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="245.0" />
+      <Label layoutX="112.0" layoutY="213.0" text="Tesorería">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Label layoutX="1166.0" layoutY="503.0" text="Campamento Bárbaro">
+      <Label fx:id="lblTesoreria" layoutX="56.0" layoutY="248.0" prefHeight="74.0" prefWidth="187.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffe39b" height="149.0" layoutX="26.0" layoutY="361.0" stroke="BLACK" strokeType="INSIDE" width="245.0" />
+      <Label layoutX="103.0" layoutY="377.0" text="Aserradero">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
+      <Label fx:id="lblAserradero" layoutX="56.0" layoutY="415.0" prefHeight="74.0" prefWidth="187.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9cff9a" height="149.0" layoutX="26.0" layoutY="524.0" stroke="BLACK" strokeType="INSIDE" width="245.0" />
+      <Label layoutX="114.0" layoutY="539.0" text="Granero">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblGranero" layoutX="56.0" layoutY="575.0" prefHeight="74.0" prefWidth="187.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#289bff" height="548.0" layoutX="294.0" layoutY="136.0" stroke="WHITE" strokeType="INSIDE" width="493.0" />
+      <Label layoutX="458.0" layoutY="150.0" prefHeight="35.0" prefWidth="176.0" text="Centro Urbano" textAlignment="CENTER" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9bcfff" height="225.0" layoutX="311.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="222.0" />
+      <Label layoutX="390.0" layoutY="218.0" text="Cuartel">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblCuartel" layoutX="328.0" layoutY="259.0" prefHeight="142.0" prefWidth="187.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9bcfff" height="225.0" layoutX="549.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="222.0" />
+      <Label layoutX="603.0" layoutY="218.0" text="Plaza Central">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblPlazaCentral" layoutX="566.0" layoutY="259.0" prefHeight="142.0" prefWidth="187.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9bcfff" height="225.0" layoutX="311.0" layoutY="442.0" stroke="BLACK" strokeType="INSIDE" width="222.0" />
+      <Label layoutX="335.0" layoutY="464.0" text="Área de Recuperación">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblAreaRecuperacion" layoutX="328.0" layoutY="503.0" prefHeight="142.0" prefWidth="187.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9bcfff" height="225.0" layoutX="549.0" layoutY="442.0" stroke="BLACK" strokeType="INSIDE" width="222.0" />
+      <Label layoutX="599.0" layoutY="461.0" text="Casa Principal">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblCasaPrincipal" layoutX="566.0" layoutY="503.0" prefHeight="142.0" prefWidth="187.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d0d8df" height="548.0" layoutX="797.0" layoutY="136.0" stroke="WHITE" strokeType="INSIDE" width="270.0" />
+      <Label layoutX="831.0" layoutY="150.0" text="Áreas de Recursos" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#faff97" height="149.0" layoutX="810.0" layoutY="200.0" stroke="BLACK" strokeType="INSIDE" width="245.0" />
+      <Label layoutX="912.0" layoutY="213.0" text="Mina">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblMina" layoutX="839.0" layoutY="248.0" prefHeight="74.0" prefWidth="187.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffe39b" height="149.0" layoutX="810.0" layoutY="361.0" stroke="BLACK" strokeType="INSIDE" width="245.0" />
+      <Label layoutX="903.0" layoutY="377.0" text="Bosque">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblBosque" layoutX="839.0" layoutY="415.0" prefHeight="74.0" prefWidth="187.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9cff9a" height="149.0" layoutX="810.0" layoutY="524.0" stroke="BLACK" strokeType="INSIDE" width="245.0" />
+      <Label layoutX="906.0" layoutY="539.0" text="Granja">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblGranja" layoutX="839.0" layoutY="575.0" prefHeight="74.0" prefWidth="187.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#9cff8f" height="285.0" layoutX="1080.0" layoutY="14.0" stroke="WHITE" strokeType="INSIDE" width="347.0" />
       <Label layoutX="1141.0" layoutY="24.0" text="Mejoras y Unidades" textFill="WHITE">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff9dd0" height="35.0" layoutX="1094.0" layoutY="68.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#e281ff" height="35.0" layoutX="1093.0" layoutY="250.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#82ffb2" height="35.0" layoutX="1093.0" layoutY="204.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#caffae" height="35.0" layoutX="1093.0" layoutY="157.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#6eb9ff" height="35.0" layoutX="1093.0" layoutY="112.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
 
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff9dd0" height="35.0" layoutX="1094.0" layoutY="68.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
       <Label layoutX="1106.0" layoutY="77.0" text="Guerreros" />
+      <Label fx:id="lblComidaGuerreros" layoutX="1372.0" layoutY="73.0" prefHeight="26.0" prefWidth="34.0" />
+      <Label fx:id="lblMaderaGuerreros" layoutX="1292.0" layoutY="73.0" prefHeight="26.0" prefWidth="34.0" />
+      <Label fx:id="lblOroGuerreros" layoutX="1210.0" layoutY="73.0" prefHeight="26.0" prefWidth="34.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#6eb9ff" height="35.0" layoutX="1093.0" layoutY="112.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
       <Label layoutX="1107.0" layoutY="121.0" text="Aldeanos" />
+      <Label fx:id="lblComidaAldeanos" layoutX="1372.0" layoutY="121.0" prefHeight="26.0" prefWidth="34.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#caffae" height="35.0" layoutX="1093.0" layoutY="157.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
       <Label layoutX="1101.0" layoutY="166.0" text="Herramientas" />
+      <Label fx:id="lblMaderaHerramientas" layoutX="1372.0" layoutY="166.0" prefHeight="26.0" prefWidth="34.0" />
+      <Label fx:id="lblOroHerramientas" layoutX="1286.0" layoutY="166.0" prefHeight="26.0" prefWidth="34.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#82ffb2" height="35.0" layoutX="1093.0" layoutY="204.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
       <Label layoutX="1103.0" layoutY="213.0" text="Armas" />
+      <Label fx:id="lblComidaArmas" layoutX="1304.0" layoutY="213.0" prefHeight="26.0" prefWidth="34.0" />
+      <Label fx:id="lblOroArmas" layoutX="1371.0" layoutY="213.0" prefHeight="26.0" prefWidth="34.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#e281ff" height="35.0" layoutX="1093.0" layoutY="250.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
       <Label layoutX="1102.0" layoutY="259.0" text="Almacenes (M)" />
-      <Button layoutX="913.0" layoutY="49.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="101.0" text="Pausa" />
-      <Button layoutX="763.0" layoutY="48.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="114.0" text="Campana" />
-      <TextField fx:id="ComidaRecursos" layoutX="634.0" layoutY="59.0" prefHeight="35.0" prefWidth="71.0" />
-      <Label layoutX="649.0" layoutY="39.0" text="Comida" />
-      <TextField fx:id="MaderaRecursos" layoutX="513.0" layoutY="59.0" prefHeight="35.0" prefWidth="71.0" />
-      <Label layoutX="529.0" layoutY="39.0" text="Madera" />
-      <TextField fx:id="OroRecursos" layoutX="390.0" layoutY="59.0" prefHeight="35.0" prefWidth="71.0" />
-      <Label layoutX="415.0" layoutY="39.0" text="Oro" />
-      <TextField fx:id="ComidaGuerreros" layoutX="1372.0" layoutY="73.0" prefHeight="26.0" prefWidth="34.0" />
-      <Label layoutX="1328.0" layoutY="78.0" text="Comida" />
-      <TextField fx:id="MaderaGuerreros" layoutX="1292.0" layoutY="73.0" prefHeight="26.0" prefWidth="34.0" />
-      <Label layoutX="1248.0" layoutY="77.0" text="Madera" />
-      <TextField fx:id="OroGuerreros" layoutX="1210.0" layoutY="72.0" prefHeight="26.0" prefWidth="34.0" />
-      <Label layoutX="1185.0" layoutY="78.0" text="Oro" />
-      <TextField fx:id="ComidaAldeanos" layoutX="1372.0" layoutY="116.0" prefHeight="26.0" prefWidth="34.0" />
-      <Label layoutX="1320.0" layoutY="120.0" text="Comida" />
-      <TextField fx:id="MaderaHerramientas" layoutX="1372.0" layoutY="161.0" prefHeight="26.0" prefWidth="34.0" />
-      <Label layoutX="1326.0" layoutY="165.0" text="Madera" />
-      <TextField fx:id="OroHerramientas" layoutX="1286.0" layoutY="161.0" prefHeight="26.0" prefWidth="34.0" />
-      <Label layoutX="1261.0" layoutY="166.0" text="Oro" />
-      <TextField fx:id="ComidaArmas" layoutX="1304.0" layoutY="208.0" prefHeight="26.0" prefWidth="34.0" />
-      <Label layoutX="1257.0" layoutY="213.0" text="Comida" />
-      <TextField fx:id="OroArmas" layoutX="1371.0" layoutY="208.0" prefHeight="26.0" prefWidth="34.0" />
-      <Label layoutX="1344.0" layoutY="213.0" text="Oro" />
-      <TextField fx:id="OroAlmacenM" layoutX="1371.0" layoutY="254.0" prefHeight="26.0" prefWidth="34.0" />
-      <Label layoutX="1344.0" layoutY="258.0" text="Oro" />
-      <TextField fx:id="MaderaAlmacenM" layoutX="1303.0" layoutY="254.0" prefHeight="26.0" prefWidth="34.0" />
-      <Label layoutX="1257.0" layoutY="258.0" text="Madera" />
-      <TextField fx:id="Mina" layoutX="839.0" layoutY="248.0" prefHeight="74.0" prefWidth="187.0" />
-      <TextField fx:id="Bosque" layoutX="839.0" layoutY="415.0" prefHeight="74.0" prefWidth="187.0" />
-      <TextField fx:id="Granja" layoutX="839.0" layoutY="575.0" prefHeight="74.0" prefWidth="187.0" />
-      <TextField fx:id="Tesoreria" layoutX="56.0" layoutY="248.0" prefHeight="74.0" prefWidth="187.0" />
-      <TextField fx:id="Aserradero" layoutX="56.0" layoutY="415.0" prefHeight="74.0" prefWidth="187.0" />
-      <TextField fx:id="Granero" layoutX="56.0" layoutY="575.0" prefHeight="74.0" prefWidth="187.0" />
+      <Label fx:id="lblOroAlmacenM" layoutX="1371.0" layoutY="259.0" prefHeight="26.0" prefWidth="34.0" />
+      <Label fx:id="lblMaderaAlmacenM" layoutX="1303.0" layoutY="259.0" prefHeight="26.0" prefWidth="34.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff4ba8" height="378.0" layoutX="1080.0" layoutY="306.0" stroke="WHITE" strokeType="INSIDE" width="347.0" />
+      <Label layoutX="1202.0" layoutY="319.0" text="Bárbaros" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffd4ea" height="115.0" layoutX="1094.0" layoutY="363.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
+      <Label layoutX="1171.0" layoutY="372.0" text="Zona de Preparación">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblZonaPreparacion" layoutX="1113.0" layoutY="405.0" prefHeight="58.0" prefWidth="280.0" />
+
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffd4ea" height="175.0" layoutX="1094.0" layoutY="493.0" stroke="BLACK" strokeType="INSIDE" width="317.0" />
+      <Label layoutX="1166.0" layoutY="503.0" text="Campamento Bárbaro">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblCampamentoBarbaro" layoutX="1112.0" layoutY="536.0" prefHeight="108.0" prefWidth="280.0" />
+
    </children>
 </AnchorPane>

@@ -78,4 +78,10 @@ public class ZonaPreparacionBarbaros {
             return esperando.size();
         }
     }
+
+    public String obtenerIdsEnPreparacion(){
+        synchronized (lock){
+            return esperando.stream().map(Barbaro :: getIdBarbaro).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+        }
+    }
 }
