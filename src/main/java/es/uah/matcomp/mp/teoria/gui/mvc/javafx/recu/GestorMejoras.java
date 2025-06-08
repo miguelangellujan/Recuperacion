@@ -1,0 +1,62 @@
+package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
+
+public class GestorMejoras {
+
+    private int nivelHerramientas = 0;
+    private int nivelArmas = 0;
+    private int nivelAlmacenes = 0;
+    private CentroUrbano centro;
+
+    public synchronized void aplicarMejoraHerramientas() {
+        int costoMadera = 120;
+        int costoOro = 80;
+        if (nivelHerramientas >= 3) {
+            Log.log("Se alcanzó el nivel máximo de mejora en herramientas.");
+            return;
+        }
+        if (centro.getRecurso("MADERA").get() >= costoMadera && centro.getRecurso("ORO").get() >= costoOro) {
+            centro.restarRecurso("MADERA", costoMadera);
+            centro.restarRecurso("ORO", costoOro);
+            nivelHerramientas++;
+            Log.log("Mejora de herramientas aplicada al nivel " + nivelHerramientas);
+        } else {
+            Log.log("No hay recursos suficientes para mejorar herramientas.");
+        }
+    }
+
+    public synchronized void aplicarMejoraArmas() {
+        int costoComida = 150;
+        int costoOro = 100;
+        if (nivelArmas >= 5) {
+            Log.log("Se alcanzó el nivel máximo de mejora en armas.");
+            return;
+        }
+        if (centro.getRecurso("COMIDA").get() >= costoComida && centro.getRecurso("ORO").get() >= costoOro) {
+            centro.restarRecurso("COMIDA", costoComida);
+            centro.restarRecurso("ORO", costoOro);
+            nivelArmas++;
+            Log.log("Mejora de armas aplicada al nivel " + nivelArmas);
+        } else {
+            Log.log("No hay recursos suficientes para mejorar armas.");
+        }
+    }
+
+    public synchronized void aplicarMejoraAlmacenes(Almacen a) {
+        int costoMadera = 150;
+        int costoOro = 50;
+        if (nivelAlmacenes >= 3) {
+            Log.log("Se alcanzó el nivel máximo de mejora en almacenes.");
+            return;
+        }
+        if (centro.getRecurso("MADERA").get() >= costoMadera && centro.getRecurso("ORO").get() >= costoOro) {
+            centro.restarRecurso("MADERA", costoMadera);
+            centro.restarRecurso("ORO", costoOro);
+            nivelAlmacenes++;
+            // Aquí deberías aumentar capacidad de almacén:
+            a.aumentarCapacidad(100);
+            Log.log("Mejora de almacenes aplicada al nivel " + nivelAlmacenes + " en " + a.getNombreZona());
+        } else {
+            Log.log("No hay recursos suficientes para mejorar almacenes.");
+        }
+    }
+}
