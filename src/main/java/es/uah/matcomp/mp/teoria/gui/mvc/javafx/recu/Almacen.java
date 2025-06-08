@@ -63,6 +63,10 @@ public class Almacen implements Zona {
         return cantidadActual;
     }
 
+    public int getCapacidadMaxima(){
+        return capacidadMaxima;
+    }
+
     public void aumentarCapacidad(int cantidad) {
         lock.lock();
         try {
@@ -72,10 +76,6 @@ public class Almacen implements Zona {
         } finally {
             lock.unlock();
         }
-    }
-
-    public int getCapacidadMaxima() {
-        return capacidadMaxima;
     }
 
     public synchronized void saquear() {
@@ -91,6 +91,7 @@ public class Almacen implements Zona {
         int oro = centro.getRecurso("ORO").get();
         Log.log("ESTADO RECURSOS => Comida: " + comida + ", Madera: " + madera + ", Oro: " + oro);
     }
+
     public void añadirInicial(int cantidad) {
         lock.lock();
         try {

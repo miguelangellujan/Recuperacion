@@ -7,6 +7,7 @@ public class Barbaro extends Thread {
     private final CentroUrbano centro;
     private static final Random rnd = new Random();
     private boolean puedeAtacar = true;
+
     public Barbaro(String id, CentroUrbano centro) {
         this.id = id;
         this.centro = centro;

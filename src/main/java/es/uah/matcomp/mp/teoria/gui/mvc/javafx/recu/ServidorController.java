@@ -1,5 +1,6 @@
 package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
@@ -61,6 +62,25 @@ public class ServidorController {
 
     @FXML
     public void initialize() {
+        /* Esto nose si lo tienes que hacer revisalo en el enunciado
+        // Fijamos los costos de unidades y mejoras en los TextField correspondientes
+        ComidaGuerreros.setText("50");
+        MaderaGuerreros.setText("50");
+        OroGuerreros.setText("80");
+        ComidaAldeanos.setText("50");
+        MaderaHerramientas.setText("120");
+        OroHerramientas.setText("80");
+        ComidaArmas.setText("150");
+        OroArmas.setText("100");
+        MaderaAlmacenM.setText("150");
+        OroAlmacenM.setText("50");
+
+        // Asignamos nombres fijos a las áreas de recursos
+        Mina.setText("Mina");
+        Bosque.setText("Bosque");
+        Granja.setText("Granja");
+         */
+
         // Hilo para crear aldeanos automáticamente cada 20 segundos (si hay comida)
         new Thread(() -> crearAldeano()).start();
 
@@ -68,6 +88,42 @@ public class ServidorController {
         new Thread(() -> crearBarbaro()).start();
 
         // Hilo opcional para mostrar recursos cada 10 s (modo consola)
+
+        // Hilo para actualizar la interfaz cada segundo
+        new Thread(() -> {
+            while(true) {
+                actualizarInterfaz();
+                try{
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Log.log("Error actualizando la interfaz");
+                }
+            }
+        }).start();
+    }
+
+    private void actualizarInterfaz() {
+        Platform.runLater(() -> {
+            // Actualiza los contadores de recursos
+            ComidaRecursos.setText(String.valueOf(centro.getRecurso("Comida").get()));
+            MaderaRecursos.setText(String.valueOf(centro.getRecurso("Madera").get()));
+            OroRecursos.setText(String.valueOf(centro.getRecurso("Oro").get()));
+
+            // Actualiza los almacenes mostrando la cantidad actual / capacidad máxima
+            Granero.setText("Granero: " + centro.getGranero().getCantidadActual() + "/" + centro.getGranero().getCapacidadMaxima());
+            Aserradero.setText("Aserradero: " + centro.getAserradero().getCantidadActual() + "/" + centro.getAserradero().getCapacidadMaxima());
+            Tesoreria.setText("Tesorería: " + centro.getTesoreria().getCantidadActual() + "/" + centro.getTesoreria().getCapacidadMaxima());
+
+            // Actualiza el estado de las unidades
+            CasaPrincipal.setText("Casa Principal: " + centro.contarAldeanos() + " aldeanos");
+            Cuartel.setText("Cuartel: " + centro.contarGuerreros() + " guerreros");
+            PlazaCentral.setText("Plaza Central: activo");
+            AreaRecuperacion.setText("Área Recuperación");
+
+            // Actualiza los indicadores de bárbaros: en preparación y en campamento
+            ZonaPreparacion.setText("Preparación: " + centro.getZonaPreparacion().getBarbarosEnPreparacion());
+            CampamentoBarbaro.setText("Campamento: " + centro.contarBarbarosCampamento());
+        });
     }
 
     @FXML

@@ -72,4 +72,10 @@ public class ZonaPreparacionBarbaros {
                 ? almacenes.get(rnd.nextInt(almacenes.size()))
                 : recursos.get(rnd.nextInt(recursos.size()));
     }
+
+    public int getBarbarosEnPreparacion(){
+        synchronized (lock){
+            return esperando.size();
+        }
+    }
 }

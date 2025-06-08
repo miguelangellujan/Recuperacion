@@ -118,7 +118,7 @@ public class CentroUrbano {
         };
     }
 
-    /**
+    /*
      * Activa o desactiva la emergencia.
      * Se actualiza la variable AtomicBoolean y se notifica a cada aldeano.
      */
@@ -183,13 +183,14 @@ public class CentroUrbano {
     }
 
     public AtomicInteger getRecurso(String tipo) {
-        return switch (tipo) {
+        return switch (tipo.toUpperCase()) { // Convierte todo a mayusculas
             case "COMIDA" -> comida;
             case "MADERA" -> madera;
             case "ORO" -> oro;
             default -> throw new IllegalArgumentException("Recurso inválido: " + tipo);
         };
     }
+
     public void sumarRecurso(String tipo, int cantidad) {
         switch (tipo) {
             case "COMIDA" -> {
@@ -232,6 +233,30 @@ public class CentroUrbano {
 
     public Cuartel getCuartel() {
         return cuartel;
+    }
+
+    public int contarAldeanos(){
+        return aldeanos.size();
+    }
+
+    public int contarGuerreros(){
+        return guerreros.size();
+    }
+
+    public int contarBarbarosCampamento(){
+        return barbaros.size();
+    }
+
+    public Almacen getGranero(){
+        return granero;
+    }
+
+    public Almacen getAserradero(){
+        return aserradero;
+    }
+
+    public Almacen getTesoreria(){
+        return tesoreria;
     }
 
     public static class CasaPrincipal {

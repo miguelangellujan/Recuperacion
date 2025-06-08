@@ -3,3 +3,150 @@
 [Sun Jun 08 01:58:52 CEST 2025] A001 entra en CASA PRINCIPAL
 [Sun Jun 08 01:58:52 CEST 2025] A002 entra en CASA PRINCIPAL
 [Sun Jun 08 01:58:53 CEST 2025] ----- INICIANDO SIMULACIÓN CONCURRENTE: Age of Threads -----
+[Sun Jun 08 21:39:39 CEST 2025] Almacén de COMIDA inicializado con 50
+[Sun Jun 08 21:39:39 CEST 2025] Almacén de MADERA inicializado con 30
+[Sun Jun 08 21:39:39 CEST 2025] Almacén de ORO inicializado con 20
+[Sun Jun 08 21:39:39 CEST 2025] Se ha creado el aldeano A001 (inicio sin coste)
+[Sun Jun 08 21:39:39 CEST 2025] Se ha creado el aldeano A002 (inicio sin coste)
+[Sun Jun 08 21:39:39 CEST 2025] A001 entra en CASA PRINCIPAL
+[Sun Jun 08 21:39:39 CEST 2025] A002 entra en CASA PRINCIPAL
+[Sun Jun 08 21:39:40 CEST 2025] ----- INICIANDO SIMULACIÓN CONCURRENTE: Age of Threads -----
+[Sun Jun 08 21:39:41 CEST 2025] A002 va a la PLAZA CENTRAL
+[Sun Jun 08 21:39:42 CEST 2025] A001 va a la PLAZA CENTRAL
+[Sun Jun 08 21:39:43 CEST 2025] A002 intenta entrar en MADERA
+[Sun Jun 08 21:39:43 CEST 2025] A002 ha entrado al área de MADERA
+[Sun Jun 08 21:39:44 CEST 2025] A001 intenta entrar en ORO
+[Sun Jun 08 21:39:44 CEST 2025] A001 ha entrado al área de ORO
+[Sun Jun 08 21:42:29 CEST 2025] Almacén de COMIDA inicializado con 50
+[Sun Jun 08 21:42:29 CEST 2025] Almacén de MADERA inicializado con 30
+[Sun Jun 08 21:42:29 CEST 2025] Almacén de ORO inicializado con 20
+[Sun Jun 08 21:42:29 CEST 2025] Se ha creado el aldeano A001 (inicio sin coste)
+[Sun Jun 08 21:42:29 CEST 2025] Se ha creado el aldeano A002 (inicio sin coste)
+[Sun Jun 08 21:42:29 CEST 2025] A001 entra en CASA PRINCIPAL
+[Sun Jun 08 21:42:29 CEST 2025] A002 entra en CASA PRINCIPAL
+[Sun Jun 08 21:42:30 CEST 2025] ----- INICIANDO SIMULACIÓN CONCURRENTE: Age of Threads -----
+[Sun Jun 08 21:42:32 CEST 2025] A001 va a la PLAZA CENTRAL
+[Sun Jun 08 21:42:32 CEST 2025] A002 va a la PLAZA CENTRAL
+[Sun Jun 08 21:42:33 CEST 2025] A001 intenta entrar en MADERA
+[Sun Jun 08 21:42:33 CEST 2025] A001 ha entrado al área de MADERA
+[Sun Jun 08 21:42:33 CEST 2025] A002 intenta entrar en ORO
+[Sun Jun 08 21:42:33 CEST 2025] A002 ha entrado al área de ORO
+[Sun Jun 08 21:42:38 CEST 2025] A002 recolecta 17 unidades de ORO
+[Sun Jun 08 21:42:38 CEST 2025] El aldeano A002 ha depositado 17 de ORO. Total almacenado: 37
+[Sun Jun 08 21:42:38 CEST 2025] A002 vuelve a la PLAZA CENTRAL
+[Sun Jun 08 21:42:38 CEST 2025] A002 entra en CASA PRINCIPAL
+[Sun Jun 08 21:42:40 CEST 2025] A001 recolecta 12 unidades de MADERA
+[Sun Jun 08 21:42:40 CEST 2025] El aldeano A001 ha depositado 12 de MADERA. Total almacenado: 42
+[Sun Jun 08 21:42:40 CEST 2025] A001 vuelve a la PLAZA CENTRAL
+[Sun Jun 08 21:42:40 CEST 2025] A001 entra en CASA PRINCIPAL
+[Sun Jun 08 21:42:42 CEST 2025] A002 va a la PLAZA CENTRAL
+[Sun Jun 08 21:42:43 CEST 2025] A002 intenta entrar en MADERA
+[Sun Jun 08 21:42:43 CEST 2025] A002 ha entrado al área de MADERA
+[Sun Jun 08 21:42:44 CEST 2025] A001 va a la PLAZA CENTRAL
+[Sun Jun 08 21:42:46 CEST 2025] A001 intenta entrar en MADERA
+[Sun Jun 08 21:42:46 CEST 2025] A001 ha entrado al área de MADERA
+[Sun Jun 08 21:42:49 CEST 2025] Se ha creado el aldeano A003
+[Sun Jun 08 21:42:49 CEST 2025] A003 entra en CASA PRINCIPAL
+[Sun Jun 08 21:42:50 CEST 2025] A002 recolecta 14 unidades de MADERA
+[Sun Jun 08 21:42:50 CEST 2025] El aldeano A002 ha depositado 14 de MADERA. Total almacenado: 56
+[Sun Jun 08 21:42:50 CEST 2025] A002 vuelve a la PLAZA CENTRAL
+[Sun Jun 08 21:42:50 CEST 2025] A002 entra en CASA PRINCIPAL
+[Sun Jun 08 21:42:51 CEST 2025] A003 va a la PLAZA CENTRAL
+[Sun Jun 08 21:42:53 CEST 2025] A003 intenta entrar en COMIDA
+[Sun Jun 08 21:42:53 CEST 2025] A003 ha entrado al área de COMIDA
+[Sun Jun 08 21:42:53 CEST 2025] A002 va a la PLAZA CENTRAL
+[Sun Jun 08 21:42:55 CEST 2025] A002 intenta entrar en COMIDA
+[Sun Jun 08 21:42:55 CEST 2025] A002 ha entrado al área de COMIDA
+[Sun Jun 08 21:42:55 CEST 2025] A001 recolecta 14 unidades de MADERA
+[Sun Jun 08 21:42:55 CEST 2025] El aldeano A001 ha depositado 14 de MADERA. Total almacenado: 70
+[Sun Jun 08 21:42:55 CEST 2025] A001 vuelve a la PLAZA CENTRAL
+[Sun Jun 08 21:42:55 CEST 2025] A001 entra en CASA PRINCIPAL
+[Sun Jun 08 21:42:58 CEST 2025] Se ha generado el bárbaro B001
+[Sun Jun 08 21:42:58 CEST 2025] B001 se dirige a la zona de preparación
+[Sun Jun 08 21:42:58 CEST 2025] B001 se une a la zona de preparación
+[Sun Jun 08 21:42:59 CEST 2025] A001 va a la PLAZA CENTRAL
+[Sun Jun 08 21:43:00 CEST 2025] A001 intenta entrar en ORO
+[Sun Jun 08 21:43:00 CEST 2025] A001 ha entrado al área de ORO
+[Sun Jun 08 21:43:01 CEST 2025] A003 recolecta 20 unidades de COMIDA
+[Sun Jun 08 21:43:01 CEST 2025] El aldeano A003 ha depositado 20 de COMIDA. Total almacenado: 70
+[Sun Jun 08 21:43:01 CEST 2025] A003 vuelve a la PLAZA CENTRAL
+[Sun Jun 08 21:43:01 CEST 2025] A003 entra en CASA PRINCIPAL
+[Sun Jun 08 21:43:03 CEST 2025] A003 va a la PLAZA CENTRAL
+[Sun Jun 08 21:43:04 CEST 2025] A002 recolecta 12 unidades de COMIDA
+[Sun Jun 08 21:43:04 CEST 2025] El aldeano A002 ha depositado 12 de COMIDA. Total almacenado: 82
+[Sun Jun 08 21:43:04 CEST 2025] A002 vuelve a la PLAZA CENTRAL
+[Sun Jun 08 21:43:04 CEST 2025] A002 entra en CASA PRINCIPAL
+[Sun Jun 08 21:43:05 CEST 2025] A003 intenta entrar en COMIDA
+[Sun Jun 08 21:43:05 CEST 2025] A003 ha entrado al área de COMIDA
+[Sun Jun 08 21:43:06 CEST 2025] A001 recolecta 15 unidades de ORO
+[Sun Jun 08 21:43:06 CEST 2025] El aldeano A001 ha depositado 13 de ORO. Total almacenado: 50
+[Sun Jun 08 21:43:06 CEST 2025] El aldeano A001 se queda esperando con 2 de ORO por falta de espacio.
+[Sun Jun 08 21:43:06 CEST 2025] El almacén de ORO está lleno. El aldeano A001 espera para depositar.
+[Sun Jun 08 21:43:07 CEST 2025] A002 va a la PLAZA CENTRAL
+[Sun Jun 08 21:43:09 CEST 2025] A002 intenta entrar en MADERA
+[Sun Jun 08 21:43:09 CEST 2025] A002 ha entrado al área de MADERA
+[Sun Jun 08 21:43:12 CEST 2025] A003 recolecta 13 unidades de COMIDA
+[Sun Jun 08 21:43:12 CEST 2025] El aldeano A003 ha depositado 13 de COMIDA. Total almacenado: 95
+[Sun Jun 08 21:43:12 CEST 2025] A003 vuelve a la PLAZA CENTRAL
+[Sun Jun 08 21:43:12 CEST 2025] A003 entra en CASA PRINCIPAL
+[Sun Jun 08 21:43:15 CEST 2025] A003 va a la PLAZA CENTRAL
+[Sun Jun 08 22:06:41 CEST 2025] Almacén de COMIDA inicializado con 50
+[Sun Jun 08 22:06:41 CEST 2025] Almacén de MADERA inicializado con 30
+[Sun Jun 08 22:06:41 CEST 2025] Almacén de ORO inicializado con 20
+[Sun Jun 08 22:06:41 CEST 2025] Se ha creado el aldeano A001 (inicio sin coste)
+[Sun Jun 08 22:06:41 CEST 2025] Se ha creado el aldeano A002 (inicio sin coste)
+[Sun Jun 08 22:06:41 CEST 2025] A001 entra en CASA PRINCIPAL
+[Sun Jun 08 22:06:41 CEST 2025] A002 entra en CASA PRINCIPAL
+[Sun Jun 08 22:06:41 CEST 2025] ----- INICIANDO SIMULACIÓN CONCURRENTE: Age of Threads -----
+[Sun Jun 08 22:06:43 CEST 2025] A001 va a la PLAZA CENTRAL
+[Sun Jun 08 22:06:44 CEST 2025] A002 va a la PLAZA CENTRAL
+[Sun Jun 08 22:06:45 CEST 2025] A001 intenta entrar en MADERA
+[Sun Jun 08 22:06:45 CEST 2025] A001 ha entrado al área de MADERA
+[Sun Jun 08 22:06:45 CEST 2025] A002 intenta entrar en COMIDA
+[Sun Jun 08 22:06:45 CEST 2025] A002 ha entrado al área de COMIDA
+[Sun Jun 08 22:07:30 CEST 2025] Almacén de COMIDA inicializado con 50
+[Sun Jun 08 22:07:30 CEST 2025] Almacén de MADERA inicializado con 30
+[Sun Jun 08 22:07:30 CEST 2025] Almacén de ORO inicializado con 20
+[Sun Jun 08 22:07:30 CEST 2025] Se ha creado el aldeano A001 (inicio sin coste)
+[Sun Jun 08 22:07:30 CEST 2025] Se ha creado el aldeano A002 (inicio sin coste)
+[Sun Jun 08 22:07:30 CEST 2025] A001 entra en CASA PRINCIPAL
+[Sun Jun 08 22:07:30 CEST 2025] A002 entra en CASA PRINCIPAL
+[Sun Jun 08 22:07:31 CEST 2025] ----- INICIANDO SIMULACIÓN CONCURRENTE: Age of Threads -----
+[Sun Jun 08 22:07:33 CEST 2025] A002 va a la PLAZA CENTRAL
+[Sun Jun 08 22:07:34 CEST 2025] A001 va a la PLAZA CENTRAL
+[Sun Jun 08 22:07:34 CEST 2025] A002 intenta entrar en ORO
+[Sun Jun 08 22:07:34 CEST 2025] A002 ha entrado al área de ORO
+[Sun Jun 08 22:07:35 CEST 2025] A001 intenta entrar en MADERA
+[Sun Jun 08 22:07:35 CEST 2025] A001 ha entrado al área de MADERA
+[Sun Jun 08 22:08:46 CEST 2025] Almacén de COMIDA inicializado con 50
+[Sun Jun 08 22:08:46 CEST 2025] Almacén de MADERA inicializado con 30
+[Sun Jun 08 22:08:46 CEST 2025] Almacén de ORO inicializado con 20
+[Sun Jun 08 22:08:46 CEST 2025] Se ha creado el aldeano A001 (inicio sin coste)
+[Sun Jun 08 22:08:46 CEST 2025] Se ha creado el aldeano A002 (inicio sin coste)
+[Sun Jun 08 22:08:46 CEST 2025] A001 entra en CASA PRINCIPAL
+[Sun Jun 08 22:08:46 CEST 2025] A002 entra en CASA PRINCIPAL
+[Sun Jun 08 22:08:47 CEST 2025] ----- INICIANDO SIMULACIÓN CONCURRENTE: Age of Threads -----
+[Sun Jun 08 22:08:48 CEST 2025] A001 va a la PLAZA CENTRAL
+[Sun Jun 08 22:08:49 CEST 2025] A001 intenta entrar en MADERA
+[Sun Jun 08 22:08:49 CEST 2025] A001 ha entrado al área de MADERA
+[Sun Jun 08 22:08:50 CEST 2025] A002 va a la PLAZA CENTRAL
+[Sun Jun 08 22:08:52 CEST 2025] A002 intenta entrar en ORO
+[Sun Jun 08 22:08:52 CEST 2025] A002 ha entrado al área de ORO
+[Sun Jun 08 22:08:56 CEST 2025] A001 recolecta 12 unidades de MADERA
+[Sun Jun 08 22:08:56 CEST 2025] El aldeano A001 ha depositado 12 de MADERA. Total almacenado: 42
+[Sun Jun 08 22:08:56 CEST 2025] A001 vuelve a la PLAZA CENTRAL
+[Sun Jun 08 22:08:56 CEST 2025] A001 entra en CASA PRINCIPAL
+[Sun Jun 08 22:10:32 CEST 2025] Almacén de COMIDA inicializado con 50
+[Sun Jun 08 22:10:32 CEST 2025] Almacén de MADERA inicializado con 30
+[Sun Jun 08 22:10:32 CEST 2025] Almacén de ORO inicializado con 20
+[Sun Jun 08 22:10:32 CEST 2025] Se ha creado el aldeano A001 (inicio sin coste)
+[Sun Jun 08 22:10:32 CEST 2025] Se ha creado el aldeano A002 (inicio sin coste)
+[Sun Jun 08 22:10:32 CEST 2025] A001 entra en CASA PRINCIPAL
+[Sun Jun 08 22:10:32 CEST 2025] A002 entra en CASA PRINCIPAL
+[Sun Jun 08 22:10:33 CEST 2025] ----- INICIANDO SIMULACIÓN CONCURRENTE: Age of Threads -----
+[Sun Jun 08 22:10:36 CEST 2025] A002 va a la PLAZA CENTRAL
+[Sun Jun 08 22:10:36 CEST 2025] A001 va a la PLAZA CENTRAL
+[Sun Jun 08 22:10:37 CEST 2025] A001 intenta entrar en COMIDA
+[Sun Jun 08 22:10:37 CEST 2025] A001 ha entrado al área de COMIDA
+[Sun Jun 08 22:10:37 CEST 2025] A002 intenta entrar en ORO
+[Sun Jun 08 22:10:37 CEST 2025] A002 ha entrado al área de ORO
