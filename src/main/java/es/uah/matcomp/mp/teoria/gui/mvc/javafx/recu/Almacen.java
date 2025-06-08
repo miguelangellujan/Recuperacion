@@ -13,11 +13,7 @@ public class Almacen implements Zona {
     private final Semaphore semDeposito = new Semaphore(3, true);
     private final Lock lock = new ReentrantLock(true);
     private final Condition espacioDisponible = lock.newCondition();
-    private final Condition colaDeposito = lock.newCondition();
-    private final Queue<Aldeano> colaEspera = new LinkedList<>();
     private final Random rnd = new Random();
-    private FuncionesComunes funcionesComunes;
-
     private final Lock lockGuerreros = new ReentrantLock(true);
     private final Condition puedeEntrarGuerrero = lockGuerreros.newCondition();
     private final List<Guerrero> guerrerosDentro = new ArrayList<>();
@@ -29,14 +25,15 @@ public class Almacen implements Zona {
         this.cantidadActual = 0;
         this.centro = centro;
     }
-    public void depositar(String idAldeano, int cantidad) throws InterruptedException {
+
+    public void depositar(Aldeano aldeano, int cantidad) throws InterruptedException {
         int restante = cantidad;
 
         lock.lock();
         try {
             while (restante > 0) {
                 while (cantidadActual == capacidadMaxima) {
-                    Log.log("El almacén de " + tipo + " está lleno. " + "El aldeano " + idAldeano + " espera para depositar.");
+                    Log.log("El almacén de " + tipo + " está lleno. " + "El aldeano " + aldeano.getIdAldeano() + " espera para depositar.");
                     espacioDisponible.await();
                 }
 
@@ -48,23 +45,33 @@ public class Almacen implements Zona {
 
                 centro.sumarRecurso(tipo, aDepositar);
 
-                Log.log("El aldeano " + idAldeano + " ha depositado " + aDepositar + " de " + tipo +
-                        ". Total almacenado: " + cantidadActual);
+                Log.log("El aldeano " + aldeano.getIdAldeano() + " ha depositado " + aDepositar + " de " + tipo + ". Total almacenado: " + cantidadActual);
 
+                // Notifica a otros aldeanos que podría haber espacio disponible
                 espacioDisponible.signalAll();
 
                 if (restante > 0 && cantidadActual == capacidadMaxima) {
-                    Log.log("El aldeano " + idAldeano + " se queda esperando con " + restante + " de " + tipo + " por falta de espacio.");
-                    espacioDisponible.await();
+                    Log.log("El aldeano " + aldeano.getIdAldeano() + " se queda esperando con " + restante + " de " + tipo + " por falta de espacio.");
                 }
             }
         } finally {
             lock.unlock();
         }
     }
+
+    public int getCantidadActual() {
+        return cantidadActual;
+    }
+
     public void aumentarCapacidad(int cantidad) {
-        capacidadMaxima += cantidad;
-        Log.log("Capacidad de " + tipo + " aumentada a " + capacidadMaxima);
+        lock.lock();
+        try {
+            capacidadMaxima += cantidad;
+            Log.log("Capacidad de " + tipo + " aumentada a " + capacidadMaxima);
+            espacioDisponible.signalAll(); // Avisamos a los aldeanos por si ahora hay hueco
+        } finally {
+            lock.unlock();
+        }
     }
 
     public int getCapacidadMaxima() {
@@ -72,7 +79,7 @@ public class Almacen implements Zona {
     }
 
     public synchronized void saquear() {
-        int porcentaje = funcionesComunes.randomBetween(10, 30);
+        int porcentaje = FuncionesComunes.randomBetween(10, 30);
         int robado = (cantidadActual * porcentaje) / 100;
         cantidadActual -= robado;
         centro.restarRecurso(tipo, robado);
@@ -83,6 +90,15 @@ public class Almacen implements Zona {
         int madera = centro.getRecurso("MADERA").get();
         int oro = centro.getRecurso("ORO").get();
         Log.log("ESTADO RECURSOS => Comida: " + comida + ", Madera: " + madera + ", Oro: " + oro);
+    }
+    public void añadirInicial(int cantidad) {
+        lock.lock();
+        try {
+            cantidadActual = Math.min(cantidad, capacidadMaxima);
+            Log.log("Almacén de " + tipo + " inicializado con " + cantidadActual);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override

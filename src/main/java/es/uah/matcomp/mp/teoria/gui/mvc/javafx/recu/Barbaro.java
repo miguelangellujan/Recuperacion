@@ -7,8 +7,6 @@ public class Barbaro extends Thread {
     private final CentroUrbano centro;
     private static final Random rnd = new Random();
     private boolean puedeAtacar = true;
-    private FuncionesComunes funcionesComunes;
-
     public Barbaro(String id, CentroUrbano centro) {
         this.id = id;
         this.centro = centro;
@@ -33,7 +31,7 @@ public class Barbaro extends Thread {
 
                 boolean ganoCombate = true;
                 if (objetivo.enfrentarABarbaro(this)) {
-                    Thread.sleep(funcionesComunes.randomBetween(500, 1000));
+                    Thread.sleep(FuncionesComunes.randomBetween(500, 1000));
                     ganoCombate = rnd.nextBoolean();
                     if (ganoCombate) {
                         Log.log(id + " gana su combate en " + objetivo.getNombreZona());

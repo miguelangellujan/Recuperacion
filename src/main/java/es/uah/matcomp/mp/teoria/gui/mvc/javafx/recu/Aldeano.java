@@ -5,7 +5,7 @@ public class Aldeano extends Thread {
     private final CentroUrbano centro;
     private boolean activo = true;
     private boolean esperandoEnEmergencia = false;
-    private FuncionesComunes funcionesComunes;
+
 
     public Aldeano(String id, CentroUrbano centro) {
         this.id = id;
@@ -52,11 +52,11 @@ public class Aldeano extends Thread {
 
                 // Paso 1: Casa Principal
                 Log.log(id + " entra en CASA PRINCIPAL");
-                Thread.sleep(funcionesComunes.randomBetween(2000, 4000));
+                Thread.sleep(FuncionesComunes.randomBetween(2000, 4000));
 
                 // Paso 2: Plaza Central
                 Log.log(id + " va a la PLAZA CENTRAL");
-                Thread.sleep(funcionesComunes.randomBetween(1000, 2000));
+                Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
 
                 // Paso 3: Selección aleatoria de recurso
                 String tipo = centro.seleccionarRecursoAleatorio();
@@ -68,8 +68,8 @@ public class Aldeano extends Thread {
                 area.entrar(this); // bloquea hasta que pueda entrar
 
                 // Paso 5: Recolectar recurso
-                int cantidad = funcionesComunes.randomBetween(10, 20);
-                Thread.sleep(funcionesComunes.randomBetween(5000, 10000));
+                int cantidad = FuncionesComunes.randomBetween(10, 20);
+                Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));
 
                 // Paso 6: Verificar si fue atacado
                 if (area.fueAtacadoDurante(this)) {
@@ -82,7 +82,7 @@ public class Aldeano extends Thread {
                 // Paso 7: Depositar recursos en el almacén
                 Log.log(id + " recolecta " + cantidad + " unidades de " + tipo);
                 area.salir(this);
-                almacen.depositar(tipo, cantidad);
+                almacen.depositar(this, cantidad);
 
                 // Paso 8: Notificar a aldeanos que puedan estar esperando
                 synchronized (area) {

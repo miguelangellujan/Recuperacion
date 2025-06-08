@@ -13,8 +13,6 @@ public class AreaRecurso implements Zona {
     private boolean enAtaque = false;
     private boolean destruida = false;
 
-    private FuncionesComunes funcionesComunes;
-
     private final ReentrantLock lockGuerreros = new ReentrantLock(true);
     private final Condition puedeEntrarGuerrero = lockGuerreros.newCondition();
     private final List<Guerrero> guerrerosDentro = new ArrayList<>();
@@ -77,7 +75,7 @@ public class AreaRecurso implements Zona {
     public synchronized boolean entrar(Aldeano a) throws InterruptedException {
         if (destruida) {
             Log.log(a.getIdAldeano() + " repara el área de " + tipo);
-            Thread.sleep(funcionesComunes.numRandom(3000, 5000));
+            Thread.sleep(FuncionesComunes.numRandom(3000, 5000));
             destruida = false;
             notifyAll();
             salir(a);

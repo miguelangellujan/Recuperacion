@@ -3,12 +3,11 @@ package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 public class Guerrero extends Thread {
     private final String id;
     private final CentroUrbano centro;
-    private final FuncionesComunes funcionesComunes;
 
     public Guerrero(String id, CentroUrbano centro) {
         this.id = id;
         this.centro = centro;
-        this.funcionesComunes = new FuncionesComunes();
+
     }
 
     public void enviarARecuperacion() {
@@ -25,7 +24,7 @@ public class Guerrero extends Thread {
         try {
             // Entrenamiento inicial
             Log.log(id + " comienza entrenamiento en el CUARTEL");
-            Thread.sleep(funcionesComunes.randomBetween(5000, 8000));
+            Thread.sleep(FuncionesComunes.randomBetween(5000, 8000));
             Log.log(id + " ha finalizado el entrenamiento y comienza patrullaje");
 
             // Patrullaje continuo
@@ -37,7 +36,7 @@ public class Guerrero extends Thread {
                     Log.log(id + " patrulla en " + zona.getNombreZona());
 
                     // Permanece un tiempo aleatorio en la zona
-                    Thread.sleep(funcionesComunes.randomBetween(2000, 3000));
+                    Thread.sleep(FuncionesComunes.randomBetween(2000, 3000));
 
                     zona.salirGuerrero(this);
                     Log.log(id + " sale de " + zona.getNombreZona());

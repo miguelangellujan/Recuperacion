@@ -43,6 +43,9 @@ public class CentroUrbano {
     private final AtomicBoolean emergenciaActiva = new AtomicBoolean(false);
 
     public CentroUrbano() {
+        granero.añadirInicial(comida.get());
+        aserradero.añadirInicial(madera.get());
+        tesoreria.añadirInicial(oro.get());
         // 2 aldeanos sin descontar comida
         for (int i = 0; i < 2; i++) {
             String id = String.format("A%03d", idAldeano.getAndIncrement());
