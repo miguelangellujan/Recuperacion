@@ -104,31 +104,30 @@ public class ServidorController {
     }
 
     private void actualizarInterfaz() {
+
         Platform.runLater(() -> {
             // Actualización de recursos
-            lblComidaRecursos.setText("Comida: " + centro.getRecurso("COMIDA").get());
-            lblMaderaRecursos.setText("Madera: " + centro.getRecurso("MADERA").get());
-            lblOroRecursos.setText("Oro: " + centro.getRecurso("ORO").get());
+            lblGranja.setText("Granja: " + centro.getArea("COMIDA").getNombreZona() + "\n" + centro.getArea("COMIDA").obtenerEstadoAldeanos());
+            lblMina.setText("Mina: " + centro.getArea("ORO").getNombreZona() + "\n" + centro.getArea("ORO").obtenerEstadoAldeanos());
+            lblBosque.setText("Bosque: " + centro.getArea("MADERA").getNombreZona() + "\n" + centro.getArea("MADERA").obtenerEstadoAldeanos());
 
-            // Estado de los almacenes
-            lblGranero.setText();
-            lblAserradero.setText();
-            lblTesoreria.setText();
+            // Estado del almacén de comida
+            lblGranero.setText("Granero: " + centro.getAlmacen("COMIDA").getCantidadActual() + "/" + centro.getAlmacen("COMIDA").getCapacidadMaxima() + "\n" + centro.getAlmacen("COMIDA").obtenerEstadoAldeanos());
+            // Estado del almacén de madera
+            lblAserradero.setText("Aserradero: " + centro.getAlmacen("MADERA").getCantidadActual() + "/" + centro.getAlmacen("MADERA").getCapacidadMaxima() + "\n" + centro.getAlmacen("MADERA").obtenerEstadoAldeanos());
+            // Estado del almacén de oro
+            lblTesoreria.setText("Tesorería: " + centro.getAlmacen("ORO").getCantidadActual() + "/" + centro.getAlmacen("ORO").getCapacidadMaxima() + "\n" + centro.getAlmacen("ORO").obtenerEstadoAldeanos());
 
             // Estado del centro urbano
-            lblCasaPrincipal.setText(centro.obtenerIdsAldeanos());
+            lblCasaPrincipal.setText(centro.getCasaPrincipal().obtenerIds());
             lblCuartel.setText(centro.obtenerIdsGuerreros());
-            lblPlazaCentral.setText();
-            lblAreaRecuperacion.setText();
+            lblPlazaCentral.setText(centro.getPlazaCentral().obtenerIds());
+            lblAreaRecuperacion.setText(centro.getAreaRecuperacion().obtenerIdsEnRecuperacion());
+
 
             // Estado de los bárbaros
             lblZonaPreparacion.setText(centro.getZonaPreparacion().obtenerIdsEnPreparacion());
             lblCampamentoBarbaro.setText(centro.obtenerIdsBarbaros());
-
-            // Áreas de recursos
-            lblMina.setText();
-            lblBosque.setText();
-            lblGranja.setText();
         });
     }
 

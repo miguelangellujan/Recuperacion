@@ -5,7 +5,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CentroUrbano {
-    // Recursos iniciales
     private final AtomicInteger comida = new AtomicInteger(50);
     private final AtomicInteger madera = new AtomicInteger(30);
     private final AtomicInteger oro = new AtomicInteger(20);
@@ -14,31 +13,25 @@ public class CentroUrbano {
     private final AtomicInteger idGuerrero = new AtomicInteger(1);
     private final AtomicInteger idBarbaro = new AtomicInteger(1);
 
-    // Zonas de recursos
     public final AreaRecurso granja = new AreaRecurso("COMIDA");
     public final AreaRecurso bosque = new AreaRecurso("MADERA");
-    public final AreaRecurso mina   = new AreaRecurso("ORO");
+    public final AreaRecurso mina = new AreaRecurso("ORO");
 
-    // Almacenes
-    public final Almacen granero    = new Almacen("COMIDA", 200,this);
-    public final Almacen aserradero = new Almacen("MADERA", 150,this);
-    public final Almacen tesoreria  = new Almacen("ORO", 50,this);
+    public final Almacen granero = new Almacen("COMIDA", 200, this);
+    public final Almacen aserradero = new Almacen("MADERA", 150, this);
+    public final Almacen tesoreria = new Almacen("ORO", 50, this);
 
-    // Otras áreas de la simulación
     public final AreaRecuperacion areaRecuperacion = new AreaRecuperacion();
-    public final ZonaPreparacionBarbaros zonaPreparacion = new ZonaPreparacionBarbaros(this); // Se pasa referencia si fuera necesario
+    public final ZonaPreparacionBarbaros zonaPreparacion = new ZonaPreparacionBarbaros(this);
 
-    // Uso de clases internas para zonas fijas del centro urbano
     private final CasaPrincipal casaPrincipal = new CasaPrincipal();
     private final PlazaCentral plazaCentral = new PlazaCentral();
     private final Cuartel cuartel = new Cuartel();
 
-    // Listas de unidades activas
     private final List<Aldeano> aldeanos = Collections.synchronizedList(new ArrayList<>());
     private final List<Guerrero> guerreros = Collections.synchronizedList(new ArrayList<>());
     private final List<Barbaro> barbaros = Collections.synchronizedList(new ArrayList<>());
 
-    // Gestión de mejoras y Emergencia (usamos AtomicBoolean en lugar de volatile)
     private final GestorMejoras mejoras = new GestorMejoras();
     private final AtomicBoolean emergenciaActiva = new AtomicBoolean(false);
 
@@ -46,7 +39,6 @@ public class CentroUrbano {
         granero.añadirInicial(comida.get());
         aserradero.añadirInicial(madera.get());
         tesoreria.añadirInicial(oro.get());
-        // 2 aldeanos sin descontar comida
         for (int i = 0; i < 2; i++) {
             String id = String.format("A%03d", idAldeano.getAndIncrement());
             Aldeano a = new Aldeano(id, this);
@@ -62,7 +54,6 @@ public class CentroUrbano {
             comida.addAndGet(-50);
             String id = String.format("A%03d", idAldeano.getAndIncrement());
             Aldeano a = new Aldeano(id, this);
-            // Notificamos el estado actual de emergencia al aldeano
             a.setEmergencia(emergenciaActiva.get());
             aldeanos.add(a);
             a.start();
@@ -118,10 +109,6 @@ public class CentroUrbano {
         };
     }
 
-    /*
-     * Activa o desactiva la emergencia.
-     * Se actualiza la variable AtomicBoolean y se notifica a cada aldeano.
-     */
     public void activarEmergencia() {
         boolean nuevoEstado = !emergenciaActiva.get();
         emergenciaActiva.set(nuevoEstado);
@@ -143,17 +130,16 @@ public class CentroUrbano {
     }
 
     public Zona obtenerZonaAleatoria() {
-        List<Zona> zonas = List.of((Zona) granja, (Zona) bosque, (Zona) mina,
-                (Zona) granero, (Zona) aserradero, (Zona) tesoreria);
+        List<Zona> zonas = List.of(granja, bosque, mina, granero, aserradero, tesoreria);
         return zonas.get(new Random().nextInt(zonas.size()));
     }
 
     public Zona seleccionarObjetivo() {
         if (Math.random() < 0.6) {
-            List<Zona> almacenes = List.of((Zona) granero, (Zona) aserradero, (Zona) tesoreria);
+            List<Zona> almacenes = List.of(granero, aserradero, tesoreria);
             return almacenes.get(new Random().nextInt(almacenes.size()));
         } else {
-            List<Zona> areas = List.of((Zona) granja, (Zona) bosque, (Zona) mina);
+            List<Zona> areas = List.of(granja, bosque, mina);
             return areas.get(new Random().nextInt(areas.size()));
         }
     }
@@ -183,7 +169,7 @@ public class CentroUrbano {
     }
 
     public AtomicInteger getRecurso(String tipo) {
-        return switch (tipo.toUpperCase()) { // Convierte todo a mayusculas
+        return switch (tipo.toUpperCase()) {
             case "COMIDA" -> comida;
             case "MADERA" -> madera;
             case "ORO" -> oro;
@@ -193,18 +179,9 @@ public class CentroUrbano {
 
     public void sumarRecurso(String tipo, int cantidad) {
         switch (tipo) {
-            case "COMIDA" -> {
-                int max = granero.getCapacidadMaxima();
-                comida.updateAndGet(current -> Math.min(current + cantidad, max));
-            }
-            case "MADERA" -> {
-                int max = aserradero.getCapacidadMaxima();
-                madera.updateAndGet(current -> Math.min(current + cantidad, max));
-            }
-            case "ORO" -> {
-                int max = tesoreria.getCapacidadMaxima();
-                oro.updateAndGet(current -> Math.min(current + cantidad, max));
-            }
+            case "COMIDA" -> comida.updateAndGet(current -> Math.min(current + cantidad, granero.getCapacidadMaxima()));
+            case "MADERA" -> madera.updateAndGet(current -> Math.min(current + cantidad, aserradero.getCapacidadMaxima()));
+            case "ORO" -> oro.updateAndGet(current -> Math.min(current + cantidad, tesoreria.getCapacidadMaxima()));
             default -> throw new IllegalArgumentException("Tipo de recurso inválido: " + tipo);
         }
     }
@@ -218,29 +195,36 @@ public class CentroUrbano {
         }
     }
 
-    public String obtenerIdsAldeanos(){
-        synchronized (aldeanos){
-            return aldeanos.stream().map(Aldeano :: getIdAldeano).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+    public String obtenerIdsAldeanos() {
+        synchronized (aldeanos) {
+            return aldeanos.stream().map(Aldeano::getIdAldeano).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
         }
     }
 
-    public String obtenerIdsGuerreros(){
-        synchronized (guerreros){
-            return guerreros.stream().map(Guerrero :: getIdGuerrero).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+    public String obtenerIdsGuerreros() {
+        synchronized (guerreros) {
+            return guerreros.stream().map(Guerrero::getIdGuerrero).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
         }
     }
 
-    public String obtenerIdsBarbaros(){
-        synchronized (barbaros){
-            return barbaros.stream().map(Barbaro :: getIdBarbaro).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+    public String obtenerIdsBarbaros() {
+        synchronized (barbaros) {
+            return barbaros.stream().map(Barbaro::getIdBarbaro).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
         }
+    }
+
+    public String obtenerIdsCasaPrincipal() {
+        return casaPrincipal.obtenerIds();
+    }
+
+    public String obtenerIdsPlazaCentral() {
+        return plazaCentral.obtenerIds();
     }
 
     public ZonaPreparacionBarbaros getZonaPreparacion() {
         return zonaPreparacion;
     }
 
-    // Métodos de acceso para las zonas internas definidas mediante clases internas
     public CasaPrincipal getCasaPrincipal() {
         return casaPrincipal;
     }
@@ -253,39 +237,67 @@ public class CentroUrbano {
         return cuartel;
     }
 
-    public int contarAldeanos(){
+    public int contarAldeanos() {
         return aldeanos.size();
     }
 
-    public int contarGuerreros(){
+    public int contarGuerreros() {
         return guerreros.size();
     }
 
-    public int contarBarbarosCampamento(){
+    public int contarBarbarosCampamento() {
         return barbaros.size();
     }
 
-    public Almacen getGranero(){
+    public Almacen getGranero() {
         return granero;
     }
 
-    public Almacen getAserradero(){
+    public Almacen getAserradero() {
         return aserradero;
     }
 
-    public Almacen getTesoreria(){
+    public Almacen getTesoreria() {
         return tesoreria;
     }
 
     public static class CasaPrincipal {
+        private final List<String> aldeanosEnCasa = Collections.synchronizedList(new ArrayList<>());
+
         public void registrarEntrada(String idAldeano) {
+            aldeanosEnCasa.add(idAldeano);
             Log.log("El aldeano " + idAldeano + " ha ingresado a la Casa Principal.");
+        }
+
+        public void salir(String idAldeano) {
+            aldeanosEnCasa.remove(idAldeano);
+            Log.log("El aldeano " + idAldeano + " ha salido de la Casa Principal.");
+        }
+
+        public String obtenerIds() {
+            synchronized (aldeanosEnCasa) {
+                return aldeanosEnCasa.isEmpty() ? "Ninguno" : String.join(", ", aldeanosEnCasa);
+            }
         }
     }
 
     public static class PlazaCentral {
+        private final List<String> aldeanosEnPlaza = Collections.synchronizedList(new ArrayList<>());
+
         public void planificar(String idAldeano) {
+            aldeanosEnPlaza.add(idAldeano);
             Log.log("El aldeano " + idAldeano + " está planificando en la Plaza Central.");
+        }
+
+        public void salir(String idAldeano) {
+            aldeanosEnPlaza.remove(idAldeano);
+            Log.log("El aldeano " + idAldeano + " ha salido de la Plaza Central.");
+        }
+
+        public String obtenerIds() {
+            synchronized (aldeanosEnPlaza) {
+                return aldeanosEnPlaza.isEmpty() ? "Ninguno" : String.join(", ", aldeanosEnPlaza);
+            }
         }
     }
 

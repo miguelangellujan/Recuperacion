@@ -13,11 +13,12 @@ public class Almacen implements Zona {
     private final Semaphore semDeposito = new Semaphore(3, true);
     private final Lock lock = new ReentrantLock(true);
     private final Condition espacioDisponible = lock.newCondition();
-    private final Random rnd = new Random();
     private final Lock lockGuerreros = new ReentrantLock(true);
     private final Condition puedeEntrarGuerrero = lockGuerreros.newCondition();
     private final List<Guerrero> guerrerosDentro = new ArrayList<>();
     private final int MAX_GUERREROS = 3;
+    private final List<Aldeano> aldeanosDepositando = new ArrayList<>();
+    private final List<Aldeano> aldeanosEsperando = new ArrayList<>();
 
     public Almacen(String tipo, int capacidad, CentroUrbano centro) {
         this.tipo = tipo;
@@ -25,16 +26,24 @@ public class Almacen implements Zona {
         this.cantidadActual = 0;
         this.centro = centro;
     }
-
     public void depositar(Aldeano aldeano, int cantidad) throws InterruptedException {
         int restante = cantidad;
-
         lock.lock();
         try {
             while (restante > 0) {
+                // Si no hay espacio, esperar bloqueando
                 while (cantidadActual == capacidadMaxima) {
-                    Log.log("El almacén de " + tipo + " está lleno. " + "El aldeano " + aldeano.getIdAldeano() + " espera para depositar.");
-                    espacioDisponible.await();
+                    if (!aldeanosEsperando.contains(aldeano)) {
+                        aldeanosEsperando.add(aldeano);
+                        Log.log("El almacén de " + tipo + " está lleno. El aldeano " + aldeano.getIdAldeano() + " espera para depositar.");
+                    }
+                    espacioDisponible.await(); // espera hasta que haya espacio
+                }
+
+                // Hay espacio, listo para depositar
+                aldeanosEsperando.remove(aldeano);
+                if (!aldeanosDepositando.contains(aldeano)) {
+                    aldeanosDepositando.add(aldeano);
                 }
 
                 int espacio = capacidadMaxima - cantidadActual;
@@ -44,21 +53,26 @@ public class Almacen implements Zona {
                 restante -= aDepositar;
 
                 centro.sumarRecurso(tipo, aDepositar);
-
                 Log.log("El aldeano " + aldeano.getIdAldeano() + " ha depositado " + aDepositar + " de " + tipo + ". Total almacenado: " + cantidadActual);
 
-                // Notifica a otros aldeanos que podría haber espacio disponible
-                espacioDisponible.signalAll();
-
-                if (restante > 0 && cantidadActual == capacidadMaxima) {
+                if (restante > 0) {
                     Log.log("El aldeano " + aldeano.getIdAldeano() + " se queda esperando con " + restante + " de " + tipo + " por falta de espacio.");
+                    aldeanosDepositando.remove(aldeano);
+                    if (!aldeanosEsperando.contains(aldeano)) {
+                        aldeanosEsperando.add(aldeano);
+                    }
+                } else {
+                    // Terminó de depositar
+                    aldeanosDepositando.remove(aldeano);
                 }
+
+                // Notificar a otros posibles aldeanos que puedan ahora depositar
+                espacioDisponible.signalAll();
             }
         } finally {
             lock.unlock();
         }
     }
-
     public int getCantidadActual() {
         return cantidadActual;
     }
@@ -77,7 +91,6 @@ public class Almacen implements Zona {
             lock.unlock();
         }
     }
-
     public synchronized void saquear() {
         int porcentaje = FuncionesComunes.randomBetween(10, 30);
         int robado = (cantidadActual * porcentaje) / 100;
@@ -151,4 +164,22 @@ public class Almacen implements Zona {
             }
         }
     }
+    public String obtenerEstadoAldeanos() {
+        synchronized (this) {
+            StringBuilder dentro = new StringBuilder();
+            for (Aldeano a : aldeanosDepositando) {
+                dentro.append(a.getIdAldeano()).append(", ");
+            }
+            if (dentro.length() > 0) dentro.setLength(dentro.length() - 2);
+
+            StringBuilder esperando = new StringBuilder();
+            for (Aldeano a : aldeanosEsperando) {
+                esperando.append(a.getIdAldeano()).append(", ");
+            }
+            if (esperando.length() > 0) esperando.setLength(esperando.length() - 2);
+
+            return "Depositando: [" + dentro + "] | Esperando: [" + esperando + "]";
+        }
+    }
+
 }

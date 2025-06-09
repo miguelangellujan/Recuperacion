@@ -7,8 +7,12 @@ import java.util.concurrent.locks.ReentrantLock;
 public class AreaRecurso implements Zona {
     private final String tipo;
 
-    private final List<Aldeano> aldeanos = new ArrayList<>();
-    private final int MAX_ALDEANOS = 4;
+    private final List<Aldeano> recolectando = new ArrayList<>();
+    private final List<Aldeano> esperandoEnCola = new ArrayList<>();
+    private final List<Aldeano> dentro = new ArrayList<>();
+
+    private final ReentrantLock lockZona = new ReentrantLock(true);
+    private final Condition puedeEntrarAldeano = lockZona.newCondition();
 
     private boolean enAtaque = false;
     private boolean destruida = false;
@@ -53,7 +57,7 @@ public class AreaRecurso implements Zona {
     }
 
     @Override
-    public boolean enfrentarABarbaro(Barbaro b) throws InterruptedException {
+    public boolean enfrentarABarbaro(Barbaro b) {
         synchronized (guerrerosDentro) {
             if (guerrerosDentro.isEmpty()) return false;
 
@@ -72,72 +76,90 @@ public class AreaRecurso implements Zona {
         }
     }
 
-    public synchronized boolean entrar(Aldeano a) throws InterruptedException {
-        if (destruida) {
-            Log.log(a.getIdAldeano() + " repara el área de " + tipo);
-            Thread.sleep(FuncionesComunes.numRandom(3000, 5000));
-            destruida = false;
-            notifyAll();
-            salir(a);
-            return false;
+    public void entrar(Aldeano a) throws InterruptedException {
+        lockZona.lock();
+        try {
+            if (destruida) {
+                Log.log(a.getIdAldeano() + " no puede entrar, el área está destruida.");
+                return;
+            }
+
+            esperandoEnCola.add(a);
+            while (recolectando.size() >= 3 || enAtaque) {
+                puedeEntrarAldeano.await();
+            }
+            esperandoEnCola.remove(a);
+            recolectando.add(a);
+
+            while (dentro.size() >= 4 || enAtaque) {
+                Log.log(a.getIdAldeano() + " espera para entrar al área de " + tipo +
+                        (enAtaque ? " (está siendo atacada)" : " (área llena)"));
+                puedeEntrarAldeano.await();
+            }
+
+            dentro.add(a);
+            Log.log(a.getIdAldeano() + " ha entrado al área de " + tipo);
+
+        } finally {
+            lockZona.unlock();
         }
-
-        while (aldeanos.size() >= MAX_ALDEANOS || enAtaque) {
-            Log.log(a.getIdAldeano() + " espera para entrar al área de " + tipo +
-                    (enAtaque ? " (está siendo atacada)" : " (área llena)"));
-            wait();
-        }
-
-        aldeanos.add(a);
-        Log.log(a.getIdAldeano() + " ha entrado al área de " + tipo);
-        return true;
-    }
-
-    public synchronized boolean fueAtacadoDurante(Aldeano a) {
-        return enAtaque;
     }
 
     public void salir(Aldeano a) {
-        synchronized (this) {
-            aldeanos.remove(a);
-            notifyAll();
+        lockZona.lock();
+        try {
+            recolectando.remove(a);
+            dentro.remove(a);
+            puedeEntrarAldeano.signalAll();
+        } finally {
+            lockZona.unlock();
         }
     }
 
-    public synchronized void iniciarAtaque() {
-        enAtaque = true;
-        Log.log("Ataque bárbaro en el área de " + tipo);
+    public void iniciarAtaque() {
+        lockZona.lock();
+        try {
+            enAtaque = true;
+            Log.log("Ataque bárbaro en el área de " + tipo);
+        } finally {
+            lockZona.unlock();
+        }
     }
 
-    public synchronized void finalizarAtaque(boolean destruir) {
-        enAtaque = false;
-        if (destruir) {
-            destruida = true;
-            Log.log("El área de " + tipo + " ha sido destruida y requiere reparación.");
-        }
-
-        for (Aldeano a : aldeanos) {
-            Log.log(a.getIdAldeano() + " es expulsado del área de " + tipo + " tras el ataque.");
-            try {
-                salir(a);
-                CentroUrbano cu = getCentroDe(a);
-                if (cu != null)
-                    cu.getAreaRecuperacion().enviarAldeano(a, 12000, 15000);
-            } catch (Exception e) {
-                Log.log("Error al expulsar a " + a.getIdAldeano() + ": " + e.getMessage());
+    public void finalizarAtaque(boolean destruir) {
+        lockZona.lock();
+        try {
+            enAtaque = false;
+            if (destruir) {
+                destruida = true;
+                Log.log("El área de " + tipo + " ha sido destruida y requiere reparación.");
             }
-        }
-        aldeanos.clear();
 
-        // Notificar a los guerreros que el ataque terminó
+            for (Aldeano a : new ArrayList<>(dentro)) {
+                Log.log(a.getIdAldeano() + " es expulsado del área de " + tipo + " tras el ataque.");
+                salir(a);
+                try {
+                    CentroUrbano cu = getCentroDe(a);
+                    if (cu != null)
+                        cu.getAreaRecuperacion().enviarAldeano(a, 12000, 15000);
+                } catch (Exception e) {
+                    Log.log("Error al expulsar a " + a.getIdAldeano() + ": " + e.getMessage());
+                }
+            }
+
+            puedeEntrarAldeano.signalAll();
+
+        } finally {
+            lockZona.unlock();
+        }
+
+        // Notificar también a los guerreros
         lockGuerreros.lock();
         try {
             puedeEntrarGuerrero.signalAll();
         } finally {
             lockGuerreros.unlock();
         }
-
-        notifyAll();
     }
 
     private CentroUrbano getCentroDe(Aldeano a) {
@@ -147,6 +169,36 @@ public class AreaRecurso implements Zona {
             return (CentroUrbano) campo.get(a);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public String obtenerEstadoAldeanos() {
+        lockZona.lock();
+        try {
+            StringBuilder dentroSb = new StringBuilder();
+            for (Aldeano a : recolectando) {
+                dentroSb.append(a.getIdAldeano()).append(", ");
+            }
+            if (dentroSb.length() > 0) dentroSb.setLength(dentroSb.length() - 2);
+
+            StringBuilder colaSb = new StringBuilder();
+            for (Aldeano a : esperandoEnCola) {
+                colaSb.append(a.getIdAldeano()).append(", ");
+            }
+            if (colaSb.length() > 0) colaSb.setLength(colaSb.length() - 2);
+
+            return "Recolectando: [" + dentroSb + "] | Esperando: [" + colaSb + "]";
+        } finally {
+            lockZona.unlock();
+        }
+    }
+
+    public boolean fueAtacadoDurante(Aldeano a) {
+        lockZona.lock();
+        try {
+            return enAtaque;
+        } finally {
+            lockZona.unlock();
         }
     }
 }

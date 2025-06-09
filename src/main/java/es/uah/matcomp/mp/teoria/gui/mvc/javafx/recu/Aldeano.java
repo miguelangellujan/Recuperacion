@@ -6,7 +6,6 @@ public class Aldeano extends Thread {
     private boolean activo = true;
     private boolean esperandoEnEmergencia = false;
 
-
     public Aldeano(String id, CentroUrbano centro) {
         this.id = id;
         this.centro = centro;
@@ -17,7 +16,6 @@ public class Aldeano extends Thread {
     }
 
     public void setEmergencia(boolean estado) {
-        // Puedes optar por actualizar una variable propia, por ejemplo:
         esperandoEnEmergencia = estado;
     }
 
@@ -39,58 +37,78 @@ public class Aldeano extends Thread {
     public void run() {
         try {
             while (activo) {
-                // Comprobar si hay emergencia
+                // === COMPROBAR EMERGENCIA ===
                 if (centro.isEmergenciaActiva()) {
                     Log.log(id + " regresa por emergencia a CASA PRINCIPAL");
+                    centro.getCasaPrincipal().registrarEntrada(id);
                     esperandoEnEmergencia = true;
                     synchronized (this) {
-                        wait(); // espera hasta que pase la emergencia
+                        wait();
                     }
-                    Log.log(id + " reanuda ciclo desde PLAZA CENTRAL");
                     esperandoEnEmergencia = false;
+                    centro.getCasaPrincipal().salir(id);
+                    Log.log(id + " reanuda ciclo desde PLAZA CENTRAL");
+                    centro.getPlazaCentral().planificar(id);
+                    Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                    centro.getPlazaCentral().salir(id);
                 }
 
-                // Paso 1: Casa Principal
+                // === PASO 1: CASA PRINCIPAL ===
                 Log.log(id + " entra en CASA PRINCIPAL");
+                centro.getCasaPrincipal().registrarEntrada(id);
                 Thread.sleep(FuncionesComunes.randomBetween(2000, 4000));
+                centro.getCasaPrincipal().salir(id);
 
-                // Paso 2: Plaza Central
+                // === PASO 2: PLAZA CENTRAL ===
                 Log.log(id + " va a la PLAZA CENTRAL");
+                centro.getPlazaCentral().planificar(id);
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                centro.getPlazaCentral().salir(id);
 
-                // Paso 3: Selección aleatoria de recurso
+                // === PASO 3: Selección de recurso ===
                 String tipo = centro.seleccionarRecursoAleatorio();
                 AreaRecurso area = centro.getArea(tipo);
                 Almacen almacen = centro.getAlmacen(tipo);
 
-                // Paso 4: Intentar entrar al área (esperando si está llena o atacada)
+                // === PASO 4: Entrar en área ===
                 Log.log(id + " intenta entrar en " + tipo);
-                area.entrar(this); // bloquea hasta que pueda entrar
+                area.entrar(this);
 
-                // Paso 5: Recolectar recurso
+                // === PASO 5: Recolectar ===
                 int cantidad = FuncionesComunes.randomBetween(10, 20);
                 Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));
 
-                // Paso 6: Verificar si fue atacado
+                // === PASO 6: Comprobar ataque ===
                 if (area.fueAtacadoDurante(this)) {
                     Log.log(id + " fue atacado mientras recolectaba en " + tipo);
                     area.salir(this);
                     centro.getAreaRecuperacion().enviarAldeano(this, 12000, 15000);
-                    continue; // volver al ciclo desde el principio
+                    continue;
                 }
 
-                // Paso 7: Depositar recursos en el almacén
                 Log.log(id + " recolecta " + cantidad + " unidades de " + tipo);
                 area.salir(this);
+
+                //Ir a Plaza Central antes de depositar
+                Log.log(id + " va a la PLAZA CENTRAL antes de depositar");
+                centro.getPlazaCentral().planificar(id);
+                Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                centro.getPlazaCentral().salir(id);
+
+// === PASO 8: Depositar en almacén ===
                 almacen.depositar(this, cantidad);
 
-                // Paso 8: Notificar a aldeanos que puedan estar esperando
+
+                // === PASO 8: Notificar ===
                 synchronized (area) {
                     area.notifyAll();
                 }
 
-                // Paso 9: Regresa a la plaza central (implícito al repetir el ciclo)
+                // === PASO 9: Volver a Plaza Central ===
                 Log.log(id + " vuelve a la PLAZA CENTRAL");
+                centro.getPlazaCentral().planificar(id);
+                Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                centro.getPlazaCentral().salir(id);
             }
 
         } catch (InterruptedException e) {
