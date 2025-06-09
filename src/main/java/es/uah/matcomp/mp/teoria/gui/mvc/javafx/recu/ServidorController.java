@@ -107,6 +107,10 @@ public class ServidorController {
 
         Platform.runLater(() -> {
             // Actualización de recursos
+            lblComidaRecursos.setText("Comida: " + centro.getRecurso("COMIDA").get());
+            lblMaderaRecursos.setText("Madera: " + centro.getRecurso("MADERA").get());
+            lblOroRecursos.setText("Oro: " + centro.getRecurso("ORO").get());
+
             lblGranja.setText("Granja: " + centro.getArea("COMIDA").getNombreZona() + "\n" + centro.getArea("COMIDA").obtenerEstadoAldeanos());
             lblMina.setText("Mina: " + centro.getArea("ORO").getNombreZona() + "\n" + centro.getArea("ORO").obtenerEstadoAldeanos());
             lblBosque.setText("Bosque: " + centro.getArea("MADERA").getNombreZona() + "\n" + centro.getArea("MADERA").obtenerEstadoAldeanos());
