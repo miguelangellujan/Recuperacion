@@ -35,6 +35,9 @@ public class CentroUrbano {
     private final GestorMejoras mejoras = new GestorMejoras();
     private final AtomicBoolean emergenciaActiva = new AtomicBoolean(false);
 
+    private boolean enEjecucion = true;
+    private Paso paso = new Paso();
+
     public CentroUrbano() {
         granero.añadirInicial(comida.get());
         aserradero.añadirInicial(madera.get());
@@ -259,6 +262,23 @@ public class CentroUrbano {
 
     public Almacen getTesoreria() {
         return tesoreria;
+    }
+
+    // Boton Pausa
+    public synchronized void ejecucion(){
+        enEjecucion = !enEjecucion;
+
+        if (enEjecucion){
+            paso.abrir();
+            System.out.println("Simulación Reanudada");
+        } else {
+            paso.cerrar();
+            System.out.println("Simulación Detenida");
+        }
+    }
+
+    public boolean estadoEjecucion(){
+        return enEjecucion;
     }
 
     public static class CasaPrincipal {

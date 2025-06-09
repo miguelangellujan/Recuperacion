@@ -17,8 +17,8 @@
       <Label fx:id="lblOroRecursos" layoutX="520.0" layoutY="59.0" prefHeight="35.0" prefWidth="71.0" />
       <Label fx:id="lblMaderaRecursos" layoutX="580.0" layoutY="59.0" prefHeight="35.0" prefWidth="71.0" />
       <Label fx:id="lblComidaRecursos" layoutX="660.0" layoutY="59.0" prefHeight="35.0" prefWidth="71.0" />
-      <Button layoutX="763.0" layoutY="48.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="114.0" text="Campana" />
-      <Button layoutX="913.0" layoutY="49.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="101.0" text="Pausa" />
+      <Button fx:id="btnAlarma" layoutX="763.0" layoutY="48.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="114.0" text="Campana" />
+      <Button fx:id="btnPausa" layoutX="913.0" layoutY="49.0" onAction="#ejecucion" mnemonicParsing="false" prefHeight="45.0" prefWidth="101.0" text="Detener" />
 
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d0d8df" height="548.0" layoutX="14.0" layoutY="136.0" stroke="WHITE" strokeType="INSIDE" width="270.0" />
       <Label layoutX="89.0" layoutY="150.0" text="Almacenes" textFill="WHITE">

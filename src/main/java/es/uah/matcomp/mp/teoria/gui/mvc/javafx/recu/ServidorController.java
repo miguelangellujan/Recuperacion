@@ -2,6 +2,7 @@ package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
@@ -58,30 +59,15 @@ public class ServidorController {
     private Label lblAreaRecuperacion;
     @FXML
     private Label lblCasaPrincipal;
+    @FXML
+    private Button btnPausa;
+    @FXML
+    private Button btnAlarma;
 
     private CentroUrbano centro = new CentroUrbano(); // crea 2 aldeanos iniciales
 
     @FXML
     public void initialize() {
-        /* Esto nose si lo tienes que hacer revisalo en el enunciado
-        // Fijamos los costos de unidades y mejoras en los TextField correspondientes
-        ComidaGuerreros.setText("50");
-        MaderaGuerreros.setText("50");
-        OroGuerreros.setText("80");
-        ComidaAldeanos.setText("50");
-        MaderaHerramientas.setText("120");
-        OroHerramientas.setText("80");
-        ComidaArmas.setText("150");
-        OroArmas.setText("100");
-        MaderaAlmacenM.setText("150");
-        OroAlmacenM.setText("50");
-
-        // Asignamos nombres fijos a las áreas de recursos
-        Mina.setText("Mina");
-        Bosque.setText("Bosque");
-        Granja.setText("Granja");
-         */
-
         // Hilo para crear aldeanos automáticamente cada 20 segundos (si hay comida)
         new Thread(() -> crearAldeano()).start();
 
@@ -91,14 +77,20 @@ public class ServidorController {
         // Hilo opcional para mostrar recursos cada 10 s (modo consola)
 
         // Hilo para actualizar la interfaz cada segundo
+        inicializarActualizacion();
+
+        btnPausa.setOnAction(event -> ejecucion());
+    }
+
+    private void inicializarActualizacion(){
         new Thread(() -> {
-            while(true) {
-                actualizarInterfaz();
-                try{
+            try {
+                while (centro.estadoEjecucion()){
+                    Platform.runLater(this::actualizarInterfaz);
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    Log.log("Error actualizando la interfaz");
                 }
+            } catch (Exception e){
+                Log.log("Error al actualizar RMI: " + e.getMessage());
             }
         }).start();
     }
@@ -159,6 +151,25 @@ public class ServidorController {
                 Thread.currentThread().interrupt();
                 break;
             }
+        }
+    }
+
+    @FXML
+    private void ejecucion(){
+        try {
+            centro.ejecucion();
+            actualizarBoton();
+        } catch (Exception ex) {
+            Log.log("Error al cambiar de estado de ejecución: " + ex.getMessage());
+        }
+    }
+
+    private void actualizarBoton() {
+        try {
+            boolean enEjecucion = centro.estadoEjecucion();
+            btnPausa.setText(enEjecucion ? "Detener" : "Reanudar");
+        } catch (Exception e) {
+            Log.log("Error al actualizar Boton: " + e.getMessage());
         }
     }
 }
