@@ -19,6 +19,10 @@ public class Barbaro extends Thread {
         return id;
     }
 
+    public boolean estaAtacando() {
+        return !puedeAtacar;
+    }
+
     @Override
     public void run() {
         try {

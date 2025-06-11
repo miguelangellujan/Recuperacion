@@ -9,8 +9,6 @@ import javafx.scene.control.TextField;
 import java.io.IOException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ClienteController {
     @FXML

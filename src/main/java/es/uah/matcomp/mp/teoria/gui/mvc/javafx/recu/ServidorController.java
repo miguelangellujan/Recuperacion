@@ -158,7 +158,7 @@ public class ServidorController {
 
             // Estado de los bárbaros
             lblZonaPreparacion.setText(centro.getZonaPreparacion().obtenerIdsEnPreparacion());
-            lblCampamentoBarbaro.setText(centro.obtenerIdsBarbaros());
+            lblCampamentoBarbaro.setText(centro.obtenerIdsBarbarosEnCampamento());
         });
     }
 

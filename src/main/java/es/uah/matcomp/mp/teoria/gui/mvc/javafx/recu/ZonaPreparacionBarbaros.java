@@ -26,6 +26,10 @@ public class ZonaPreparacionBarbaros {
         }
     }
 
+    public List<Barbaro> getBarbarosEsperando() {
+        return esperando;
+    }
+
     public String obtenerIdsEnPreparacion(){
         synchronized (lock){
             return esperando.stream().map(Barbaro :: getIdBarbaro).reduce((a, b) -> a + ", " + b).orElse("Ninguno");

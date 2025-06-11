@@ -15,6 +15,33 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
         this.centro = centroUrbano;
     }
 
+    // Número de Bárbaros en el campamento y en la zona de preparación
+    @Override
+    public String barbarosZonaPreparacion() throws RemoteException {
+        return centro.getZonaPreparacion().obtenerIdsEnPreparacion();
+    }
+
+    @Override
+    public String barbarosCampamento() throws RemoteException {
+        return centro.obtenerIdsBarbarosEnCampamento();
+    }
+
+    // Estado de los recursos almacenados (cantidad actual / capacidad máxima)
+    @Override
+    public int getComida() throws RemoteException {
+        return centro.getRecurso("COMIDA").get();
+    }
+
+    @Override
+    public int getMadera() throws RemoteException {
+        return centro.getRecurso("MADERA").get();
+    }
+
+    @Override
+    public int getOro() throws RemoteException {
+        return centro.getRecurso("ORO").get();
+    }
+
     // Botón de Emergencia
     @Override
     public boolean isEmergenciaActiva() throws RemoteException {

@@ -200,6 +200,17 @@ public class CentroUrbano {
         }
     }
 
+    public String obtenerIdsBarbarosEnCampamento() {
+        synchronized (barbaros) {
+            List<Barbaro> esperando = zonaPreparacion.getBarbarosEsperando();
+
+            return barbaros.stream()
+                    .filter(b -> !esperando.contains(b) && !b.estaAtacando())
+                    .map(Barbaro :: getIdBarbaro)
+                    .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+        }
+    }
+
     public String obtenerIdsCasaPrincipal() {
         return casaPrincipal.obtenerIds();
     }
