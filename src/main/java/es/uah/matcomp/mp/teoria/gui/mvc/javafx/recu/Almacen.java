@@ -1,9 +1,7 @@
 package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 
 import java.util.*;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.*;
 
 public class Almacen implements Zona {
     private final String tipo;
@@ -16,11 +14,48 @@ public class Almacen implements Zona {
     private final List<Aldeano> aldeanosDepositando = new ArrayList<>();
     private final List<Aldeano> aldeanosEsperando = new ArrayList<>();
 
+    // Constructor
     public Almacen(String tipo, int capacidad, CentroUrbano centro) {
         this.tipo = tipo;
         this.capacidadMaxima = capacidad;
         this.cantidadActual = 0;
         this.centro = centro;
+    }
+
+    // Getters
+    public int getCantidadActual() {
+        return cantidadActual;
+    }
+
+    public int getCapacidadMaxima(){
+        return capacidadMaxima;
+    }
+
+    // Funciones Interface Zona
+    @Override
+    public boolean entrarGuerrero(Guerrero g) throws InterruptedException {
+        // En el almacén no se necesita controlar la entrada de guerreros de forma específica.
+        // Se retorna true para cumplir con el contrato de la interfaz Zona.
+        return true;
+    }
+
+    @Override
+    public void salirGuerrero(Guerrero g) {
+        // Para el almacén, no se requiere ninguna acción especial al salir un guerrero.
+        // Este método se implementa como un stub vacío para satisfacer la interfaz.
+    }
+
+    @Override
+    public String getNombreZona() {
+        return "Almacén de " + tipo;
+    }
+
+    @Override
+    public boolean enfrentarABarbaro(Barbaro b) throws InterruptedException {
+        // En el contexto del almacén, el método de combate no se utiliza directamente.
+        // Se retorna true para indicar que el almacén "permite" que el ataque continúe
+        // (en la práctica, el ataque se gestiona mediante el método saquear()).
+        return true;
     }
 
     public void depositar(Aldeano aldeano, int cantidad) throws InterruptedException {
@@ -68,14 +103,6 @@ public class Almacen implements Zona {
         }
     }
 
-    public int getCantidadActual() {
-        return cantidadActual;
-    }
-
-    public int getCapacidadMaxima(){
-        return capacidadMaxima;
-    }
-
     public void aumentarCapacidad(int cantidad) {
         synchronized (lock){
             capacidadMaxima += cantidad;
@@ -105,31 +132,6 @@ public class Almacen implements Zona {
         }
     }
 
-    @Override
-    public boolean entrarGuerrero(Guerrero g) throws InterruptedException {
-        // En el almacén no se necesita controlar la entrada de guerreros de forma específica.
-        // Se retorna true para cumplir con el contrato de la interfaz Zona.
-        return true;
-    }
-
-    @Override
-    public void salirGuerrero(Guerrero g) {
-        // Para el almacén, no se requiere ninguna acción especial al salir un guerrero.
-        // Este método se implementa como un stub vacío para satisfacer la interfaz.
-    }
-
-    @Override
-    public String getNombreZona() {
-        return "Almacén de " + tipo;
-    }
-
-    @Override
-    public boolean enfrentarABarbaro(Barbaro b) throws InterruptedException {
-        // En el contexto del almacén, el método de combate no se utiliza directamente.
-        // Se retorna true para indicar que el almacén "permite" que el ataque continúe
-        // (en la práctica, el ataque se gestiona mediante el método saquear()).
-        return true;
-    }
     public String obtenerEstadoAldeanos() {
         synchronized (lock) {
             StringBuilder dentro = new StringBuilder();
@@ -148,6 +150,7 @@ public class Almacen implements Zona {
         }
     }
 
+    // Sacar a los aldeanos del almacén cuando se pulsa el botón de alarma
     public void liberarAldeanos(){
         synchronized (lock){
             aldeanosDepositando.clear();

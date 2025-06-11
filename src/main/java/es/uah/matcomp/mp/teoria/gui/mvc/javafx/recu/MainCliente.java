@@ -15,11 +15,13 @@ public class MainCliente extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("clienteRMI.fxml"));
         Parent root = loader.load();
 
-        ServidorController app = loader.getController();
+        ClienteController app = loader.getController();
 
         stage.setTitle("Age of Threads - Remoto");
         stage.setScene(new Scene(root));
-        stage.show();}
+        stage.show();
+    }
+
     public static void main(String[] args) {
         launch(args);
     }

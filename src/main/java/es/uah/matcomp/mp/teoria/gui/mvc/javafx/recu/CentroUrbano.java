@@ -12,16 +12,16 @@ public class CentroUrbano {
     private final AtomicInteger idGuerrero = new AtomicInteger(1);
     private final AtomicInteger idBarbaro = new AtomicInteger(1);
 
-    public final AreaRecurso granja = new AreaRecurso("COMIDA");
-    public final AreaRecurso bosque = new AreaRecurso("MADERA");
-    public final AreaRecurso mina = new AreaRecurso("ORO");
+    private final AreaRecurso granja = new AreaRecurso("COMIDA");
+    private final AreaRecurso bosque = new AreaRecurso("MADERA");
+    private final AreaRecurso mina = new AreaRecurso("ORO");
 
-    public final Almacen granero = new Almacen("COMIDA", 200, this);
-    public final Almacen aserradero = new Almacen("MADERA", 150, this);
-    public final Almacen tesoreria = new Almacen("ORO", 50, this);
+    private final Almacen granero = new Almacen("COMIDA", 200, this);
+    private final Almacen aserradero = new Almacen("MADERA", 150, this);
+    private final Almacen tesoreria = new Almacen("ORO", 50, this);
 
-    public final AreaRecuperacion areaRecuperacion = new AreaRecuperacion();
-    public final ZonaPreparacionBarbaros zonaPreparacion = new ZonaPreparacionBarbaros(this);
+    private final AreaRecuperacion areaRecuperacion = new AreaRecuperacion();
+    private final ZonaPreparacionBarbaros zonaPreparacion = new ZonaPreparacionBarbaros(this);
 
     private final CasaPrincipal casaPrincipal = new CasaPrincipal();
     private final PlazaCentral plazaCentral = new PlazaCentral();
@@ -34,6 +34,7 @@ public class CentroUrbano {
     private final GestorMejoras mejoras;
     private final AtomicBoolean emergenciaActiva = new AtomicBoolean(false);
 
+    // Constructor
     public CentroUrbano() {
         mejoras = new GestorMejoras(this);
         granero.añadirInicial(comida.get());
@@ -49,6 +50,48 @@ public class CentroUrbano {
         }
     }
 
+    // Geters para acceso a variables
+    public List<Aldeano> getAldeanos() {
+        return aldeanos;
+    }
+
+    public AreaRecuperacion getAreaRecuperacion() {
+        return areaRecuperacion;
+    }
+
+    public GestorMejoras getGestorMejoras() {
+        return mejoras;
+    }
+
+    public ZonaPreparacionBarbaros getZonaPreparacion() {
+        return zonaPreparacion;
+    }
+
+    public CasaPrincipal getCasaPrincipal() {
+        return casaPrincipal;
+    }
+
+    public PlazaCentral getPlazaCentral() {
+        return plazaCentral;
+    }
+
+    public Cuartel getCuartel() {
+        return cuartel;
+    }
+
+    public Almacen getGranero() {
+        return granero;
+    }
+
+    public Almacen getAserradero() {
+        return aserradero;
+    }
+
+    public Almacen getTesoreria() {
+        return tesoreria;
+    }
+
+    // Crear Individuos
     public synchronized void crearAldeano() {
         if (comida.get() >= 50) {
             comida.addAndGet(-50);
@@ -86,6 +129,8 @@ public class CentroUrbano {
         Log.log("Se ha generado el bárbaro " + id);
     }
 
+
+    // Funciones relacionadas con los recursos
     public String seleccionarRecursoAleatorio() {
         String[] tipos = {"COMIDA", "MADERA", "ORO"};
         return tipos[new Random().nextInt(tipos.length)];
@@ -109,33 +154,73 @@ public class CentroUrbano {
         };
     }
 
-    public void activarEmergencia() {
-        boolean nuevoEstado = !emergenciaActiva.get();
-        emergenciaActiva.set(nuevoEstado);
+    public AtomicInteger getRecurso(String tipo) {
+        return switch (tipo.toUpperCase()) {
+            case "COMIDA" -> comida;
+            case "MADERA" -> madera;
+            case "ORO" -> oro;
+            default -> throw new IllegalArgumentException("Recurso inválido: " + tipo);
+        };
+    }
 
-        if (nuevoEstado) {
-            Log.log("¡Emergencia activada! Los aldeanos regresan a CASA PRINCIPAL.");
-
-            granero.liberarAldeanos();
-            aserradero.liberarAldeanos();
-            tesoreria.liberarAldeanos();
-
-            for(Aldeano a : aldeanos){
-                a.setEmergencia(true);
-                a.moverACasaPrincipal();
-            }
-        } else {
-            Log.log("¡Emergencia desactivada! Los aldeanos retoman su trabajo.");
-
-            for(Aldeano a : aldeanos){
-                a.setEmergencia(false);
-                synchronized (a){
-                    a.notify();
-                }
-            }
+    public void sumarRecurso(String tipo, int cantidad) {
+        switch (tipo) {
+            case "COMIDA" -> comida.updateAndGet(current -> Math.min(current + cantidad, granero.getCapacidadMaxima()));
+            case "MADERA" -> madera.updateAndGet(current -> Math.min(current + cantidad, aserradero.getCapacidadMaxima()));
+            case "ORO" -> oro.updateAndGet(current -> Math.min(current + cantidad, tesoreria.getCapacidadMaxima()));
+            default -> throw new IllegalArgumentException("Tipo de recurso inválido: " + tipo);
         }
     }
 
+    public void restarRecurso(String tipo, int cantidad) {
+        switch (tipo) {
+            case "COMIDA" -> comida.updateAndGet(current -> Math.max(current - cantidad, 0));
+            case "MADERA" -> madera.updateAndGet(current -> Math.max(current - cantidad, 0));
+            case "ORO" -> oro.updateAndGet(current -> Math.max(current - cantidad, 0));
+            default -> throw new IllegalArgumentException("Tipo de recurso inválido: " + tipo);
+        }
+    }
+
+    // Obtener ids para la actualización de la interfaz
+    public String obtenerIdsAldeanos() {
+        synchronized (aldeanos) {
+            return aldeanos.stream().map(Aldeano::getIdAldeano).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+        }
+    }
+
+    public String obtenerIdsGuerreros() {
+        synchronized (guerreros) {
+            return guerreros.stream().map(Guerrero::getIdGuerrero).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+        }
+    }
+
+    public String obtenerIdsBarbaros() {
+        synchronized (barbaros) {
+            return barbaros.stream().map(Barbaro::getIdBarbaro).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+        }
+    }
+
+    public String obtenerIdsCasaPrincipal() {
+        return casaPrincipal.obtenerIds();
+    }
+
+    public String obtenerIdsPlazaCentral() {
+        return plazaCentral.obtenerIds();
+    }
+
+    public int contarAldeanos() {
+        return aldeanos.size();
+    }
+
+    public int contarGuerreros() {
+        return guerreros.size();
+    }
+
+    public int contarBarbarosCampamento() {
+        return barbaros.size();
+    }
+
+    // Funciones para el ataque
     public void entrenar(Guerrero g) throws InterruptedException {
         cuartel.entrenar(g);
     }
@@ -167,111 +252,7 @@ public class CentroUrbano {
         }
     }
 
-    public AreaRecuperacion getAreaRecuperacion() {
-        return areaRecuperacion;
-    }
-
-    public boolean isEmergenciaActiva() {
-        return emergenciaActiva.get();
-    }
-
-    public GestorMejoras getGestorMejoras() {
-        return mejoras;
-    }
-
-    public AtomicInteger getRecurso(String tipo) {
-        return switch (tipo.toUpperCase()) {
-            case "COMIDA" -> comida;
-            case "MADERA" -> madera;
-            case "ORO" -> oro;
-            default -> throw new IllegalArgumentException("Recurso inválido: " + tipo);
-        };
-    }
-
-    public void sumarRecurso(String tipo, int cantidad) {
-        switch (tipo) {
-            case "COMIDA" -> comida.updateAndGet(current -> Math.min(current + cantidad, granero.getCapacidadMaxima()));
-            case "MADERA" -> madera.updateAndGet(current -> Math.min(current + cantidad, aserradero.getCapacidadMaxima()));
-            case "ORO" -> oro.updateAndGet(current -> Math.min(current + cantidad, tesoreria.getCapacidadMaxima()));
-            default -> throw new IllegalArgumentException("Tipo de recurso inválido: " + tipo);
-        }
-    }
-
-    public void restarRecurso(String tipo, int cantidad) {
-        switch (tipo) {
-            case "COMIDA" -> comida.updateAndGet(current -> Math.max(current - cantidad, 0));
-            case "MADERA" -> madera.updateAndGet(current -> Math.max(current - cantidad, 0));
-            case "ORO" -> oro.updateAndGet(current -> Math.max(current - cantidad, 0));
-            default -> throw new IllegalArgumentException("Tipo de recurso inválido: " + tipo);
-        }
-    }
-
-    public String obtenerIdsAldeanos() {
-        synchronized (aldeanos) {
-            return aldeanos.stream().map(Aldeano::getIdAldeano).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
-        }
-    }
-
-    public String obtenerIdsGuerreros() {
-        synchronized (guerreros) {
-            return guerreros.stream().map(Guerrero::getIdGuerrero).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
-        }
-    }
-
-    public String obtenerIdsBarbaros() {
-        synchronized (barbaros) {
-            return barbaros.stream().map(Barbaro::getIdBarbaro).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
-        }
-    }
-
-    public String obtenerIdsCasaPrincipal() {
-        return casaPrincipal.obtenerIds();
-    }
-
-    public String obtenerIdsPlazaCentral() {
-        return plazaCentral.obtenerIds();
-    }
-
-    public ZonaPreparacionBarbaros getZonaPreparacion() {
-        return zonaPreparacion;
-    }
-
-    public CasaPrincipal getCasaPrincipal() {
-        return casaPrincipal;
-    }
-
-    public PlazaCentral getPlazaCentral() {
-        return plazaCentral;
-    }
-
-    public Cuartel getCuartel() {
-        return cuartel;
-    }
-
-    public int contarAldeanos() {
-        return aldeanos.size();
-    }
-
-    public int contarGuerreros() {
-        return guerreros.size();
-    }
-
-    public int contarBarbarosCampamento() {
-        return barbaros.size();
-    }
-
-    public Almacen getGranero() {
-        return granero;
-    }
-
-    public Almacen getAserradero() {
-        return aserradero;
-    }
-
-    public Almacen getTesoreria() {
-        return tesoreria;
-    }
-
+    // Emergencia
     public void setEmergencia(boolean estado) {
         for (Aldeano a : aldeanos) {
             a.setEmergencia(estado);  // Esto interrumpe a los aldeanos (mira la clase Aldeano)
@@ -285,6 +266,38 @@ public class CentroUrbano {
         return emergenciaActiva.get();
     }
 
+    public boolean isEmergenciaActiva() {
+        return emergenciaActiva.get();
+    }
+
+    public void activarEmergencia() {
+        boolean nuevoEstado = !emergenciaActiva.get();
+        emergenciaActiva.set(nuevoEstado);
+
+        if (nuevoEstado) {
+            Log.log("¡Emergencia activada! Los aldeanos regresan a CASA PRINCIPAL.");
+
+            granero.liberarAldeanos();
+            aserradero.liberarAldeanos();
+            tesoreria.liberarAldeanos();
+
+            for(Aldeano a : aldeanos){
+                a.setEmergencia(true);
+                a.moverACasaPrincipal();
+            }
+        } else {
+            Log.log("¡Emergencia desactivada! Los aldeanos retoman su trabajo.");
+
+            for(Aldeano a : aldeanos){
+                a.setEmergencia(false);
+                synchronized (a){
+                    a.notify();
+                }
+            }
+        }
+    }
+
+    // Clases
     public static class CasaPrincipal {
         private final List<String> aldeanosEnCasa = Collections.synchronizedList(new ArrayList<>());
 

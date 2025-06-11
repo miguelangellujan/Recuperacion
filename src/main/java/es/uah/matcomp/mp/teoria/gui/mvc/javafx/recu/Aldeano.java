@@ -7,6 +7,7 @@ public class Aldeano extends Thread {
     private boolean emergencia = false;
     private volatile boolean esperandoEnEmergencia = false;
 
+    // Constructor
     public Aldeano(String id, CentroUrbano centro) {
         this.id = id;
         this.centro = centro;
@@ -14,6 +15,13 @@ public class Aldeano extends Thread {
 
     public String getIdAldeano() {
         return id;
+    }
+
+    // Emergencia
+    private void checkYEsperarEmergencia() throws InterruptedException {
+        if (centro.isEmergenciaActiva()) {
+            throw new InterruptedException("Emergencia activa, interrumpir para ir a Casa Principal");
+        }
     }
 
     public void setEmergencia(boolean estado) {
@@ -24,7 +32,7 @@ public class Aldeano extends Thread {
         }
     }
 
-    public void moverACasaPrincipal(){
+    public void moverACasaPrincipal() {
         synchronized (this) {
             if(!esperandoEnEmergencia){
                 esperandoEnEmergencia = true;
@@ -41,6 +49,21 @@ public class Aldeano extends Thread {
             centro.getCasaPrincipal().registrarEntrada(id);
             Log.log(id + " se ha movido a la Clase Principal por emergencia.");
         }
+    }
+
+    private void esperarFinEmergencia() throws InterruptedException {
+        esperandoEnEmergencia = true;
+
+        moverACasaPrincipal();
+
+        // Espera hasta que la emergencia se desactive.
+        while (centro.isEmergenciaActiva()) {
+            synchronized (this) {
+                wait();
+            }
+        }
+
+        moverAPlazaCentral();
     }
 
     public void moverAPlazaCentral(){
@@ -128,7 +151,7 @@ public class Aldeano extends Thread {
                 // Si la interrupción es debido a la emergencia...
                 if (activo && centro.isEmergenciaActiva()) {
                     try {
-                        irCasaPrincipalYEsperarFinEmergencia();
+                        esperarFinEmergencia();
                     } catch (InterruptedException ie) {
                         // Si otra interrupción ocurre en esta fase, finaliza el hilo.
                         activo = false;
@@ -141,35 +164,5 @@ public class Aldeano extends Thread {
                 }
             }
         }
-    }
-
-    /**
-     * Método que comprueba si hay una emergencia activa y, de ser así,
-     * lanza una excepción para desencadenar la rutina de emergencia.
-     */
-    private void checkYEsperarEmergencia() throws InterruptedException {
-        if (centro.isEmergenciaActiva()) {
-            throw new InterruptedException("Emergencia activa, interrumpir para ir a Casa Principal");
-        }
-    }
-
-    /**
-     * Simula el regreso del aldeano a la CASA PRINCIPAL con un retardo
-     * aleatorio (entre 2 y 5 segundos) y espera de forma pasiva hasta que
-     * se desactive la emergencia.
-     */
-    private void irCasaPrincipalYEsperarFinEmergencia() throws InterruptedException {
-        esperandoEnEmergencia = true;
-
-        moverACasaPrincipal();
-
-        // Espera hasta que la emergencia se desactive.
-        while (centro.isEmergenciaActiva()) {
-            synchronized (this) {
-                wait();
-            }
-        }
-
-        moverAPlazaCentral();
     }
 }

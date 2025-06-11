@@ -7,6 +7,7 @@ public class GestorMejoras {
     private int nivelAlmacenes = 0;
     private final CentroUrbano centro;
 
+    // Constructor
     public GestorMejoras(CentroUrbano centro) {
         this.centro = centro;
     }

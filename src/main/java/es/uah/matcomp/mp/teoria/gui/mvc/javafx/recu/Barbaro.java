@@ -8,9 +8,15 @@ public class Barbaro extends Thread {
     private static final Random rnd = new Random();
     private boolean puedeAtacar = true;
 
+    // Constructor
     public Barbaro(String id, CentroUrbano centro) {
         this.id = id;
         this.centro = centro;
+    }
+
+    // Getter
+    public String getIdBarbaro() {
+        return id;
     }
 
     @Override
@@ -59,8 +65,5 @@ public class Barbaro extends Thread {
             Log.log(id + " fue interrumpido.");
             Thread.currentThread().interrupt();
         }
-    }
-    public String getIdBarbaro() {
-        return id;
     }
 }

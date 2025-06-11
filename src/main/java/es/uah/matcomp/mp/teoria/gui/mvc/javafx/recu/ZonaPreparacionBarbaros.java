@@ -15,8 +15,21 @@ public class ZonaPreparacionBarbaros {
 
     private final CentroUrbano centro;
 
+    // Constructor
     public ZonaPreparacionBarbaros(CentroUrbano centro) {
         this.centro = centro;
+    }
+
+    public int getBarbarosEnPreparacion(){
+        synchronized (lock){
+            return esperando.size();
+        }
+    }
+
+    public String obtenerIdsEnPreparacion(){
+        synchronized (lock){
+            return esperando.stream().map(Barbaro :: getIdBarbaro).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+        }
     }
 
     public Zona esperarGrupo(Barbaro b) throws InterruptedException {
@@ -71,17 +84,5 @@ public class ZonaPreparacionBarbaros {
         return rnd.nextDouble() < 0.6
                 ? almacenes.get(rnd.nextInt(almacenes.size()))
                 : recursos.get(rnd.nextInt(recursos.size()));
-    }
-
-    public int getBarbarosEnPreparacion(){
-        synchronized (lock){
-            return esperando.size();
-        }
-    }
-
-    public String obtenerIdsEnPreparacion(){
-        synchronized (lock){
-            return esperando.stream().map(Barbaro :: getIdBarbaro).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
-        }
     }
 }

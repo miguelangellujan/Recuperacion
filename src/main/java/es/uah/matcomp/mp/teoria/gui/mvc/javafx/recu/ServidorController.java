@@ -6,6 +6,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+import java.io.IOException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -72,11 +75,23 @@ public class ServidorController {
 
     @FXML
     public void initialize() {
+        try {
+            ImplementacionRMI servidor = new ImplementacionRMI(centro);
+
+            Registry registry = LocateRegistry.createRegistry(1099);
+            registry.rebind("AgeOfThreadsService", servidor);
+
+            Log.log("Servidor Age of Threads Arrancado");
+        } catch (IOException e){
+            Log.log("Error en el servidor: " + e.getMessage());
+        }
+
         iniciarHilos();
         btnDetener.setOnAction(event -> ejecucion());
         btnCampana.setOnAction(event -> activarCampana());
     }
 
+    // Inicializar los hilos donde se crean los individuos
     private void iniciarHilos(){
         Thread hiloAldeano = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()){
@@ -113,7 +128,8 @@ public class ServidorController {
         hilosActivos.add(hiloInterfaz);
         hiloInterfaz.start();
     }
-    
+
+    // Actualizar la información que aparece en la interfaz
     private void actualizarInterfaz() {
 
         Platform.runLater(() -> {
@@ -173,6 +189,7 @@ public class ServidorController {
         }
     }
 
+    // Funciones para el funcionamiento del botón de pausa
     @FXML
     private void ejecucion(){
         enPausa = !enPausa;
@@ -188,9 +205,10 @@ public class ServidorController {
         btnDetener.setText(enPausa ? "Reanudar" : "Detener");
     }
 
+    // Función para el botón de la emergencia
     @FXML
     private void activarCampana() {
-        // Ahora obtenemos el estado actual desde CentroUrbano (deberías tener un método isEmergenciaActiva)
+        // Ahora obtenemos el estado actual desde CentroUrbano
         boolean estadoActual = !centro.isEmergenciaActiva();
 
         // Llamamos a activarEmergencia, que alterna el estado y notifica aldeanos

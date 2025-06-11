@@ -22,10 +22,12 @@ public class AreaRecurso implements Zona {
     private final List<Guerrero> guerrerosDentro = new ArrayList<>();
     private final int MAX_GUERREROS = 3;
 
+    // Constructor
     public AreaRecurso(String tipo) {
         this.tipo = tipo;
     }
 
+    // Funciones Interface Zona
     @Override
     public boolean entrarGuerrero(Guerrero g) throws InterruptedException {
         lockGuerreros.lock();
@@ -76,6 +78,7 @@ public class AreaRecurso implements Zona {
         }
     }
 
+    // Acceso al área de recurso
     public void entrar(Aldeano a) throws InterruptedException {
         lockZona.lock();
         try {
@@ -117,6 +120,7 @@ public class AreaRecurso implements Zona {
         }
     }
 
+    // Ataque
     public void iniciarAtaque() {
         lockZona.lock();
         try {
@@ -163,6 +167,15 @@ public class AreaRecurso implements Zona {
         }
     }
 
+    public boolean fueAtacadoDurante(Aldeano a) {
+        lockZona.lock();
+        try {
+            return enAtaque;
+        } finally {
+            lockZona.unlock();
+        }
+    }
+
     private CentroUrbano getCentroDe(Aldeano a) {
         try {
             java.lang.reflect.Field campo = Aldeano.class.getDeclaredField("centro");
@@ -189,15 +202,6 @@ public class AreaRecurso implements Zona {
             if (colaSb.length() > 0) colaSb.setLength(colaSb.length() - 2);
 
             return "Recolectando: "+ dentroSb + "\n\nEsperando: " + colaSb ;
-        } finally {
-            lockZona.unlock();
-        }
-    }
-
-    public boolean fueAtacadoDurante(Aldeano a) {
-        lockZona.lock();
-        try {
-            return enAtaque;
         } finally {
             lockZona.unlock();
         }
