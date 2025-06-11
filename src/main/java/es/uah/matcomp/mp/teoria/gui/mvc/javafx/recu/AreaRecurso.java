@@ -187,7 +187,7 @@ public class AreaRecurso implements Zona {
             }
             if (colaSb.length() > 0) colaSb.setLength(colaSb.length() - 2);
 
-            return "Recolectando: [" + dentroSb + "] | Esperando: [" + colaSb + "]";
+            return "Recolectando: "+ dentroSb + "\n\nEsperando: " + colaSb ;
         } finally {
             lockZona.unlock();
         }

@@ -3,8 +3,9 @@ package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 public class Aldeano extends Thread {
     private final String id;
     private final CentroUrbano centro;
-    private boolean activo = true;
-    private boolean esperandoEnEmergencia = false;
+    private volatile boolean activo = true;
+    private boolean emergencia = false;
+    private volatile boolean esperandoEnEmergencia = false;
 
     public Aldeano(String id, CentroUrbano centro) {
         this.id = id;
@@ -15,12 +16,21 @@ public class Aldeano extends Thread {
         return id;
     }
 
-    public void setEmergencia(boolean estado) {
-        esperandoEnEmergencia = estado;
-    }
-
     public boolean isEsperandoEnEmergencia() {
         return esperandoEnEmergencia;
+    }
+
+    public void setEmergencia(boolean estado) {
+        emergencia = estado;
+        if (estado) {
+            // Interrumpe cualquier espera o sleep activo para forzar la comprobación de emergencia.
+            this.interrupt();
+        }
+    }
+
+    public void detener() {
+        activo = false;
+        this.interrupt(); // para salir de cualquier sleep o wait
     }
 
     public void continuarTrasEmergencia() {
@@ -29,56 +39,45 @@ public class Aldeano extends Thread {
         }
     }
 
-    public CentroUrbano getCentro() {
-        return centro;
-    }
-
     @Override
     public void run() {
-        try {
-            while (activo) {
-                // === COMPROBAR EMERGENCIA ===
-                if (centro.isEmergenciaActiva()) {
-                    Log.log(id + " regresa por emergencia a CASA PRINCIPAL");
-                    centro.getCasaPrincipal().registrarEntrada(id);
-                    esperandoEnEmergencia = true;
-                    synchronized (this) {
-                        wait();
-                    }
-                    esperandoEnEmergencia = false;
-                    centro.getCasaPrincipal().salir(id);
-                    Log.log(id + " reanuda ciclo desde PLAZA CENTRAL");
-                    centro.getPlazaCentral().planificar(id);
-                    Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
-                    centro.getPlazaCentral().salir(id);
-                }
+        while (activo) {
+            try {
+                // Antes de cada acción, comprobamos si hay emergencia
+                checkYEsperarEmergencia();
 
-                // === PASO 1: CASA PRINCIPAL ===
+                // Empezamos el ciclo normal
+                centro.getPaso().mirar();
+
                 Log.log(id + " entra en CASA PRINCIPAL");
                 centro.getCasaPrincipal().registrarEntrada(id);
                 Thread.sleep(FuncionesComunes.randomBetween(2000, 4000));
                 centro.getCasaPrincipal().salir(id);
 
-                // === PASO 2: PLAZA CENTRAL ===
+                checkYEsperarEmergencia();
+
+                centro.getPaso().mirar();
                 Log.log(id + " va a la PLAZA CENTRAL");
                 centro.getPlazaCentral().planificar(id);
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
                 centro.getPlazaCentral().salir(id);
 
-                // === PASO 3: Selección de recurso ===
                 String tipo = centro.seleccionarRecursoAleatorio();
                 AreaRecurso area = centro.getArea(tipo);
                 Almacen almacen = centro.getAlmacen(tipo);
 
-                // === PASO 4: Entrar en área ===
+                checkYEsperarEmergencia();
+
+                centro.getPaso().mirar();
                 Log.log(id + " intenta entrar en " + tipo);
                 area.entrar(this);
 
-                // === PASO 5: Recolectar ===
-                int cantidad = FuncionesComunes.randomBetween(10, 20);
-                Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));
+                checkYEsperarEmergencia();
 
-                // === PASO 6: Comprobar ataque ===
+                centro.getPaso().mirar();
+                int cantidad = FuncionesComunes.randomBetween(10, 20);
+                Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));  // recolección
+
                 if (area.fueAtacadoDurante(this)) {
                     Log.log(id + " fue atacado mientras recolectaba en " + tipo);
                     area.salir(this);
@@ -89,30 +88,84 @@ public class Aldeano extends Thread {
                 Log.log(id + " recolecta " + cantidad + " unidades de " + tipo);
                 area.salir(this);
 
-                //Ir a Plaza Central antes de depositar
+                checkYEsperarEmergencia();
+
+                centro.getPaso().mirar();
                 Log.log(id + " va a la PLAZA CENTRAL antes de depositar");
                 centro.getPlazaCentral().planificar(id);
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
                 centro.getPlazaCentral().salir(id);
 
-// === PASO 8: Depositar en almacén ===
+                checkYEsperarEmergencia();
+
+                centro.getPaso().mirar();
                 almacen.depositar(this, cantidad);
 
-
-                // === PASO 8: Notificar ===
                 synchronized (area) {
                     area.notifyAll();
                 }
 
-                // === PASO 9: Volver a Plaza Central ===
+                checkYEsperarEmergencia();
+
+                centro.getPaso().mirar();
                 Log.log(id + " vuelve a la PLAZA CENTRAL");
                 centro.getPlazaCentral().planificar(id);
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
                 centro.getPlazaCentral().salir(id);
-            }
 
-        } catch (InterruptedException e) {
-            Log.log(id + " ha sido interrumpido.");
+            } catch (InterruptedException e) {
+                // Si la interrupción es debido a la emergencia...
+                if (activo && centro.isEmergenciaActiva()) {
+                    try {
+                        irCasaPrincipalYEsperarFinEmergencia();
+                    } catch (InterruptedException ie) {
+                        // Si otra interrupción ocurre en esta fase, finaliza el hilo.
+                        activo = false;
+                    }
+                    // Tras finalizar la emergencia, retomamos el ciclo (desde PLAZA CENTRAL en la próxima iteración)
+                    continue;
+                } else {
+                    Log.log(id + " ha sido interrumpido y termina.");
+                    activo = false;
+                }
+            }
         }
+    }
+
+    /**
+     * Método que comprueba si hay una emergencia activa y, de ser así,
+     * lanza una excepción para desencadenar la rutina de emergencia.
+     */
+    private void checkYEsperarEmergencia() throws InterruptedException {
+        if (centro.isEmergenciaActiva()) {
+            throw new InterruptedException("Emergencia activa, interrumpir para ir a Casa Principal");
+        }
+    }
+
+    /**
+     * Simula el regreso del aldeano a la CASA PRINCIPAL con un retardo
+     * aleatorio (entre 2 y 5 segundos) y espera de forma pasiva hasta que
+     * se desactive la emergencia.
+     */
+    private void irCasaPrincipalYEsperarFinEmergencia() throws InterruptedException {
+        esperandoEnEmergencia = true;
+
+        // Simula el tiempo requerido para llegar a la CASA PRINCIPAL.
+        int retardo = FuncionesComunes.randomBetween(2000, 5000);
+        Thread.sleep(retardo);
+
+        Log.log(id + " regresa por emergencia a CASA PRINCIPAL");
+        centro.getCasaPrincipal().registrarEntrada(id);
+
+        // Espera hasta que la emergencia se desactive.
+        while (centro.isEmergenciaActiva()) {
+            synchronized (this) {
+                wait();
+            }
+        }
+
+        centro.getCasaPrincipal().salir(id);
+        esperandoEnEmergencia = false;
+        Log.log(id + " emergencia desactivada, reanudando ciclo.");
     }
 }

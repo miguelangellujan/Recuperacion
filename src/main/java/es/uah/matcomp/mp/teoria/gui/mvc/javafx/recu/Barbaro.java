@@ -17,19 +17,22 @@ public class Barbaro extends Thread {
     public void run() {
         try {
             while (true) {
+                centro.getPaso().mirar();
+
                 if (!puedeAtacar) {
                     Log.log(id + " descansa en campamento por 40s");
                     Thread.sleep(40000);
                     puedeAtacar = true;
                 }
 
+                centro.getPaso().mirar();
                 Log.log(id + " se dirige a la zona de preparación");
                 ZonaPreparacionBarbaros zonaPrep = centro.getZonaPreparacion();
 
-                // El bárbaro espera en la zona de preparación hasta que su grupo esté formado y se asigne objetivo
                 Zona objetivo = zonaPrep.esperarGrupo(this);
                 Log.log(id + " ataca la zona: " + objetivo.getNombreZona());
 
+                centro.getPaso().mirar();
                 boolean ganoCombate = true;
                 if (objetivo.enfrentarABarbaro(this)) {
                     Thread.sleep(FuncionesComunes.randomBetween(500, 1000));
@@ -45,6 +48,7 @@ public class Barbaro extends Thread {
                     Log.log(id + " no encontró defensores en " + objetivo.getNombreZona());
                 }
 
+                centro.getPaso().mirar();
                 Thread.sleep(1000);
                 if (objetivo instanceof AreaRecurso recurso) {
                     recurso.iniciarAtaque();
@@ -61,7 +65,6 @@ public class Barbaro extends Thread {
             Thread.currentThread().interrupt();
         }
     }
-
     public String getIdBarbaro() {
         return id;
     }

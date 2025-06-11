@@ -64,8 +64,8 @@ public class ServidorController {
     @FXML
     private Button btnAlarma;
 
-    private CentroUrbano centro = new CentroUrbano(); // crea 2 aldeanos iniciales
-
+    private CentroUrbano centro = new CentroUrbano();// crea 2 aldeanos iniciales
+    private boolean emergenciaActiva=false;
     @FXML
     public void initialize() {
         // Hilo para crear aldeanos automáticamente cada 20 segundos (si hay comida)
@@ -80,6 +80,8 @@ public class ServidorController {
         inicializarActualizacion();
 
         btnPausa.setOnAction(event -> ejecucion());
+        btnAlarma.setOnAction(event -> toggleEmergencia());
+
     }
 
     private void inicializarActualizacion(){
@@ -94,7 +96,15 @@ public class ServidorController {
             }
         }).start();
     }
-
+    private void toggleEmergencia() {
+        // Llamamos a activarEmergencia, que alterna el estado y notifica aldeanos
+        centro.activarEmergencia();
+        // Ahora obtenemos el estado actual desde CentroUrbano (deberías tener un método isEmergenciaActiva)
+        boolean estadoActual = centro.isEmergenciaActiva();
+        // Actualizamos texto botón
+        btnAlarma.setText(estadoActual ? "Detener Emergencia" : "Activar Emergencia");
+    }
+    
     private void actualizarInterfaz() {
 
         Platform.runLater(() -> {
@@ -103,16 +113,16 @@ public class ServidorController {
             lblMaderaRecursos.setText("Madera: " + centro.getRecurso("MADERA").get());
             lblOroRecursos.setText("Oro: " + centro.getRecurso("ORO").get());
 
-            lblGranja.setText("Granja: " + centro.getArea("COMIDA").getNombreZona() + "\n" + centro.getArea("COMIDA").obtenerEstadoAldeanos());
-            lblMina.setText("Mina: " + centro.getArea("ORO").getNombreZona() + "\n" + centro.getArea("ORO").obtenerEstadoAldeanos());
-            lblBosque.setText("Bosque: " + centro.getArea("MADERA").getNombreZona() + "\n" + centro.getArea("MADERA").obtenerEstadoAldeanos());
+            lblGranja.setText(centro.getArea("COMIDA").obtenerEstadoAldeanos());
+            lblMina.setText(centro.getArea("ORO").obtenerEstadoAldeanos());
+            lblBosque.setText(centro.getArea("MADERA").obtenerEstadoAldeanos());
 
             // Estado del almacén de comida
-            lblGranero.setText("Granero: " + centro.getAlmacen("COMIDA").getCantidadActual() + "/" + centro.getAlmacen("COMIDA").getCapacidadMaxima() + "\n" + centro.getAlmacen("COMIDA").obtenerEstadoAldeanos());
+            lblGranero.setText(centro.getAlmacen("COMIDA").obtenerEstadoAldeanos());
             // Estado del almacén de madera
-            lblAserradero.setText("Aserradero: " + centro.getAlmacen("MADERA").getCantidadActual() + "/" + centro.getAlmacen("MADERA").getCapacidadMaxima() + "\n" + centro.getAlmacen("MADERA").obtenerEstadoAldeanos());
+            lblAserradero.setText(centro.getAlmacen("MADERA").obtenerEstadoAldeanos());
             // Estado del almacén de oro
-            lblTesoreria.setText("Tesorería: " + centro.getAlmacen("ORO").getCantidadActual() + "/" + centro.getAlmacen("ORO").getCapacidadMaxima() + "\n" + centro.getAlmacen("ORO").obtenerEstadoAldeanos());
+            lblTesoreria.setText(centro.getAlmacen("ORO").obtenerEstadoAldeanos());
 
             // Estado del centro urbano
             lblCasaPrincipal.setText(centro.getCasaPrincipal().obtenerIds());

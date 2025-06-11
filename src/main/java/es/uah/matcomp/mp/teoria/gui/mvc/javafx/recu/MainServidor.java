@@ -14,14 +14,11 @@ public class MainServidor extends Application {
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("servidorRMI.fxml"));
         Parent root = loader.load();
-
         ServidorController app = loader.getController();
-
         stage.setTitle("Age of Threads");
         stage.setScene(new Scene(root));
-        stage.show();
-        Log.log("----- INICIANDO SIMULACIÓN CONCURRENTE: Age of Threads -----");
-    }
+        stage.show();}
+
     public static void main(String[] args) {
         launch(args);
     }

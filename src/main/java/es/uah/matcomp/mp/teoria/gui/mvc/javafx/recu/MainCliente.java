@@ -19,9 +19,7 @@ public class MainCliente extends Application {
 
         stage.setTitle("Age of Threads - Remoto");
         stage.setScene(new Scene(root));
-        stage.show();
-    }
-
+        stage.show();}
     public static void main(String[] args) {
         launch(args);
     }

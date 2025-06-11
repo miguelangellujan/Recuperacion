@@ -178,7 +178,7 @@ public class Almacen implements Zona {
             }
             if (esperando.length() > 0) esperando.setLength(esperando.length() - 2);
 
-            return "Depositando: [" + dentro + "] | Esperando: [" + esperando + "]";
+            return "Depositando: " + dentro + "\n\nEsperando: " + esperando;
         }
     }
 

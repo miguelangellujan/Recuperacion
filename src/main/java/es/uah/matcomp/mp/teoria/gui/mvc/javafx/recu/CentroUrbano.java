@@ -8,7 +8,7 @@ public class CentroUrbano {
     private final AtomicInteger comida = new AtomicInteger(50);
     private final AtomicInteger madera = new AtomicInteger(30);
     private final AtomicInteger oro = new AtomicInteger(20);
-
+    private boolean emergencia = false;
     private final AtomicInteger idAldeano = new AtomicInteger(1);
     private final AtomicInteger idGuerrero = new AtomicInteger(1);
     private final AtomicInteger idBarbaro = new AtomicInteger(1);
@@ -276,6 +276,26 @@ public class CentroUrbano {
             System.out.println("Simulación Detenida");
         }
     }
+    public Paso getPaso() {return paso;}
+
+    public void setEmergencia(boolean estado) {
+        this.emergencia = estado;
+        if (estado) {
+            Log.log("¡Emergencia activada! Los aldeanos regresan a CASA PRINCIPAL.");
+        } else {
+            Log.log("¡Emergencia desactivada! Los aldeanos retoman su trabajo.");
+        }
+        for (Aldeano a : aldeanos) {
+            a.setEmergencia(estado);  // Esto interrumpe a los aldeanos (mira la clase Aldeano)
+            synchronized (a) {
+                a.notify();  // Despierta a los aldeanos si están esperando
+            }
+        }
+    }
+    public boolean isEmergencia() {
+        return emergencia;
+    }
+
 
     public boolean estadoEjecucion(){
         return enEjecucion;
