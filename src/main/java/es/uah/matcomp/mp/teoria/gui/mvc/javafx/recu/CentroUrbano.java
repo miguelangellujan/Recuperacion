@@ -211,6 +211,10 @@ public class CentroUrbano {
         }
     }
 
+    public int contarBarbarosEnCampamento(){
+        return obtenerIdsBarbarosEnCampamento().length();
+    }
+
     public String obtenerIdsCasaPrincipal() {
         return casaPrincipal.obtenerIds();
     }
@@ -227,7 +231,7 @@ public class CentroUrbano {
         return guerreros.size();
     }
 
-    public int contarBarbarosCampamento() {
+    public int contarBarbaros() {
         return barbaros.size();
     }
 
@@ -271,10 +275,6 @@ public class CentroUrbano {
                 a.notify();  // Despierta a los aldeanos si están esperando
             }
         }
-    }
-
-    public boolean isEmergencia() {
-        return emergenciaActiva.get();
     }
 
     public boolean isEmergenciaActiva() {

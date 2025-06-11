@@ -138,11 +138,11 @@
       <TextField fx:id="GuerrerosCentroUrbano" layoutX="548.0" layoutY="502.0" prefHeight="30.0" prefWidth="76.0" />
 
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffb6d7" height="101.0" layoutX="21.0" layoutY="562.0" stroke="BLACK" strokeType="INSIDE" width="666.0" />
-      <Label fx:id="lblComida" layoutX="280.0" layoutY="589.0" prefHeight="46.0" prefWidth="102.0" />
-      <Label fx:id="lblMadera" layoutX="164.0" layoutY="589.0" prefHeight="46.0" prefWidth="102.0" />
-      <Label fx:id="lblOro" layoutX="39.0" layoutY="589.0" prefHeight="46.0" prefWidth="102.0" />
-      <Button fx:id="btnDetener" layoutX="573.0" layoutY="590.0" onAction="#ejecucion" mnemonicParsing="false" prefHeight="45.0" prefWidth="88.0" text="Detener" />
-      <Button fx:id="btnCampana" layoutX="433.0" layoutY="590.0" onAction="#activarCampana" mnemonicParsing="false" prefHeight="46.0" prefWidth="119.0" text="Activar Emergencia" />
+      <Label fx:id="lblComida" layoutX="245.0" layoutY="589.0" prefHeight="46.0" prefWidth="102.0" />
+      <Label fx:id="lblMadera" layoutX="129.0" layoutY="590.0" prefHeight="46.0" prefWidth="102.0" />
+      <Label fx:id="lblOro" layoutX="45.0" layoutY="589.0" prefHeight="46.0" prefWidth="102.0" />
+      <Button fx:id="btnDetener" layoutX="573.0" layoutY="590.0" mnemonicParsing="false" onAction="#ejecucion" prefHeight="45.0" prefWidth="88.0" text="Detener" />
+      <Button fx:id="btnCampana" layoutX="433.0" layoutY="590.0" mnemonicParsing="false" onAction="#activarCampana" prefHeight="46.0" prefWidth="119.0" text="Activar Emergencia" />
 
    </children>
 </AnchorPane>

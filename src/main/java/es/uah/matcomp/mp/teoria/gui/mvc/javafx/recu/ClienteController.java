@@ -100,7 +100,11 @@ public class ClienteController {
 
     private void actualizarInterfaz(){
         try {
-
+            ZonaPreparacionBarbaros.setText(String.valueOf(interfazRMI.barbarosZonaPreparacion()));
+            CampamentoBarbaros.setText(String.valueOf(interfazRMI.barbarosCampamento()));
+            lblComida.setText("Comida: " + interfazRMI.getComida() + " / " + interfazRMI.getCapacidadMaxComida());
+            lblMadera.setText("Madera: " + interfazRMI.getMadera() + " / " + interfazRMI.getCapacidadMaxMadera());
+            lblOro.setText("Oro: " + interfazRMI.getOro() + " / " + interfazRMI.getCapacidadMaxOro());
         } catch (Exception e){
             Log.log("Error al actualizar la interfaz del cliente: " + e.getMessage());
         }

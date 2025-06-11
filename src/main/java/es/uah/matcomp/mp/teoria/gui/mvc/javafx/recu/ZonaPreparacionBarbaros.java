@@ -36,6 +36,10 @@ public class ZonaPreparacionBarbaros {
         }
     }
 
+    public int contarBarbarosPreparacion(){
+        return obtenerIdsEnPreparacion().length();
+    }
+
     public Zona esperarGrupo(Barbaro b) throws InterruptedException {
         synchronized (lock) {
             barbarosTotales.incrementAndGet();

@@ -1,5 +1,7 @@
 package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 
+import javafx.fxml.FXML;
+
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,13 +19,13 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
 
     // Número de Bárbaros en el campamento y en la zona de preparación
     @Override
-    public String barbarosZonaPreparacion() throws RemoteException {
-        return centro.getZonaPreparacion().obtenerIdsEnPreparacion();
+    public int barbarosZonaPreparacion() throws RemoteException {
+        return centro.getZonaPreparacion().contarBarbarosPreparacion();
     }
 
     @Override
-    public String barbarosCampamento() throws RemoteException {
-        return centro.obtenerIdsBarbarosEnCampamento();
+    public int barbarosCampamento() throws RemoteException {
+        return centro.contarBarbarosEnCampamento();
     }
 
     // Estado de los recursos almacenados (cantidad actual / capacidad máxima)
@@ -33,13 +35,28 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
     }
 
     @Override
+    public int getCapacidadMaxComida() throws RemoteException {
+        return centro.getGranero().getCapacidadMaxima();
+    }
+
+    @Override
     public int getMadera() throws RemoteException {
         return centro.getRecurso("MADERA").get();
     }
 
     @Override
+    public int getCapacidadMaxMadera() throws RemoteException {
+        return centro.getAserradero().getCapacidadMaxima();
+    }
+
+    @Override
     public int getOro() throws RemoteException {
         return centro.getRecurso("ORO").get();
+    }
+
+    @Override
+    public int getCapacidadMaxOro() throws RemoteException {
+        return centro.getTesoreria().getCapacidadMaxima();
     }
 
     // Botón de Emergencia
