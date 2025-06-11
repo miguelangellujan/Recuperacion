@@ -11,7 +11,7 @@ public class ZonaPreparacionBarbaros {
     private long ultimoAtaque = 0;
 
     private Zona objetivoGrupoActual = null;
-    private Set<Barbaro> grupoActual = new HashSet<>();
+    private final Set<Barbaro> grupoActual = new HashSet<>();
 
     private final CentroUrbano centro;
 

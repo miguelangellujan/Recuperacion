@@ -5,7 +5,11 @@ public class GestorMejoras {
     private int nivelHerramientas = 0;
     private int nivelArmas = 0;
     private int nivelAlmacenes = 0;
-    private CentroUrbano centro;
+    private final CentroUrbano centro;
+
+    public GestorMejoras(CentroUrbano centro) {
+        this.centro = centro;
+    }
 
     public synchronized void aplicarMejoraHerramientas() {
         int costoMadera = 120;

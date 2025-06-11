@@ -8,8 +8,4 @@ public class FuncionesComunes {
     public static int randomBetween(int min, int max) {
         return rnd.nextInt(max - min + 1) + min;
     }
-
-    public static int numRandom(int min, int max) {
-        return min + new Random().nextInt(max - min + 1);
-    }
 }

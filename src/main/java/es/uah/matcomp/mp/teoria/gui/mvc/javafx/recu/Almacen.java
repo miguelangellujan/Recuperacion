@@ -2,6 +2,7 @@ package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.*;
 
 public class Almacen implements Zona {
@@ -10,13 +11,8 @@ public class Almacen implements Zona {
     private int capacidadMaxima;
     private final CentroUrbano centro;
 
-    private final Semaphore semDeposito = new Semaphore(3, true);
-    private final Lock lock = new ReentrantLock(true);
-    private final Condition espacioDisponible = lock.newCondition();
-    private final Lock lockGuerreros = new ReentrantLock(true);
-    private final Condition puedeEntrarGuerrero = lockGuerreros.newCondition();
-    private final List<Guerrero> guerrerosDentro = new ArrayList<>();
-    private final int MAX_GUERREROS = 3;
+    private final AtomicInteger semDeposito = new AtomicInteger(3);
+    private Object lock = new Object();
     private final List<Aldeano> aldeanosDepositando = new ArrayList<>();
     private final List<Aldeano> aldeanosEsperando = new ArrayList<>();
 
@@ -26,10 +22,10 @@ public class Almacen implements Zona {
         this.cantidadActual = 0;
         this.centro = centro;
     }
+
     public void depositar(Aldeano aldeano, int cantidad) throws InterruptedException {
         int restante = cantidad;
-        lock.lock();
-        try {
+        synchronized (lock){
             while (restante > 0) {
                 // Si no hay espacio, esperar bloqueando
                 while (cantidadActual == capacidadMaxima) {
@@ -37,7 +33,7 @@ public class Almacen implements Zona {
                         aldeanosEsperando.add(aldeano);
                         Log.log("El almacén de " + tipo + " está lleno. El aldeano " + aldeano.getIdAldeano() + " espera para depositar.");
                     }
-                    espacioDisponible.await(); // espera hasta que haya espacio
+                    lock.wait(); // espera hasta que haya espacio
                 }
 
                 // Hay espacio, listo para depositar
@@ -67,12 +63,11 @@ public class Almacen implements Zona {
                 }
 
                 // Notificar a otros posibles aldeanos que puedan ahora depositar
-                espacioDisponible.signalAll();
+                lock.notifyAll();
             }
-        } finally {
-            lock.unlock();
         }
     }
+
     public int getCantidadActual() {
         return cantidadActual;
     }
@@ -82,15 +77,13 @@ public class Almacen implements Zona {
     }
 
     public void aumentarCapacidad(int cantidad) {
-        lock.lock();
-        try {
+        synchronized (lock){
             capacidadMaxima += cantidad;
             Log.log("Capacidad de " + tipo + " aumentada a " + capacidadMaxima);
-            espacioDisponible.signalAll(); // Avisamos a los aldeanos por si ahora hay hueco
-        } finally {
-            lock.unlock();
+            lock.notifyAll(); // Avisamos a los aldeanos por si ahora hay hueco
         }
     }
+
     public synchronized void saquear() {
         int porcentaje = FuncionesComunes.randomBetween(10, 30);
         int robado = (cantidadActual * porcentaje) / 100;
@@ -106,38 +99,23 @@ public class Almacen implements Zona {
     }
 
     public void añadirInicial(int cantidad) {
-        lock.lock();
-        try {
+        synchronized (lock){
             cantidadActual = Math.min(cantidad, capacidadMaxima);
             Log.log("Almacén de " + tipo + " inicializado con " + cantidadActual);
-        } finally {
-            lock.unlock();
         }
     }
 
     @Override
     public boolean entrarGuerrero(Guerrero g) throws InterruptedException {
-        lockGuerreros.lock();
-        try {
-            while (guerrerosDentro.size() >= MAX_GUERREROS) {
-                puedeEntrarGuerrero.await();
-            }
-            guerrerosDentro.add(g);
-            return true;
-        } finally {
-            lockGuerreros.unlock();
-        }
+        // En el almacén no se necesita controlar la entrada de guerreros de forma específica.
+        // Se retorna true para cumplir con el contrato de la interfaz Zona.
+        return true;
     }
 
     @Override
     public void salirGuerrero(Guerrero g) {
-        lockGuerreros.lock();
-        try {
-            guerrerosDentro.remove(g);
-            puedeEntrarGuerrero.signalAll();
-        } finally {
-            lockGuerreros.unlock();
-        }
+        // Para el almacén, no se requiere ninguna acción especial al salir un guerrero.
+        // Este método se implementa como un stub vacío para satisfacer la interfaz.
     }
 
     @Override
@@ -147,25 +125,13 @@ public class Almacen implements Zona {
 
     @Override
     public boolean enfrentarABarbaro(Barbaro b) throws InterruptedException {
-        synchronized (guerrerosDentro) {
-            if (guerrerosDentro.isEmpty()) return false;
-
-            Guerrero g = guerrerosDentro.remove(0);
-            Log.log(b.getIdBarbaro() + " se enfrenta a " + g.getIdGuerrero());
-
-            boolean barbaroGana = new Random().nextBoolean();
-            if (barbaroGana) {
-                Log.log(b.getIdBarbaro() + " derrota a " + g.getIdGuerrero());
-                return true;
-            } else {
-                Log.log(b.getIdBarbaro() + " pierde contra " + g.getIdGuerrero());
-                g.enviarARecuperacion();
-                return false;
-            }
-        }
+        // En el contexto del almacén, el método de combate no se utiliza directamente.
+        // Se retorna true para indicar que el almacén "permite" que el ataque continúe
+        // (en la práctica, el ataque se gestiona mediante el método saquear()).
+        return true;
     }
     public String obtenerEstadoAldeanos() {
-        synchronized (this) {
+        synchronized (lock) {
             StringBuilder dentro = new StringBuilder();
             for (Aldeano a : aldeanosDepositando) {
                 dentro.append(a.getIdAldeano()).append(", ");
@@ -182,4 +148,18 @@ public class Almacen implements Zona {
         }
     }
 
+    public void liberarAldeanos(){
+        synchronized (lock){
+            aldeanosDepositando.clear();
+            aldeanosEsperando.clear();
+        }
+    }
+
+    public void salir(Aldeano aldeano) {
+        synchronized (lock) {
+            aldeanosDepositando.remove(aldeano);
+            aldeanosEsperando.remove(aldeano);
+            Log.log(aldeano.getIdAldeano() + " ha salido del almacén de " + tipo);
+        }
+    }
 }

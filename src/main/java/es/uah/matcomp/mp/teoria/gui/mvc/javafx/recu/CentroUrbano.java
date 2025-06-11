@@ -8,7 +8,6 @@ public class CentroUrbano {
     private final AtomicInteger comida = new AtomicInteger(50);
     private final AtomicInteger madera = new AtomicInteger(30);
     private final AtomicInteger oro = new AtomicInteger(20);
-    private boolean emergencia = false;
     private final AtomicInteger idAldeano = new AtomicInteger(1);
     private final AtomicInteger idGuerrero = new AtomicInteger(1);
     private final AtomicInteger idBarbaro = new AtomicInteger(1);
@@ -32,13 +31,11 @@ public class CentroUrbano {
     private final List<Guerrero> guerreros = Collections.synchronizedList(new ArrayList<>());
     private final List<Barbaro> barbaros = Collections.synchronizedList(new ArrayList<>());
 
-    private final GestorMejoras mejoras = new GestorMejoras();
+    private final GestorMejoras mejoras;
     private final AtomicBoolean emergenciaActiva = new AtomicBoolean(false);
 
-    private boolean enEjecucion = true;
-    private Paso paso = new Paso();
-
     public CentroUrbano() {
+        mejoras = new GestorMejoras(this);
         granero.añadirInicial(comida.get());
         aserradero.añadirInicial(madera.get());
         tesoreria.añadirInicial(oro.get());
@@ -115,15 +112,26 @@ public class CentroUrbano {
     public void activarEmergencia() {
         boolean nuevoEstado = !emergenciaActiva.get();
         emergenciaActiva.set(nuevoEstado);
+
         if (nuevoEstado) {
             Log.log("¡Emergencia activada! Los aldeanos regresan a CASA PRINCIPAL.");
+
+            granero.liberarAldeanos();
+            aserradero.liberarAldeanos();
+            tesoreria.liberarAldeanos();
+
+            for(Aldeano a : aldeanos){
+                a.setEmergencia(true);
+                a.moverACasaPrincipal();
+            }
         } else {
             Log.log("¡Emergencia desactivada! Los aldeanos retoman su trabajo.");
-        }
-        for (Aldeano a : aldeanos) {
-            a.setEmergencia(nuevoEstado);
-            synchronized (a) {
-                a.notify();
+
+            for(Aldeano a : aldeanos){
+                a.setEmergencia(false);
+                synchronized (a){
+                    a.notify();
+                }
             }
         }
     }
@@ -264,27 +272,7 @@ public class CentroUrbano {
         return tesoreria;
     }
 
-    // Boton Pausa
-    public synchronized void ejecucion(){
-        enEjecucion = !enEjecucion;
-
-        if (enEjecucion){
-            paso.abrir();
-            System.out.println("Simulación Reanudada");
-        } else {
-            paso.cerrar();
-            System.out.println("Simulación Detenida");
-        }
-    }
-    public Paso getPaso() {return paso;}
-
     public void setEmergencia(boolean estado) {
-        this.emergencia = estado;
-        if (estado) {
-            Log.log("¡Emergencia activada! Los aldeanos regresan a CASA PRINCIPAL.");
-        } else {
-            Log.log("¡Emergencia desactivada! Los aldeanos retoman su trabajo.");
-        }
         for (Aldeano a : aldeanos) {
             a.setEmergencia(estado);  // Esto interrumpe a los aldeanos (mira la clase Aldeano)
             synchronized (a) {
@@ -292,26 +280,34 @@ public class CentroUrbano {
             }
         }
     }
+
     public boolean isEmergencia() {
-        return emergencia;
-    }
-
-
-    public boolean estadoEjecucion(){
-        return enEjecucion;
+        return emergenciaActiva.get();
     }
 
     public static class CasaPrincipal {
         private final List<String> aldeanosEnCasa = Collections.synchronizedList(new ArrayList<>());
 
         public void registrarEntrada(String idAldeano) {
-            aldeanosEnCasa.add(idAldeano);
-            Log.log("El aldeano " + idAldeano + " ha ingresado a la Casa Principal.");
+            synchronized (aldeanosEnCasa){
+                if(!aldeanosEnCasa.contains(idAldeano)){
+                    aldeanosEnCasa.add(idAldeano);
+                    Log.log("El aldeano " + idAldeano + " ha ingresado a la Casa Principal.");
+                }
+            }
         }
 
         public void salir(String idAldeano) {
-            aldeanosEnCasa.remove(idAldeano);
-            Log.log("El aldeano " + idAldeano + " ha salido de la Casa Principal.");
+            synchronized (aldeanosEnCasa){
+                aldeanosEnCasa.remove(idAldeano);
+                Log.log("El aldeano " + idAldeano + " ha salido de la Casa Principal.");
+            }
+        }
+
+        public boolean estaRegistrado(String idAldeano) {
+            synchronized (aldeanosEnCasa){
+                return aldeanosEnCasa.contains(idAldeano);
+            }
         }
 
         public String obtenerIds() {
@@ -325,13 +321,23 @@ public class CentroUrbano {
         private final List<String> aldeanosEnPlaza = Collections.synchronizedList(new ArrayList<>());
 
         public void planificar(String idAldeano) {
-            aldeanosEnPlaza.add(idAldeano);
-            Log.log("El aldeano " + idAldeano + " está planificando en la Plaza Central.");
+            synchronized (aldeanosEnPlaza){
+                if(!aldeanosEnPlaza.contains(idAldeano)){
+                    aldeanosEnPlaza.add(idAldeano);
+                    Log.log("El aldeano " + idAldeano + " está planificando en la Plaza Central.");
+                }
+            }
         }
 
         public void salir(String idAldeano) {
             aldeanosEnPlaza.remove(idAldeano);
             Log.log("El aldeano " + idAldeano + " ha salido de la Plaza Central.");
+        }
+
+        public boolean estaRegistrado(String idAldeano){
+            synchronized (aldeanosEnPlaza){
+                return aldeanosEnPlaza.contains(idAldeano);
+            }
         }
 
         public String obtenerIds() {

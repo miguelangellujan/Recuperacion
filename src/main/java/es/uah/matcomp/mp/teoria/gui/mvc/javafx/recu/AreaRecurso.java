@@ -88,6 +88,7 @@ public class AreaRecurso implements Zona {
             while (recolectando.size() >= 3 || enAtaque) {
                 puedeEntrarAldeano.await();
             }
+
             esperandoEnCola.remove(a);
             recolectando.add(a);
 

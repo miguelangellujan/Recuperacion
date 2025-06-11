@@ -6,6 +6,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class ServidorController {
@@ -60,49 +62,56 @@ public class ServidorController {
     @FXML
     private Label lblCasaPrincipal;
     @FXML
-    private Button btnPausa;
+    private Button btnDetener;
     @FXML
-    private Button btnAlarma;
+    private Button btnCampana;
 
     private CentroUrbano centro = new CentroUrbano();// crea 2 aldeanos iniciales
-    private boolean emergenciaActiva=false;
+    private final List<Thread> hilosActivos = new ArrayList<>();
+    private boolean enPausa = false;
+
     @FXML
     public void initialize() {
-        // Hilo para crear aldeanos automáticamente cada 20 segundos (si hay comida)
-        new Thread(() -> crearAldeano()).start();
-
-        // Hilo para generación automática de bárbaros cada 15–30 s
-        new Thread(() -> crearBarbaro()).start();
-
-        // Hilo opcional para mostrar recursos cada 10 s (modo consola)
-
-        // Hilo para actualizar la interfaz cada segundo
-        inicializarActualizacion();
-
-        btnPausa.setOnAction(event -> ejecucion());
-        btnAlarma.setOnAction(event -> toggleEmergencia());
-
+        iniciarHilos();
+        btnDetener.setOnAction(event -> ejecucion());
+        btnCampana.setOnAction(event -> activarCampana());
     }
 
-    private void inicializarActualizacion(){
-        new Thread(() -> {
-            try {
-                while (centro.estadoEjecucion()){
-                    Platform.runLater(this::actualizarInterfaz);
-                    Thread.sleep(1000);
+    private void iniciarHilos(){
+        Thread hiloAldeano = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()){
+                if(!enPausa){
+                    crearAldeano();
                 }
-            } catch (Exception e){
-                Log.log("Error al actualizar RMI: " + e.getMessage());
             }
-        }).start();
-    }
-    private void toggleEmergencia() {
-        // Llamamos a activarEmergencia, que alterna el estado y notifica aldeanos
-        centro.activarEmergencia();
-        // Ahora obtenemos el estado actual desde CentroUrbano (deberías tener un método isEmergenciaActiva)
-        boolean estadoActual = centro.isEmergenciaActiva();
-        // Actualizamos texto botón
-        btnAlarma.setText(estadoActual ? "Detener Emergencia" : "Activar Emergencia");
+        });
+        hilosActivos.add(hiloAldeano);
+        hiloAldeano.start();
+
+        Thread hiloBarbaro = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()){
+                if(!enPausa){
+                    crearBarbaro();
+                }
+            }
+        });
+        hilosActivos.add(hiloBarbaro);
+        hiloBarbaro.start();
+
+        Thread hiloInterfaz = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()){
+                if(!enPausa){
+                    actualizarInterfaz();
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e){
+                    Log.log("Error actualizando la interfaz: " + e.getMessage());
+                }
+            }
+        });
+        hilosActivos.add(hiloInterfaz);
+        hiloInterfaz.start();
     }
     
     private void actualizarInterfaz() {
@@ -166,20 +175,28 @@ public class ServidorController {
 
     @FXML
     private void ejecucion(){
-        try {
-            centro.ejecucion();
-            actualizarBoton();
-        } catch (Exception ex) {
-            Log.log("Error al cambiar de estado de ejecución: " + ex.getMessage());
+        enPausa = !enPausa;
+
+        if(enPausa){
+            for (Thread hiloActivo : hilosActivos){
+                hiloActivo.interrupt();
+            }
+        } else {
+            iniciarHilos();
         }
+
+        btnDetener.setText(enPausa ? "Reanudar" : "Detener");
     }
 
-    private void actualizarBoton() {
-        try {
-            boolean enEjecucion = centro.estadoEjecucion();
-            btnPausa.setText(enEjecucion ? "Detener" : "Reanudar");
-        } catch (Exception e) {
-            Log.log("Error al actualizar Boton: " + e.getMessage());
-        }
+    @FXML
+    private void activarCampana() {
+        // Ahora obtenemos el estado actual desde CentroUrbano (deberías tener un método isEmergenciaActiva)
+        boolean estadoActual = !centro.isEmergenciaActiva();
+
+        // Llamamos a activarEmergencia, que alterna el estado y notifica aldeanos
+        centro.activarEmergencia();
+
+        // Actualizamos texto botón
+        btnCampana.setText(estadoActual ? "Detener Emergencia" : "Activar Emergencia");
     }
 }

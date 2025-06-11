@@ -16,10 +16,6 @@ public class Aldeano extends Thread {
         return id;
     }
 
-    public boolean isEsperandoEnEmergencia() {
-        return esperandoEnEmergencia;
-    }
-
     public void setEmergencia(boolean estado) {
         emergencia = estado;
         if (estado) {
@@ -28,14 +24,38 @@ public class Aldeano extends Thread {
         }
     }
 
-    public void detener() {
-        activo = false;
-        this.interrupt(); // para salir de cualquier sleep o wait
+    public void moverACasaPrincipal(){
+        synchronized (this) {
+            if(!esperandoEnEmergencia){
+                esperandoEnEmergencia = true;
+
+                centro.getArea("COMIDA").salir(this);
+                centro.getArea("MADERA").salir(this);
+                centro.getArea("ORO").salir(this);
+                centro.getPlazaCentral().salir(id);
+                centro.getAlmacen("COMIDA").salir(this);
+                centro.getAlmacen("MADERA").salir(this);
+                centro.getAlmacen("ORO").salir(this);
+            }
+
+            centro.getCasaPrincipal().registrarEntrada(id);
+            Log.log(id + " se ha movido a la Clase Principal por emergencia.");
+        }
     }
 
-    public void continuarTrasEmergencia() {
+    public void moverAPlazaCentral(){
         synchronized (this) {
-            notify();
+            if (esperandoEnEmergencia && centro.getCasaPrincipal().estaRegistrado(id)) {
+                esperandoEnEmergencia = false;
+
+                centro.getCasaPrincipal().salir(id);
+
+                if(!centro.getPlazaCentral().estaRegistrado(id)){
+                    centro.getPlazaCentral().planificar(id);
+                }
+
+                Log.log(id + " ha salido de la Casa Principal y retoma el ciclo en la Plaza Central.");
+            }
         }
     }
 
@@ -46,9 +66,6 @@ public class Aldeano extends Thread {
                 // Antes de cada acción, comprobamos si hay emergencia
                 checkYEsperarEmergencia();
 
-                // Empezamos el ciclo normal
-                centro.getPaso().mirar();
-
                 Log.log(id + " entra en CASA PRINCIPAL");
                 centro.getCasaPrincipal().registrarEntrada(id);
                 Thread.sleep(FuncionesComunes.randomBetween(2000, 4000));
@@ -56,7 +73,6 @@ public class Aldeano extends Thread {
 
                 checkYEsperarEmergencia();
 
-                centro.getPaso().mirar();
                 Log.log(id + " va a la PLAZA CENTRAL");
                 centro.getPlazaCentral().planificar(id);
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
@@ -68,13 +84,11 @@ public class Aldeano extends Thread {
 
                 checkYEsperarEmergencia();
 
-                centro.getPaso().mirar();
                 Log.log(id + " intenta entrar en " + tipo);
                 area.entrar(this);
 
                 checkYEsperarEmergencia();
 
-                centro.getPaso().mirar();
                 int cantidad = FuncionesComunes.randomBetween(10, 20);
                 Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));  // recolección
 
@@ -90,7 +104,6 @@ public class Aldeano extends Thread {
 
                 checkYEsperarEmergencia();
 
-                centro.getPaso().mirar();
                 Log.log(id + " va a la PLAZA CENTRAL antes de depositar");
                 centro.getPlazaCentral().planificar(id);
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
@@ -98,7 +111,6 @@ public class Aldeano extends Thread {
 
                 checkYEsperarEmergencia();
 
-                centro.getPaso().mirar();
                 almacen.depositar(this, cantidad);
 
                 synchronized (area) {
@@ -107,7 +119,6 @@ public class Aldeano extends Thread {
 
                 checkYEsperarEmergencia();
 
-                centro.getPaso().mirar();
                 Log.log(id + " vuelve a la PLAZA CENTRAL");
                 centro.getPlazaCentral().planificar(id);
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
@@ -150,12 +161,7 @@ public class Aldeano extends Thread {
     private void irCasaPrincipalYEsperarFinEmergencia() throws InterruptedException {
         esperandoEnEmergencia = true;
 
-        // Simula el tiempo requerido para llegar a la CASA PRINCIPAL.
-        int retardo = FuncionesComunes.randomBetween(2000, 5000);
-        Thread.sleep(retardo);
-
-        Log.log(id + " regresa por emergencia a CASA PRINCIPAL");
-        centro.getCasaPrincipal().registrarEntrada(id);
+        moverACasaPrincipal();
 
         // Espera hasta que la emergencia se desactive.
         while (centro.isEmergenciaActiva()) {
@@ -164,8 +170,6 @@ public class Aldeano extends Thread {
             }
         }
 
-        centro.getCasaPrincipal().salir(id);
-        esperandoEnEmergencia = false;
-        Log.log(id + " emergencia desactivada, reanudando ciclo.");
+        moverAPlazaCentral();
     }
 }

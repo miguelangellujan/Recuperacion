@@ -22,26 +22,22 @@ public class Guerrero extends Thread {
     @Override
     public void run() {
         try {
-            centro.getPaso().mirar();
             Log.log(id + " comienza entrenamiento en el CUARTEL");
-            Thread.sleep(FuncionesComunes.randomBetween(5000, 8000));
+            centro.getCuartel().entrenar(this);
             Log.log(id + " ha finalizado el entrenamiento y comienza patrullaje");
 
             while (!Thread.currentThread().isInterrupted()) {
-                centro.getPaso().mirar();
                 Zona zona = centro.obtenerZonaAleatoriaParaPatrulla();
 
                 if (zona.entrarGuerrero(this)) {
                     Log.log(id + " patrulla en " + zona.getNombreZona());
 
-                    centro.getPaso().mirar();
                     Thread.sleep(FuncionesComunes.randomBetween(2000, 3000));
 
                     zona.salirGuerrero(this);
                     Log.log(id + " sale de " + zona.getNombreZona());
                 } else {
                     Log.log(id + " no puede patrullar en " + zona.getNombreZona() + " (llena o en combate), espera...");
-                    centro.getPaso().mirar();
                     Thread.sleep(500);
                 }
             }
