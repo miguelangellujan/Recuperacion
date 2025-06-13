@@ -13,6 +13,7 @@ public class Almacen implements Zona {
     private Object lock = new Object();
     private final List<Aldeano> aldeanosDepositando = new ArrayList<>();
     private final List<Aldeano> aldeanosEsperando = new ArrayList<>();
+    private List<Guerrero> guerreros=new ArrayList<>();
 
     // Constructor
     public Almacen(String tipo, int capacidad, CentroUrbano centro) {
@@ -34,15 +35,13 @@ public class Almacen implements Zona {
     // Funciones Interface Zona
     @Override
     public boolean entrarGuerrero(Guerrero g) throws InterruptedException {
-        // En el almacén no se necesita controlar la entrada de guerreros de forma específica.
-        // Se retorna true para cumplir con el contrato de la interfaz Zona.
+        guerreros.add(g);
         return true;
     }
 
     @Override
     public void salirGuerrero(Guerrero g) {
-        // Para el almacén, no se requiere ninguna acción especial al salir un guerrero.
-        // Este método se implementa como un stub vacío para satisfacer la interfaz.
+        guerreros.remove(g);
     }
 
     @Override
@@ -131,6 +130,20 @@ public class Almacen implements Zona {
             Log.log("Almacén de " + tipo + " inicializado con " + cantidadActual);
         }
     }
+    public List<Aldeano> getAldeanos() {
+        synchronized (lock) {
+            // Crear nueva lista para evitar problemas de concurrencia si devuelves la lista original
+            List<Aldeano> todosAldeanos = new ArrayList<>();
+            todosAldeanos.addAll(aldeanosDepositando);
+            todosAldeanos.addAll(aldeanosEsperando);
+            return todosAldeanos;
+        }
+    }
+
+    public List<Guerrero> getGuerreros() {
+        return guerreros;
+    }
+
 
     public String obtenerEstadoAldeanos() {
         synchronized (lock) {

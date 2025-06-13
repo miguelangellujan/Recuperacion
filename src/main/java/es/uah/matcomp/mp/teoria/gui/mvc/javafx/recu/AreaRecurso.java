@@ -206,4 +206,27 @@ public class AreaRecurso implements Zona {
             lockZona.unlock();
         }
     }
+    public List<Aldeano> getAldeanos() {
+        lockZona.lock();
+        try {
+            // Devuelvo una nueva lista con todos los aldeanos de las tres listas internas
+            List<Aldeano> todos = new ArrayList<>();
+            todos.addAll(recolectando);
+            todos.addAll(esperandoEnCola);
+            todos.addAll(dentro);
+            return todos;
+        } finally {
+            lockZona.unlock();
+        }
+    }
+
+    public List<Guerrero> getGuerreros() {
+        lockGuerreros.lock();
+        try {
+            // Devuelvo copia de la lista de guerreros dentro
+            return new ArrayList<>(guerrerosDentro);
+        } finally {
+            lockGuerreros.unlock();
+        }
+    }
 }

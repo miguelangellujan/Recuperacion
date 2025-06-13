@@ -22,12 +22,43 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
     public int barbarosZonaPreparacion() throws RemoteException {
         return centro.getZonaPreparacion().contarBarbarosPreparacion();
     }
+    //RECURSOS
+    public int aldeanosengranja() throws RemoteException{
+        return centro.contarAldeanosEnGranja();
+    }
+    public int guerrerosengranja()throws RemoteException{
+        return centro.contarGuerrerosEnGranja();}
+    public int aldeanosenbosque() throws RemoteException{
+        return centro.contarAldeanosEnBosque();
+    }
+    public int guerrerosenbosque()throws RemoteException{
+        return centro.contarGuerrerosEnBosque();}
+    public int aldeanosentesoreria() throws RemoteException{
+        return centro.contarAldeanosEntesoreria();
+    }
+    public int aldeanosenmina() throws RemoteException{
+        return centro.contarAldeanosEnMina();}
+    public int guerrerosenmina()throws RemoteException{
+        return centro.contarGuerrerosEnMina();}
+
+    //ALMACENES
+    public int guerrerosetesoreria()throws RemoteException{
+        return centro.contarGuerrerosEntesoreria();}
+    public int aldeanosengranero() throws RemoteException{
+        return centro.contarAldeanosEngranero();
+    }
+    public int guerrerosengranero()throws RemoteException{
+        return centro.contarGuerrerosEngranero();}
+    public int aldeanosenaserradero() throws RemoteException{
+        return centro.contarAldeanosEnaserradero();
+    }
+    public int guerrerosenaserradero()throws RemoteException{
+        return centro.contarGuerrerosEnaserradero();}
 
     @Override
     public int barbarosCampamento() throws RemoteException {
         return centro.contarBarbarosEnCampamento();
     }
-
     // Estado de los recursos almacenados (cantidad actual / capacidad máxima)
     @Override
     public int getComida() throws RemoteException {

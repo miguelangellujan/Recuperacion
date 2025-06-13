@@ -2,6 +2,7 @@ package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 public class AreaRecuperacion {
     private final List<String> enRecuperacion = new CopyOnWriteArrayList<>();
@@ -45,5 +46,30 @@ public class AreaRecuperacion {
     public String obtenerIdsEnRecuperacion() {
         if (enRecuperacion.isEmpty()) return "Área de Recuperación: vacía";
         return "En recuperación: " + String.join(", ", enRecuperacion);
+    }
+    // === FUNCIONES ADICIONALES ===
+
+    public List<String> getAldeanosEnRecuperacion() {
+        return enRecuperacion.stream()
+                .filter(id -> id.startsWith("Aldeano"))
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getGuerrerosEnRecuperacion() {
+        return enRecuperacion.stream()
+                .filter(id -> id.startsWith("Guerrero"))
+                .collect(Collectors.toList());
+    }
+
+    public int contarAldeanosEnRecuperacion() {
+        return (int) enRecuperacion.stream()
+                .filter(id -> id.startsWith("Aldeano"))
+                .count();
+    }
+
+    public int contarGuerrerosEnRecuperacion() {
+        return (int) enRecuperacion.stream()
+                .filter(id -> id.startsWith("Guerrero"))
+                .count();
     }
 }
