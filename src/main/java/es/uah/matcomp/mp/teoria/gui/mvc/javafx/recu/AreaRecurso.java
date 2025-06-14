@@ -62,22 +62,37 @@ public class AreaRecurso implements Zona {
     @Override
     public boolean enfrentarABarbaro(Barbaro b) {
         synchronized (guerrerosDentro) {
-            if (guerrerosDentro.isEmpty()) return false;
+            for (Guerrero g : guerrerosDentro) {
+                if (!g.estaLuchando()) {
+                    g.setLuchando(true);
+                    Log.log(b.getIdBarbaro() + " se enfrenta a " + g.getIdGuerrero());
 
-            Guerrero g = guerrerosDentro.remove(0);
-            Log.log(b.getIdBarbaro() + " se enfrenta a " + g.getIdGuerrero());
+                    double probVictoriaGuerrero = g.getProbabilidadVictoria(); // ej: 0.5 + mejora
+                    double random = Math.random();
 
-            boolean barbaroGana = new Random().nextBoolean();
-            if (barbaroGana) {
-                Log.log(b.getIdBarbaro() + " derrota a " + g.getIdGuerrero());
-                return true;
-            } else {
-                Log.log(b.getIdBarbaro() + " pierde contra " + g.getIdGuerrero());
-                g.enviarARecuperacion();
-                return false;
+                    boolean guerreroGana = random < probVictoriaGuerrero;
+
+                    if (guerreroGana) {
+                        Log.log(g.getIdGuerrero() + " derrota a " + b.getIdBarbaro());
+                        // Aquí podrías llamar a un método para que el bárbaro pierda o salga
+                        // b.serDerrotado(); // si tienes este método
+                        g.setLuchando(false); // Guerrero ya libre para pelear otra vez
+                        return false;  // Indica que bárbaro NO ganó (guerrero ganó)
+                    } else {
+                        Log.log(b.getIdBarbaro() + " derrota a " + g.getIdGuerrero());
+                        guerrerosDentro.remove(g); // Guerrero derrotado, sale de zona
+                        g.enviarARecuperacion();
+                        // No ponemos g.setLuchando(false) porque guerrero ya eliminado de zona
+                        return true; // Indica que bárbaro ganó
+                    }
+                }
             }
+            // No hay guerreros disponibles para pelear
+            return false;
         }
     }
+
+
 
     // Acceso al área de recurso
     public void entrar(Aldeano a) throws InterruptedException {

@@ -12,6 +12,10 @@ public class GestorMejoras {
         this.centro = centro;
     }
 
+    public int getNivelHerramientas() {return nivelHerramientas;}
+    public int getNivelArmas() {return nivelArmas;}
+    public int getNivelAlmacenes() {return nivelAlmacenes;}
+
     public synchronized void aplicarMejoraHerramientas() {
         int costoMadera = 120;
         int costoOro = 80;

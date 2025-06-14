@@ -56,11 +56,10 @@ public class Almacen implements Zona {
         Thread.sleep(1000); // Espera de 1 segundo antes de saquear
         return false;
     }
-
-
     public void depositar(Aldeano aldeano, int cantidad) throws InterruptedException {
         int restante = cantidad;
-        synchronized (lock){
+        Random rnd = new Random();
+        synchronized (lock) {
             while (restante > 0) {
                 // Si no hay espacio, esperar bloqueando
                 while (cantidadActual == capacidadMaxima) {
@@ -70,7 +69,6 @@ public class Almacen implements Zona {
                     }
                     lock.wait(); // espera hasta que haya espacio
                 }
-
                 // Hay espacio, listo para depositar
                 aldeanosEsperando.remove(aldeano);
                 if (!aldeanosDepositando.contains(aldeano)) {
@@ -80,6 +78,15 @@ public class Almacen implements Zona {
                 int espacio = capacidadMaxima - cantidadActual;
                 int aDepositar = Math.min(espacio, restante);
 
+                // Simular tiempo aleatorio de depósito entre 2 y 3 segundos
+                int tiempoDeposito = 2000 + rnd.nextInt(1001);
+                try {
+                    lock.notifyAll(); // Notificar antes de dormir para evitar deadlocks
+                    Thread.sleep(tiempoDeposito);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw e;
+                }
                 cantidadActual += aDepositar;
                 restante -= aDepositar;
 
@@ -96,7 +103,6 @@ public class Almacen implements Zona {
                     // Terminó de depositar
                     aldeanosDepositando.remove(aldeano);
                 }
-
                 // Notificar a otros posibles aldeanos que puedan ahora depositar
                 lock.notifyAll();
             }
