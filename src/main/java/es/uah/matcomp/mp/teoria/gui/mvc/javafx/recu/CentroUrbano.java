@@ -51,10 +51,6 @@ public class CentroUrbano {
     }
 
     // Geters para acceso a variables
-    public List<Aldeano> getAldeanos() {
-        return aldeanos;
-    }
-
     public AreaRecuperacion getAreaRecuperacion() {
         return areaRecuperacion;
     }
@@ -200,40 +196,32 @@ public class CentroUrbano {
         }
     }
     //CENTRO URBANO
-    public String obtenerIdsAldeanosEnCentroUrbano() {
-        List<String> ids = new ArrayList<>();
-        synchronized (casaPrincipal) {
-            ids.addAll(casaPrincipal.getAldeanos().stream().map(Aldeano::getIdAldeano).toList());
+    // ALDEANOS EN CENTRO URBANO COMPLETO
+    public String getAldeanos() {
+        synchronized (aldeanos) {
+            return aldeanos.stream()
+                    .map(Aldeano::getIdAldeano)
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("Ninguno");
         }
-        synchronized (plazaCentral) {
-            ids.addAll(plazaCentral.getAldeanos().stream().map(Aldeano::getIdAldeano).toList());
-        }
-        synchronized (areaRecuperacion) {
-            ids.addAll(areaRecuperacion.getAldeanos().stream().map(Aldeano::getIdAldeano).toList());
-        }
-        return ids.isEmpty() ? "Ninguno" : String.join(", ", ids);
+    }
+    public int contarAldeanos() {
+        return getAldeanos().equals("Ninguno") ? 0 : getAldeanos().split(", ").length;
     }
 
-    public int contarAldeanosEnCentroUrbano() {
-        String ids = obtenerIdsAldeanosEnCentroUrbano();
-        return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
+    // GUERREROS EN CENTRO URBANO
+    public String getGuerreros() {
+        synchronized (guerreros) {
+            return guerreros.stream()
+                    .map(Guerrero::getIdGuerrero)
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("Ninguno");
+        }
+    }
+    public int contarGuerreros() {
+        return getGuerreros().equals("Ninguno") ? 0 : getGuerreros().split(", ").length;
     }
 
-    public String obtenerIdsGuerrerosEnCentroUrbano() {
-        List<String> ids = new ArrayList<>();
-        synchronized (cuartel) {
-            ids.addAll(cuartel.getGuerreros().stream().map(Guerrero::getIdGuerrero).toList());
-        }
-        synchronized (areaRecuperacion) {
-            ids.addAll(areaRecuperacion.getGuerreros().stream().map(Guerrero::getIdGuerrero).toList());
-        }
-        return ids.isEmpty() ? "Ninguno" : String.join(", ", ids);
-    }
-
-    public int contarGuerrerosEnCentroUrbano() {
-        String ids = obtenerIdsGuerrerosEnCentroUrbano();
-        return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
-    }
 
     //GRANJA
     public String obtenerIdsAldeanosEnGranja() {
@@ -390,23 +378,17 @@ public class CentroUrbano {
         return plazaCentral.obtenerIds();
     }
 
-    public int contarAldeanos() {
-        return aldeanos.size();
-    }
-
-    public int contarGuerreros() {
-        return guerreros.size();
-    }
-
     public int contarBarbaros() {
         return barbaros.size();
+    }
+    public List<Aldeano> getAldeanos2(){
+        return aldeanos;
     }
 
     // Funciones para el ataque
     public void entrenar(Guerrero g) throws InterruptedException {
         cuartel.entrenar(g);
     }
-
     public Zona obtenerZonaAleatoria() {
         List<Zona> zonas = List.of(granja, bosque, mina, granero, aserradero, tesoreria);
         return zonas.get(new Random().nextInt(zonas.size()));

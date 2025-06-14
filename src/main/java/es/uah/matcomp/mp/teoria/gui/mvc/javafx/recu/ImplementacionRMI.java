@@ -54,7 +54,13 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
     }
     public int guerrerosenaserradero()throws RemoteException{
         return centro.contarGuerrerosEnaserradero();}
-
+    //CENTRO URBANO
+    public int aldeanosencentrourbano() throws RemoteException{
+        return centro.contarAldeanos();
+    }
+    public int guerrerosencentrourbano() throws RemoteException{
+        return centro.contarGuerreros();
+    }
     @Override
     public int barbarosCampamento() throws RemoteException {
         return centro.contarBarbarosEnCampamento();
@@ -108,14 +114,14 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
             centro.getAserradero().liberarAldeanos();
             centro.getTesoreria().liberarAldeanos();
 
-            for(Aldeano a : centro.getAldeanos()){
+            for(Aldeano a : centro.getAldeanos2()){
                 a.setEmergencia(true);
                 a.moverACasaPrincipal();
             }
         } else {
             Log.log("¡Emergencia desactivada! Los aldeanos retoman su trabajo.");
 
-            for(Aldeano a : centro.getAldeanos()){
+            for(Aldeano a : centro.getAldeanos2()){
                 a.setEmergencia(false);
                 synchronized (a){
                     a.notify();
