@@ -214,8 +214,13 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
             Log.log("¡Emergencia desactivada! Los aldeanos retoman su trabajo.");
 
             for(Aldeano a : centro.getAldeanos2()){
+                if (centro.getCasaPrincipal().estaRegistrado(a.getIdAldeano())) {
+                    centro.getCasaPrincipal().salir(a.getIdAldeano());
+                    a.moverAPlazaCentral(); // Los devuelve a PlazaCentral después de la emergencia
+                }
+
                 a.setEmergencia(false);
-                synchronized (a){
+                synchronized (a) {
                     a.notify();
                 }
             }

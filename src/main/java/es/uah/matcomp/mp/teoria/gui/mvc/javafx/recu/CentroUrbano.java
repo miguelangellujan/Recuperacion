@@ -455,9 +455,6 @@ public class CentroUrbano {
         if (nuevoEstado) {
             Log.log("¡Emergencia activada! Los aldeanos regresan a CASA PRINCIPAL.");
 
-            granero.liberarAldeanos();
-            aserradero.liberarAldeanos();
-            tesoreria.liberarAldeanos();
 
             for(Aldeano a : aldeanos){
                 a.setEmergencia(true);
