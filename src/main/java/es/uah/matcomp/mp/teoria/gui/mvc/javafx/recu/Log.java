@@ -17,7 +17,7 @@ public class Log {
         Runtime.getRuntime().addShutdownHook(new CerrarLogger());
     }
 
-    // para añadir monitor método synchronized para proteger acceso
+    // Para añadir monitor método synchronized para proteger acceso
     public static synchronized void log (String mensaje) {
         String texto = String.format("[%s] %s", new Date(), mensaje);
         System.out.println(texto);
@@ -26,6 +26,7 @@ public class Log {
             writer.flush();
         }
     }
+
     private static class CerrarLogger extends Thread {
         public void run() {
             if (writer != null) {

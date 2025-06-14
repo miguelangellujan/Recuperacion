@@ -57,9 +57,13 @@ public class Aldeano extends Thread {
         moverACasaPrincipal();
 
         // Espera hasta que la emergencia se desactive.
-        while (centro.isEmergenciaActiva()) {
-            synchronized (this) {
-                wait();
+        synchronized (this) {
+            while (centro.isEmergenciaActiva()) {
+                try {
+                    wait(500);
+                } catch (InterruptedException e) {
+                    Log.log("Error en la emergencia: " + e.getMessage());
+                }
             }
         }
 

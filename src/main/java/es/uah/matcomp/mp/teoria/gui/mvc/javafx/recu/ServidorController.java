@@ -94,30 +94,51 @@ public class ServidorController {
     // Inicializar los hilos donde se crean los individuos
     private void iniciarHilos(){
         Thread hiloAldeano = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()){
-                if(!enPausa){
-                    crearAldeano();
+            while (true){
+                synchronized (centro.getPausaLock()) {
+                    while (centro.isPausado()) {
+                        try {
+                            centro.getPausaLock().wait();
+                        } catch (InterruptedException e) {
+                            Log.log("Error creando el hilo del aldeano: " + e.getMessage());
+                        }
+                    }
                 }
+                crearAldeano();
             }
         });
         hilosActivos.add(hiloAldeano);
         hiloAldeano.start();
 
         Thread hiloBarbaro = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()){
-                if(!enPausa){
-                    crearBarbaro();
+            while (true){
+                synchronized (centro.getPausaLock()) {
+                    while (centro.isPausado()) {
+                        try {
+                            centro.getPausaLock().wait();
+                        } catch (InterruptedException e) {
+                            Log.log("Error creando el hilo del aldeano: " + e.getMessage());
+                        }
+                    }
                 }
+                crearBarbaro();
             }
         });
         hilosActivos.add(hiloBarbaro);
         hiloBarbaro.start();
 
         Thread hiloInterfaz = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()){
-                if(!enPausa){
-                    actualizarInterfaz();
+            while (true){
+                synchronized (centro.getPausaLock()) {
+                    while (centro.isPausado()) {
+                        try {
+                            centro.getPausaLock().wait();
+                        } catch (InterruptedException e) {
+                            Log.log("Error creando el hilo del aldeano: " + e.getMessage());
+                        }
+                    }
                 }
+                Platform.runLater(this :: actualizarInterfaz);
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e){
@@ -133,7 +154,6 @@ public class ServidorController {
     private void actualizarInterfaz() {
 
         Platform.runLater(() -> {
-            // Actualización de recursos
             lblComidaRecursos.setText("Comida: " + centro.getRecurso("COMIDA").get());
             lblMaderaRecursos.setText("Madera: " + centro.getRecurso("MADERA").get());
             lblOroRecursos.setText("Oro: " + centro.getRecurso("ORO").get());
@@ -142,23 +162,17 @@ public class ServidorController {
             lblMina.setText(centro.getArea("ORO").obtenerEstadoAldeanos());
             lblBosque.setText(centro.getArea("MADERA").obtenerEstadoAldeanos());
 
-            // Estado del almacén de comida
             lblGranero.setText(centro.getAlmacen("COMIDA").obtenerEstadoAldeanos());
-            // Estado del almacén de madera
             lblAserradero.setText(centro.getAlmacen("MADERA").obtenerEstadoAldeanos());
-            // Estado del almacén de oro
             lblTesoreria.setText(centro.getAlmacen("ORO").obtenerEstadoAldeanos());
 
-            // Estado del centro urbano
             lblCasaPrincipal.setText(centro.getCasaPrincipal().obtenerIds());
-            lblCuartel.setText(centro.obtenerIdsGuerreros());
+            lblCuartel.setText(centro.getGuerreros());
             lblPlazaCentral.setText(centro.getPlazaCentral().obtenerIds());
             lblAreaRecuperacion.setText(centro.getAreaRecuperacion().obtenerIdsEnRecuperacion());
 
-
-            // Estado de los bárbaros
             lblZonaPreparacion.setText(centro.getZonaPreparacion().obtenerIdsEnPreparacion());
-            lblCampamentoBarbaro.setText(centro.obtenerIdsBarbarosEnCampamento());
+            lblCampamentoBarbaro.setText(centro.getBarbarosCampamento());
         });
     }
 
@@ -193,13 +207,12 @@ public class ServidorController {
     @FXML
     private void ejecucion(){
         enPausa = !enPausa;
+        centro.setPausa(enPausa);
 
         if(enPausa){
-            for (Thread hiloActivo : hilosActivos){
-                hiloActivo.interrupt();
-            }
+            Log.log("Sistema Pausado");
         } else {
-            iniciarHilos();
+            Log.log("Sistema Reanudado");
         }
 
         btnDetener.setText(enPausa ? "Reanudar" : "Detener");
