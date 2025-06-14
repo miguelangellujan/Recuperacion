@@ -6,10 +6,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class AreaRecurso implements Zona {
     private final String tipo;
-
     private final List<Aldeano> recolectando = new ArrayList<>();
     private final List<Aldeano> esperandoEnCola = new ArrayList<>();
     private final List<Aldeano> dentro = new ArrayList<>();
+    private final List<Barbaro> barbarosAtacando = new ArrayList<>();
+
 
     private final ReentrantLock lockZona = new ReentrantLock(true);
     private final Condition puedeEntrarAldeano = lockZona.newCondition();
@@ -121,11 +122,14 @@ public class AreaRecurso implements Zona {
     }
 
     // Ataque
-    public void iniciarAtaque() {
+    public void iniciarAtaque(Barbaro b) {
         lockZona.lock();
         try {
             enAtaque = true;
-            Log.log("Ataque bárbaro en el área de " + tipo);
+            synchronized (barbarosAtacando) {
+                barbarosAtacando.add(b);
+            }
+            Log.log("Ataque bárbaro en el área de " + tipo + " por " + b.getIdBarbaro());
         } finally {
             lockZona.unlock();
         }
@@ -135,11 +139,13 @@ public class AreaRecurso implements Zona {
         lockZona.lock();
         try {
             enAtaque = false;
+
             if (destruir) {
                 destruida = true;
                 Log.log("El área de " + tipo + " ha sido destruida y requiere reparación.");
             }
 
+            // Expulsar aldeanos
             for (Aldeano a : new ArrayList<>(dentro)) {
                 Log.log(a.getIdAldeano() + " es expulsado del área de " + tipo + " tras el ataque.");
                 salir(a);
@@ -151,14 +157,15 @@ public class AreaRecurso implements Zona {
                     Log.log("Error al expulsar a " + a.getIdAldeano() + ": " + e.getMessage());
                 }
             }
-
             puedeEntrarAldeano.signalAll();
-
         } finally {
             lockZona.unlock();
         }
-
-        // Notificar también a los guerreros
+        // Limpiar bárbaros que estaban atacando
+        synchronized (barbarosAtacando) {
+            barbarosAtacando.clear();
+        }
+        // Notificar a los guerreros
         lockGuerreros.lock();
         try {
             puedeEntrarGuerrero.signalAll();
@@ -166,6 +173,7 @@ public class AreaRecurso implements Zona {
             lockGuerreros.unlock();
         }
     }
+
 
     public boolean fueAtacadoDurante(Aldeano a) {
         lockZona.lock();
@@ -229,4 +237,10 @@ public class AreaRecurso implements Zona {
             lockGuerreros.unlock();
         }
     }
+    public List<Barbaro> getBarbaros() {
+        synchronized (barbarosAtacando) {
+            return new ArrayList<>(barbarosAtacando);
+        }
+    }
+
 }

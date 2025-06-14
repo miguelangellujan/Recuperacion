@@ -23,37 +23,56 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
         return centro.getZonaPreparacion().contarBarbarosPreparacion();
     }
     //RECURSOS
+    //Granjaa
     public int aldeanosengranja() throws RemoteException{
         return centro.contarAldeanosEnGranja();
     }
     public int guerrerosengranja()throws RemoteException{
         return centro.contarGuerrerosEnGranja();}
+    public int barbarosengranja()throws RemoteException{
+        return centro.contarBarbarosEnGranja();}
+    //Bosque
     public int aldeanosenbosque() throws RemoteException{
         return centro.contarAldeanosEnBosque();
     }
     public int guerrerosenbosque()throws RemoteException{
         return centro.contarGuerrerosEnBosque();}
-    public int aldeanosentesoreria() throws RemoteException{
-        return centro.contarAldeanosEntesoreria();
-    }
+    public int barbarosenbosque()throws RemoteException{
+        return centro.contarBarbarosEnBosque();}
+    //Mina
     public int aldeanosenmina() throws RemoteException{
         return centro.contarAldeanosEnMina();}
     public int guerrerosenmina()throws RemoteException{
         return centro.contarGuerrerosEnMina();}
+    public int barbarosenmina()throws RemoteException{
+        return centro.contarBarbarosEnMina();}
 
     //ALMACENES
+    public int aldeanosentesoreria() throws RemoteException{
+        return centro.contarAldeanosEntesoreria();
+    }
     public int guerrerosetesoreria()throws RemoteException{
         return centro.contarGuerrerosEntesoreria();}
+    public int barbarosentesoreria() throws RemoteException{
+        return centro.contarBarbarosEntesoreria();
+    }
     public int aldeanosengranero() throws RemoteException{
         return centro.contarAldeanosEngranero();
     }
     public int guerrerosengranero()throws RemoteException{
         return centro.contarGuerrerosEngranero();}
+    public int barbarosengranero() throws RemoteException{
+        return centro.contarBarbarosEngranero();
+    }
     public int aldeanosenaserradero() throws RemoteException{
         return centro.contarAldeanosEnaserradero();
     }
     public int guerrerosenaserradero()throws RemoteException{
         return centro.contarGuerrerosEnaserradero();}
+    public int barbarosenaserradero()throws RemoteException{
+        return centro.contarBarbarosEnaserradero();
+
+    }
     //CENTRO URBANO
     public int aldeanosencentrourbano() throws RemoteException{
         return centro.contarAldeanos();

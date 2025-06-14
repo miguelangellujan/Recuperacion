@@ -56,12 +56,11 @@ public class Barbaro extends Thread {
 
                 Thread.sleep(1000);
                 if (objetivo instanceof AreaRecurso recurso) {
-                    recurso.iniciarAtaque();
+                    recurso.iniciarAtaque(this);
                     recurso.finalizarAtaque(true);
                 } else if (objetivo instanceof Almacen almacen) {
-                    almacen.saquear();
+                    almacen.saquear(this);
                 }
-
                 Log.log(id + " finaliza el ataque en " + objetivo.getNombreZona());
                 puedeAtacar = false;
             }

@@ -196,7 +196,6 @@ public class CentroUrbano {
         }
     }
     //CENTRO URBANO
-    // ALDEANOS EN CENTRO URBANO COMPLETO
     public String getAldeanos() {
         synchronized (aldeanos) {
             return aldeanos.stream()
@@ -222,7 +221,6 @@ public class CentroUrbano {
         return getGuerreros().equals("Ninguno") ? 0 : getGuerreros().split(", ").length;
     }
 
-
     //GRANJA
     public String obtenerIdsAldeanosEnGranja() {
         synchronized (granja) {
@@ -231,14 +229,12 @@ public class CentroUrbano {
                     .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
         }
     }
-
     public int contarAldeanosEnGranja() {
         return obtenerIdsAldeanosEnGranja().equals("Ninguno") ? 0 : obtenerIdsAldeanosEnGranja().split(", ").length;
     }
     public int contarGuerrerosEnGranja() {
         return obtenerIdsGuerrerosEnGranja().equals("Ninguno") ? 0 : obtenerIdsGuerrerosEnGranja().split(", ").length;
     }
-
     public String obtenerIdsGuerrerosEnGranja() {
         synchronized (granja) {
             return granja.getGuerreros().stream()
@@ -246,6 +242,20 @@ public class CentroUrbano {
                     .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
         }
     }
+    public String obtenerIdsBarbarosEnGranja() {
+        synchronized (granja) {
+            return granja.getBarbaros().stream()
+                    .map(Barbaro::getIdBarbaro)
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("Ninguno");
+        }
+    }
+
+    public int contarBarbarosEnGranja() {
+        String ids = obtenerIdsBarbarosEnGranja();
+        return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
+    }
+
     //BOSQUE
     public String obtenerIdsAldeanosEnBosque() {
         synchronized (bosque) {
@@ -266,6 +276,18 @@ public class CentroUrbano {
     }
     public int contarGuerrerosEnBosque() {
         return obtenerIdsGuerrerosEnBosque().equals("Ninguno") ? 0 : obtenerIdsGuerrerosEnBosque().split(", ").length;
+    }
+    public String obtenerIdsBarbarosEnBosque() {
+        synchronized (bosque) {
+            return bosque.getBarbaros().stream()
+                    .map(Barbaro::getIdBarbaro)
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("Ninguno");
+        }
+    }
+    public int contarBarbarosEnBosque() {
+        String ids = obtenerIdsBarbarosEnBosque();
+        return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
     //MINA
     public String obtenerIdsAldeanosEnMina() {
@@ -289,7 +311,19 @@ public class CentroUrbano {
     public int contarGuerrerosEnMina() {
         return obtenerIdsGuerrerosEnMina().equals("Ninguno") ? 0 : obtenerIdsGuerrerosEnMina().split(", ").length;
     }
-
+    public String obtenerIdsBarbarosEnMina() {
+        synchronized (mina) {
+            return mina.getBarbaros().stream()
+                    .map(Barbaro::getIdBarbaro)
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("Ninguno");
+        }
+    }
+    public int contarBarbarosEnMina() {
+        String ids = obtenerIdsBarbarosEnMina();
+        return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
+    }
+/////////////////////////////
     //TESORERÍA
     public String obtenerIdsAldeanosEntesoreria() {
         synchronized (tesoreria) {
@@ -311,6 +345,16 @@ public class CentroUrbano {
     }
     public int contarGuerrerosEntesoreria() {
         return obtenerIdsGuerrerosEntesoreria().equals("Ninguno") ? 0 : obtenerIdsGuerrerosEntesoreria().split(", ").length;
+    }
+    public String obtenerIdsBarbarosEntesoreria() {
+        synchronized (tesoreria) {
+            return tesoreria.getBarbaros().stream()
+                    .map(Barbaro::getIdBarbaro)
+                    .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+        }
+    }
+    public int contarBarbarosEntesoreria() {
+        return obtenerIdsBarbarosEntesoreria().equals("Ninguno") ? 0 : obtenerIdsBarbarosEntesoreria().split(", ").length;
     }
     //GRANERO
     public String obtenerIdsAldeanosEngranero() {
@@ -334,6 +378,16 @@ public class CentroUrbano {
     public int contarGuerrerosEngranero() {
         return obtenerIdsGuerrerosEngranero().equals("Ninguno") ? 0 : obtenerIdsGuerrerosEngranero().split(", ").length;
     }
+    public String obtenerIdsBarbarosEngranero() {
+        synchronized (granero) {
+            return granero.getBarbaros().stream()
+                    .map(Barbaro::getIdBarbaro)
+                    .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+        }
+    }
+    public int contarBarbarosEngranero() {
+        return obtenerIdsBarbarosEngranero().equals("Ninguno") ? 0 : obtenerIdsBarbarosEngranero().split(", ").length;
+    }
     //ASERRADERO
     public String obtenerIdsAldeanosEnaserradero() {
         synchronized (aserradero) {
@@ -355,6 +409,16 @@ public class CentroUrbano {
     }
     public int contarGuerrerosEnaserradero() {
         return obtenerIdsGuerrerosEnaserradero().equals("Ninguno") ? 0 : obtenerIdsGuerrerosEnaserradero().split(", ").length;
+    }
+    public String obtenerIdsBarbarosEnaserradero() {
+        synchronized (aserradero) {
+            return aserradero.getBarbaros().stream()
+                    .map(Barbaro::getIdBarbaro)
+                    .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+        }
+    }
+    public int contarBarbarosEnaserradero() {
+        return obtenerIdsBarbarosEnaserradero().equals("Ninguno") ? 0 : obtenerIdsBarbarosEnaserradero().split(", ").length;
     }
     public String obtenerIdsBarbarosEnCampamento() {
         synchronized (barbaros) {

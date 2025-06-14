@@ -13,7 +13,8 @@ public class Almacen implements Zona {
     private Object lock = new Object();
     private final List<Aldeano> aldeanosDepositando = new ArrayList<>();
     private final List<Aldeano> aldeanosEsperando = new ArrayList<>();
-    private List<Guerrero> guerreros=new ArrayList<>();
+    private final List<Guerrero> guerreros=new ArrayList<>();
+    private final List<Barbaro> barbarosAtacando = new ArrayList<>();
 
     // Constructor
     public Almacen(String tipo, int capacidad, CentroUrbano centro) {
@@ -51,11 +52,11 @@ public class Almacen implements Zona {
 
     @Override
     public boolean enfrentarABarbaro(Barbaro b) throws InterruptedException {
-        // En el contexto del almacén, el método de combate no se utiliza directamente.
-        // Se retorna true para indicar que el almacén "permite" que el ataque continúe
-        // (en la práctica, el ataque se gestiona mediante el método saquear()).
-        return true;
+        // No hay defensores en un almacén. El bárbaro pasa directamente al saqueo.
+        Thread.sleep(1000); // Espera de 1 segundo antes de saquear
+        return false;
     }
+
 
     public void depositar(Aldeano aldeano, int cantidad) throws InterruptedException {
         int restante = cantidad;
@@ -109,20 +110,28 @@ public class Almacen implements Zona {
             lock.notifyAll(); // Avisamos a los aldeanos por si ahora hay hueco
         }
     }
+    public void saquear(Barbaro b) {
+        agregarBarbaro(b);
 
-    public synchronized void saquear() {
         int porcentaje = FuncionesComunes.randomBetween(10, 30);
-        int robado = (cantidadActual * porcentaje) / 100;
-        cantidadActual -= robado;
+        int robado;
+        synchronized (lock) {
+            robado = (cantidadActual * porcentaje) / 100;
+            cantidadActual -= robado;
+        }
+
         centro.restarRecurso(tipo, robado);
 
-        Log.log("¡SAQUEO en " + tipo + "! Se han robado " + robado + " unidades. Restante: " + cantidadActual);
+        Log.log("¡SAQUEO en " + tipo + "! Se han robado " + robado + " unidades por " + b.getIdBarbaro() + ". Restante: " + cantidadActual);
+
+        eliminarBarbaro(b);
 
         int comida = centro.getRecurso("COMIDA").get();
         int madera = centro.getRecurso("MADERA").get();
         int oro = centro.getRecurso("ORO").get();
         Log.log("ESTADO RECURSOS => Comida: " + comida + ", Madera: " + madera + ", Oro: " + oro);
     }
+
 
     public void añadirInicial(int cantidad) {
         synchronized (lock){
@@ -178,4 +187,22 @@ public class Almacen implements Zona {
             Log.log(aldeano.getIdAldeano() + " ha salido del almacén de " + tipo);
         }
     }
+
+    public synchronized void agregarBarbaro(Barbaro b) {
+        if (!barbarosAtacando.contains(b)) {
+            barbarosAtacando.add(b);
+            Log.log("Barbaro " + b.getIdBarbaro() + " ha empezado a saquear el almacén de " + tipo);
+        }
+    }
+
+    public synchronized void eliminarBarbaro(Barbaro b) {
+        if (barbarosAtacando.remove(b)) {
+            Log.log("Barbaro " + b.getIdBarbaro() + " ha terminado de saquear el almacén de " + tipo);
+        }
+    }
+
+    public synchronized List<Barbaro> getBarbaros() {
+        return new ArrayList<>(barbarosAtacando);
+    }
+
 }
