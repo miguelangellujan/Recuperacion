@@ -5,7 +5,7 @@ public class Aldeano extends Thread {
     private final CentroUrbano centro;
     private volatile boolean activo = true;
     private boolean emergencia = false;
-    private volatile boolean esperandoEnEmergencia = false;
+    private boolean esperandoEnEmergencia = false;
 
     // Constructor
     public Aldeano(String id, CentroUrbano centro) {
@@ -117,6 +117,11 @@ public class Aldeano extends Thread {
                 checkYEsperarEmergencia();
 
                 int cantidad = FuncionesComunes.randomBetween(10, 20);
+
+                int nivelHerramientas = centro.getGestorMejoras().getNivelHerramientas();
+                nivelHerramientas = Math.min(nivelHerramientas, 3); // Máximo 3 niveles
+                int recolectar = cantidad + (5 * nivelHerramientas);
+
                 Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));  // recolección
 
                 if (area.fueAtacadoDurante(this)) {
@@ -126,7 +131,7 @@ public class Aldeano extends Thread {
                     continue;
                 }
 
-                Log.log(id + " recolecta " + cantidad + " unidades de " + tipo);
+                Log.log(id + " recolecta " + recolectar + " unidades de " + tipo);
                 area.salir(this);
 
                 checkYEsperarEmergencia();
@@ -138,7 +143,7 @@ public class Aldeano extends Thread {
 
                 checkYEsperarEmergencia();
 
-                almacen.depositar(this, cantidad);
+                almacen.depositar(this, recolectar);
 
                 synchronized (area) {
                     area.notifyAll();

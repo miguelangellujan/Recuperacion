@@ -16,6 +16,9 @@ public class GestorMejoras {
     public int getNivelArmas() {return nivelArmas;}
     public int getNivelAlmacenes() {return nivelAlmacenes;}
 
+
+    //Funciones asociadas a la interfaz
+
     public synchronized void aplicarMejoraHerramientas() {
         int costoMadera = 120;
         int costoOro = 80;
@@ -50,22 +53,28 @@ public class GestorMejoras {
         }
     }
 
-    public synchronized void aplicarMejoraAlmacenes(Almacen a) {
+    public synchronized void aplicarMejoraAlmacenes() {
         int costoMadera = 150;
         int costoOro = 50;
         if (nivelAlmacenes >= 3) {
             Log.log("Se alcanzó el nivel máximo de mejora en almacenes.");
             return;
         }
+
         if (centro.getRecurso("MADERA").get() >= costoMadera && centro.getRecurso("ORO").get() >= costoOro) {
             centro.restarRecurso("MADERA", costoMadera);
             centro.restarRecurso("ORO", costoOro);
             nivelAlmacenes++;
-            // Aquí deberías aumentar capacidad de almacén:
-            a.aumentarCapacidad(100);
-            Log.log("Mejora de almacenes aplicada al nivel " + nivelAlmacenes + " en " + a.getNombreZona());
+
+            for (Almacen almacen : centro.getAlmacenes()) {
+                almacen.aumentarCapacidad(100);
+                Log.log("Capacidad aumentada en " + almacen.getNombreZona() + " al nivel " + nivelAlmacenes);
+            }
+
+            Log.log("Mejora de almacenes aplicada al nivel " + nivelAlmacenes);
         } else {
             Log.log("No hay recursos suficientes para mejorar almacenes.");
         }
     }
+
 }

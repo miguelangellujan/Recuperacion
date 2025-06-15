@@ -31,7 +31,7 @@ public class CentroUrbano {
     private final List<Guerrero> guerreros = Collections.synchronizedList(new ArrayList<>());
     private final List<Barbaro> barbaros = Collections.synchronizedList(new ArrayList<>());
 
-    private final GestorMejoras mejoras;
+    private final GestorMejoras gestorMejoras = new GestorMejoras(this);
 
     private final AtomicBoolean emergenciaActiva = new AtomicBoolean(false);
 
@@ -40,7 +40,7 @@ public class CentroUrbano {
 
     // Constructor
     public CentroUrbano() {
-        mejoras = new GestorMejoras(this);
+        GestorMejoras mejoras = new GestorMejoras(this);
         granero.añadirInicial(comida.get());
         aserradero.añadirInicial(madera.get());
         tesoreria.añadirInicial(oro.get());
@@ -60,7 +60,7 @@ public class CentroUrbano {
     }
 
     public GestorMejoras getGestorMejoras() {
-        return mejoras;
+        return gestorMejoras;
     }
 
     public ZonaPreparacionBarbaros getZonaPreparacion() {
@@ -94,6 +94,10 @@ public class CentroUrbano {
     public Object getPausaLock() {
         return pausaLock;
     }
+    public List<Almacen> getAlmacenes() {
+        return Arrays.asList(granero, aserradero, tesoreria);
+    }
+
 
     // Crear Individuos
     public synchronized void crearAldeano() {
