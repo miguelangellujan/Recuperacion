@@ -17,131 +17,131 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
 
     // Centro Urbano
     @Override
-    public int aldeanosCentroUrbano() throws RemoteException{
+    public int aldeanosCentroUrbano() throws RemoteException {
         String aldeanos = centro.getAldeanos();
         return aldeanos.equals("Ninguno") ? 0 : aldeanos.split(", ").length;
     }
 
     @Override
-    public int guerrerosCentroUrbano() throws RemoteException{
+    public int guerrerosCentroUrbano() throws RemoteException {
         String guerreros = centro.getGuerreros();
         return guerreros.equals("Ninguno") ? 0 : guerreros.split(", ").length;
     }
 
     // Áreas de Recursos
 
-        // Mina
+    // Mina
     @Override
-    public int aldeanosMina() throws RemoteException{
+    public int aldeanosMina() throws RemoteException {
         String ids = centro.getAldeanosMina();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
     @Override
-    public int guerrerosMina()throws RemoteException{
+    public int guerrerosMina() throws RemoteException {
         String ids = centro.getGuerrerosMina();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
     @Override
-    public int barbarosMina()throws RemoteException{
+    public int barbarosMina() throws RemoteException {
         String ids = centro.getBarbarosMina();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
-        // Bosque
+    // Bosque
     @Override
-    public int aldeanosBosque() throws RemoteException{
+    public int aldeanosBosque() throws RemoteException {
         String ids = centro.getAldeanosBosque();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
     @Override
-    public int guerrerosBosque()throws RemoteException{
+    public int guerrerosBosque() throws RemoteException {
         String ids = centro.getGuerrerosBosque();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
     @Override
-    public int barbarosBosque()throws RemoteException{
+    public int barbarosBosque() throws RemoteException {
         String ids = centro.getBarbarosBosque();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
-        // Granja
+    // Granja
     @Override
-    public int aldeanosGranja() throws RemoteException{
+    public int aldeanosGranja() throws RemoteException {
         String ids = centro.getAldeanosGranja();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
     @Override
-    public int guerrerosGranja()throws RemoteException{
+    public int guerrerosGranja() throws RemoteException {
         String ids = centro.getGuerrerosGranja();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
     @Override
-    public int barbarosGranja()throws RemoteException{
+    public int barbarosGranja() throws RemoteException {
         String ids = centro.getBarbarosGranja();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
     // Almacenes
 
-        // Tesorería
+    // Tesorería
     @Override
-    public int aldeanosTesoreria() throws RemoteException{
+    public int aldeanosTesoreria() throws RemoteException {
         String ids = centro.getAldeanosTesoreria();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
     @Override
-    public int guerrerosTesoreria()throws RemoteException{
+    public int guerrerosTesoreria() throws RemoteException {
         String ids = centro.getGuerrerosTesoreria();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
     @Override
-    public int barbarosTesoreria() throws RemoteException{
+    public int barbarosTesoreria() throws RemoteException {
         String ids = centro.getBarbarosTesoreria();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
-        // Aserradero
+    // Aserradero
     @Override
-    public int aldeanosAserradero() throws RemoteException{
+    public int aldeanosAserradero() throws RemoteException {
         String ids = centro.getAldeanosAserradero();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
     @Override
-    public int guerrerosAserradero()throws RemoteException{
+    public int guerrerosAserradero() throws RemoteException {
         String ids = centro.getGuerrerosAserradero();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
     @Override
-    public int barbarosAserradero()throws RemoteException{
+    public int barbarosAserradero() throws RemoteException {
         String ids = centro.getBarbarosAserradero();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
-        // Granero
+    // Granero
     @Override
-    public int aldeanosGranero() throws RemoteException{
+    public int aldeanosGranero() throws RemoteException {
         String ids = centro.getAldeanosGranero();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
     @Override
-    public int guerrerosGranero()throws RemoteException{
+    public int guerrerosGranero() throws RemoteException {
         String ids = centro.getGuerrerosGranero();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
 
     @Override
-    public int barbarosGranero() throws RemoteException{
+    public int barbarosGranero() throws RemoteException {
         String ids = centro.getBarbarosGranero();
         return ids.equals("Ninguno") ? 0 : ids.split(", ").length;
     }
@@ -206,14 +206,14 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
             centro.getAserradero().liberarAldeanos();
             centro.getTesoreria().liberarAldeanos();
 
-            for(Aldeano a : centro.getAldeanos2()){
+            for (Aldeano a : centro.getAldeanos2()) {
                 a.setEmergencia(true);
                 a.moverACasaPrincipal();
             }
         } else {
             Log.log("¡Emergencia desactivada! Los aldeanos retoman su trabajo.");
 
-            for(Aldeano a : centro.getAldeanos2()){
+            for (Aldeano a : centro.getAldeanos2()) {
                 if (centro.getCasaPrincipal().estaRegistrado(a.getIdAldeano())) {
                     centro.getCasaPrincipal().salir(a.getIdAldeano());
                     a.moverAPlazaCentral(); // Los devuelve a PlazaCentral después de la emergencia
@@ -229,15 +229,16 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
 
     // Botón de Pausa
     @Override
+
     public boolean isPausado() throws RemoteException {
-        return pausado.get();
+        return centro.isPausado();
     }
+
 
     @Override
     public void pausarEjecucion() throws RemoteException {
         boolean nuevoEstado = !centro.isPausado();
-        pausado.set(nuevoEstado);
-
+        centro.setPausa(nuevoEstado);
         Log.log(nuevoEstado ? "Sistema Pausado" : "Sistema Reanudado");
     }
 }
