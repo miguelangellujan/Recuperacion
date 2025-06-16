@@ -8,8 +8,8 @@ public class AreaRecurso implements Zona {
     private final String tipo;
     private final List<Aldeano> recolectando = new ArrayList<>();
     private final List<Aldeano> esperandoEnCola = new ArrayList<>();
-    private final List<Aldeano> dentro = new ArrayList<>();
     private final List<Barbaro> barbarosAtacando = new ArrayList<>();
+    private AreaRecuperacion areaRecuperacion;
 
 
     private final ReentrantLock lockZona = new ReentrantLock(true);
@@ -91,9 +91,6 @@ public class AreaRecurso implements Zona {
             return false;
         }
     }
-
-
-
     // Acceso al área de recurso
     public void entrar(Aldeano a) throws InterruptedException {
         lockZona.lock();
@@ -102,22 +99,18 @@ public class AreaRecurso implements Zona {
                 Log.log(a.getIdAldeano() + " no puede entrar, el área está destruida.");
                 return;
             }
-
             esperandoEnCola.add(a);
             while (recolectando.size() >= 3 || enAtaque) {
                 puedeEntrarAldeano.await();
             }
-
             esperandoEnCola.remove(a);
-            recolectando.add(a);
 
-            while (dentro.size() >= 4 || enAtaque) {
+            while (recolectando.size() >= 4 || enAtaque) {
                 Log.log(a.getIdAldeano() + " espera para entrar al área de " + tipo +
                         (enAtaque ? " (está siendo atacada)" : " (área llena)"));
                 puedeEntrarAldeano.await();
             }
-
-            dentro.add(a);
+            recolectando.add(a);
             Log.log(a.getIdAldeano() + " ha entrado al área de " + tipo);
 
         } finally {
@@ -129,7 +122,6 @@ public class AreaRecurso implements Zona {
         lockZona.lock();
         try {
             recolectando.remove(a);
-            dentro.remove(a);
             puedeEntrarAldeano.signalAll();
         } finally {
             lockZona.unlock();
@@ -161,7 +153,7 @@ public class AreaRecurso implements Zona {
             }
 
             // Expulsar aldeanos
-            for (Aldeano a : new ArrayList<>(dentro)) {
+            for (Aldeano a : new ArrayList<>(recolectando)) {
                 Log.log(a.getIdAldeano() + " es expulsado del área de " + tipo + " tras el ataque.");
                 salir(a);
                 try {
@@ -187,6 +179,19 @@ public class AreaRecurso implements Zona {
         } finally {
             lockGuerreros.unlock();
         }
+    }
+    public synchronized void expulsarAldeanos() {
+        for (Aldeano a : recolectando) {
+            areaRecuperacion.enviarAldeano(a,12000,15000);
+            a.interrupt();
+        }
+        for (Aldeano a : esperandoEnCola) {
+            areaRecuperacion.enviarAldeano(a,12000,15000);
+            a.interrupt();
+        }
+        recolectando.clear();
+        esperandoEnCola.clear();
+
     }
 
 
@@ -253,7 +258,6 @@ public class AreaRecurso implements Zona {
             List<Aldeano> todos = new ArrayList<>();
             todos.addAll(recolectando);
             todos.addAll(esperandoEnCola);
-            todos.addAll(dentro);
             return todos;
         } finally {
             lockZona.unlock();

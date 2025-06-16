@@ -177,23 +177,19 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
     public int getCapacidadMaxMadera() throws RemoteException {
         return centro.getAserradero().getCapacidadMaxima();
     }
-
     @Override
     public int getOro() throws RemoteException {
         return centro.getRecurso("ORO").get();
     }
-
     @Override
     public int getCapacidadMaxOro() throws RemoteException {
         return centro.getTesoreria().getCapacidadMaxima();
     }
-
     // Botón de Emergencia
     @Override
     public boolean isEmergenciaActiva() throws RemoteException {
         return emergenciaActiva.get();
     }
-
     @Override
     public void activarEmergencia() throws RemoteException {
         boolean nuevoEstado = !emergenciaActiva.get();
@@ -226,15 +222,11 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
             }
         }
     }
-
     // Botón de Pausa
     @Override
-
     public boolean isPausado() throws RemoteException {
         return centro.isPausado();
     }
-
-
     @Override
     public void pausarEjecucion() throws RemoteException {
         boolean nuevoEstado = !centro.isPausado();

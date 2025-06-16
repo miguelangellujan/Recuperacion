@@ -26,14 +26,6 @@ public class Barbaro extends Thread {
         try {
             while (true) {
                 centro.esperarSiPausado();
-                if (!puedeAtacar) {
-                    Log.log(id + " descansa en campamento por 40s");
-                    centro.esperarSiPausado();
-                    Thread.sleep(40000);
-                    puedeAtacar = true;
-                }
-
-                centro.esperarSiPausado();
                 Log.log(id + " se dirige a la zona de preparación");
                 ZonaPreparacionBarbaros zonaPrep = centro.getZonaPreparacion();
 
@@ -58,30 +50,42 @@ public class Barbaro extends Thread {
                     } else {
                         Log.log(id + " pierde el combate y se retira al campamento (60s)");
                         centro.esperarSiPausado();
-                        Thread.sleep(60000);
-                        continue;
+                        Thread.sleep(60000); // castigo por perder
+                        continue; // se salta el saqueo y vuelve a la zona de preparación
                     }
                 } else {
                     Log.log(id + " no encontró defensores en " + objetivo.getNombreZona());
                     centro.esperarSiPausado();
-                    Thread.sleep(1000);
+                    Thread.sleep(1000); // espera obligatoria sin combate
                 }
 
                 centro.esperarSiPausado();
-                Thread.sleep(1000);
+                Thread.sleep(1000); // observación antes del saqueo
 
                 if (objetivo instanceof AreaRecurso recurso) {
                     recurso.iniciarAtaque(this);
-                    recurso.finalizarAtaque(true);
+                    recurso.expulsarAldeanos(); // según el enunciado
                     centro.esperarSiPausado();
-                    Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                    Thread.sleep(FuncionesComunes.randomBetween(1000, 2000)); // tiempo saqueo
+                    recurso.finalizarAtaque(true);
                     recurso.eliminarBarbaro(this);
+                    Log.log(id + " ha destruido el área de recurso: " + recurso.getNombreZona());
                 } else if (objetivo instanceof Almacen almacen) {
+                    almacen.expulsarAldeanos(); // según el enunciado
+                    centro.esperarSiPausado();
+                    Thread.sleep(FuncionesComunes.randomBetween(1000, 2000)); // tiempo saqueo
                     almacen.saquear(this);
+                    Log.log(id + " ha saqueado el almacén: " + almacen.getNombreZona());
                 }
 
                 Log.log(id + " finaliza el ataque en " + objetivo.getNombreZona());
+
+                // Tras completar un ataque exitoso
                 puedeAtacar = false;
+                Log.log(id + " regresa al campamento y espera 40s");
+                centro.esperarSiPausado();
+                Thread.sleep(40000);
+                puedeAtacar = true;
             }
         } catch (InterruptedException e) {
             Log.log(id + " fue interrumpido.");
