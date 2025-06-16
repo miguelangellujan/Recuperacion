@@ -427,9 +427,16 @@ public class CentroUrbano {
     public void setPausa(boolean estado) {
         pausado.set(estado);
 
-        if(!estado) {
-            synchronized (pausaLock) {
-                pausaLock.notifyAll();
+        if (!estado) {
+            synchronized (this) {
+                notifyAll();
+            }
+        }
+    }
+    public void esperarSiPausado() throws InterruptedException {
+        synchronized (this) {
+            while (pausado.get()) {
+                wait();
             }
         }
     }

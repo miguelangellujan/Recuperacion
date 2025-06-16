@@ -198,6 +198,12 @@ public class AreaRecurso implements Zona {
             lockZona.unlock();
         }
     }
+    public void eliminarBarbaro(Barbaro b) {
+        synchronized (barbarosAtacando) {
+            barbarosAtacando.remove(b);
+        }
+    }
+
 
     private CentroUrbano getCentroDe(Aldeano a) {
         try {
@@ -223,8 +229,19 @@ public class AreaRecurso implements Zona {
                 colaSb.append(a.getIdAldeano()).append(", ");
             }
             if (colaSb.length() > 0) colaSb.setLength(colaSb.length() - 2);
+            StringBuilder guerr = new StringBuilder();
+            for (Guerrero g : getGuerreros()) {
+                guerr.append(g.getIdGuerrero()).append(", ");
+            }
+            if (guerr.length() > 0) guerr.setLength(guerr.length() - 2);
+            StringBuilder barb = new StringBuilder();
+            for (Barbaro b : getBarbaros()) {
+                barb.append(b.getIdBarbaro()).append(", ");
+            }
+            if (barb.length() > 0) barb.setLength(barb.length() - 2);
 
-            return "Recolectando: "+ dentroSb + "\n\nEsperando: " + colaSb ;
+
+            return "Recolectando: "+ dentroSb + "\nEsperando: " + colaSb +"\nGuerreros: "+guerr+"\nBárbaros: "+barb;
         } finally {
             lockZona.unlock();
         }

@@ -25,49 +25,51 @@ public class Barbaro extends Thread {
     public void run() {
         try {
             while (true) {
+                centro.esperarSiPausado();
                 if (!puedeAtacar) {
                     Log.log(id + " descansa en campamento por 40s");
                     Thread.sleep(40000);
                     puedeAtacar = true;
                 }
 
+                centro.esperarSiPausado();
                 Log.log(id + " se dirige a la zona de preparación");
                 ZonaPreparacionBarbaros zonaPrep = centro.getZonaPreparacion();
 
                 Zona objetivo = zonaPrep.esperarGrupo(this);
                 Log.log(id + " ataca la zona: " + objetivo.getNombreZona());
 
-                boolean ganoCombate = true;
+                centro.esperarSiPausado();
+                boolean ganoCombate;
                 boolean huboEnfrentamiento = objetivo.enfrentarABarbaro(this);
 
                 if (huboEnfrentamiento) {
-                    // Lucha uno contra uno
                     Thread.sleep(FuncionesComunes.randomBetween(500, 1000));
-                    ganoCombate = rnd.nextBoolean();
+                    ganoCombate = rnd.nextDouble() < 1.0 - (0.5 + 0.05 * Math.min(5, centro.getGestorMejoras().getNivelArmas()));
                     if (ganoCombate) {
                         Log.log(id + " gana su combate en " + objetivo.getNombreZona());
                     } else {
                         Log.log(id + " pierde el combate y se retira al campamento (60s)");
-                        Thread.sleep(60000); // Espera antes de volver a atacar
+                        Thread.sleep(60000);
                         continue;
                     }
                 } else {
-                    // No había guerreros
                     Log.log(id + " no encontró defensores en " + objetivo.getNombreZona());
-                    Thread.sleep(1000); // Espera antes de pasar al saqueo
+                    Thread.sleep(1000);
                 }
 
-                // Fase de saqueo
-                Thread.sleep(1000); // Observando la zona
+                Thread.sleep(1000);
                 if (objetivo instanceof AreaRecurso recurso) {
                     recurso.iniciarAtaque(this);
                     recurso.finalizarAtaque(true);
+                    Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                    recurso.eliminarBarbaro(this);
                 } else if (objetivo instanceof Almacen almacen) {
                     almacen.saquear(this);
                 }
 
                 Log.log(id + " finaliza el ataque en " + objetivo.getNombreZona());
-                puedeAtacar = false; // Provoca espera de 40s antes del próximo ataque
+                puedeAtacar = false;
             }
         } catch (InterruptedException e) {
             Log.log(id + " fue interrumpido.");

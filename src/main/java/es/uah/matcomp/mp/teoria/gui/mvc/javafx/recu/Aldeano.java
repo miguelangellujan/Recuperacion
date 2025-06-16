@@ -90,7 +90,7 @@ public class Aldeano extends Thread {
     public void run() {
         while (activo) {
             try {
-                // Antes de cada acción, comprobamos si hay emergencia
+                centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
                 Log.log(id + " entra en CASA PRINCIPAL");
@@ -98,6 +98,7 @@ public class Aldeano extends Thread {
                 Thread.sleep(FuncionesComunes.randomBetween(2000, 4000));
                 centro.getCasaPrincipal().salir(id);
 
+                centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
                 Log.log(id + " va a la PLAZA CENTRAL");
@@ -109,20 +110,20 @@ public class Aldeano extends Thread {
                 AreaRecurso area = centro.getArea(tipo);
                 Almacen almacen = centro.getAlmacen(tipo);
 
+                centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
                 Log.log(id + " intenta entrar en " + tipo);
                 area.entrar(this);
 
+                centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
                 int cantidad = FuncionesComunes.randomBetween(10, 20);
-
-                int nivelHerramientas = centro.getGestorMejoras().getNivelHerramientas();
-                nivelHerramientas = Math.min(nivelHerramientas, 3); // Máximo 3 niveles
+                int nivelHerramientas = Math.min(centro.getGestorMejoras().getNivelHerramientas(), 3);
                 int recolectar = cantidad + (5 * nivelHerramientas);
 
-                Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));  // recolección
+                Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));
 
                 if (area.fueAtacadoDurante(this)) {
                     Log.log(id + " fue atacado mientras recolectaba en " + tipo);
@@ -134,6 +135,7 @@ public class Aldeano extends Thread {
                 Log.log(id + " recolecta " + recolectar + " unidades de " + tipo);
                 area.salir(this);
 
+                centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
                 Log.log(id + " va a la PLAZA CENTRAL antes de depositar");
@@ -141,6 +143,7 @@ public class Aldeano extends Thread {
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
                 centro.getPlazaCentral().salir(id);
 
+                centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
                 almacen.depositar(this, recolectar);
@@ -149,6 +152,7 @@ public class Aldeano extends Thread {
                     area.notifyAll();
                 }
 
+                centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
                 Log.log(id + " vuelve a la PLAZA CENTRAL");
@@ -157,15 +161,12 @@ public class Aldeano extends Thread {
                 centro.getPlazaCentral().salir(id);
 
             } catch (InterruptedException e) {
-                // Si la interrupción es debido a la emergencia...
                 if (activo && centro.isEmergenciaActiva()) {
                     try {
                         esperarFinEmergencia();
                     } catch (InterruptedException ie) {
-                        // Si otra interrupción ocurre en esta fase, finaliza el hilo.
                         activo = false;
                     }
-                    // Tras finalizar la emergencia, retomamos el ciclo (desde PLAZA CENTRAL en la próxima iteración)
                     continue;
                 } else {
                     Log.log(id + " ha sido interrumpido y termina.");

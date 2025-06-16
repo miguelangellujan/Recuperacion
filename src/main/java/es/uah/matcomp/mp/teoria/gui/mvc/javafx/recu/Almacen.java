@@ -14,6 +14,8 @@ public class Almacen implements Zona {
     private final List<Aldeano> aldeanosDepositando = new ArrayList<>();
     private final List<Aldeano> aldeanosEsperando = new ArrayList<>();
     private final List<Guerrero> guerreros=new ArrayList<>();
+    private final Set<Guerrero> guerrerosEnCombate = Collections.synchronizedSet(new HashSet<>());
+
     private final List<Barbaro> barbarosAtacando = new ArrayList<>();
 
     // Constructor
@@ -173,8 +175,18 @@ public class Almacen implements Zona {
                 esperando.append(a.getIdAldeano()).append(", ");
             }
             if (esperando.length() > 0) esperando.setLength(esperando.length() - 2);
+            StringBuilder guerr = new StringBuilder();
+            for (Guerrero g : getGuerreros()) {
+                guerr.append(g.getIdGuerrero()).append(", ");
+            }
+            if (guerr.length() > 0) guerr.setLength(guerr.length() - 2);
+            StringBuilder barb = new StringBuilder();
+            for (Barbaro b : getBarbaros()) {
+                barb.append(b.getIdBarbaro()).append(", ");
+            }
+            if (barb.length() > 0) barb.setLength(barb.length() - 2);
 
-            return "Depositando: " + dentro + "\n\nEsperando: " + esperando;
+            return "Depositando: "+ dentro + "\nEsperando: " + esperando +"\nGuerreros: "+guerr+"\nBárbaros: "+barb;
         }
     }
 

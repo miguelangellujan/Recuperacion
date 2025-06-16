@@ -40,11 +40,13 @@ public class Guerrero extends Thread {
     @Override
     public void run() {
         try {
+            centro.esperarSiPausado();
             Log.log(id + " comienza entrenamiento en el CUARTEL");
             centro.getCuartel().entrenar(this);
             Log.log(id + " ha finalizado el entrenamiento y comienza patrullaje");
 
             while (!Thread.currentThread().isInterrupted()) {
+                centro.esperarSiPausado();
                 Zona zona = centro.obtenerZonaAleatoriaParaPatrulla();
 
                 if (zona.entrarGuerrero(this)) {
