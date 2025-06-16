@@ -10,11 +10,11 @@ public class Guerrero extends Thread {
     public Guerrero(String id, CentroUrbano centro) {
         this.id = id;
         this.centro = centro;
-
     }
 
     public boolean estaLuchando() {
-        return luchando.get();}
+        return luchando.get();
+    }
 
     public void setLuchando(boolean estado) {
         luchando.set(estado);
@@ -47,17 +47,20 @@ public class Guerrero extends Thread {
 
             while (!Thread.currentThread().isInterrupted()) {
                 centro.esperarSiPausado();
+
                 Zona zona = centro.obtenerZonaAleatoriaParaPatrulla();
 
                 if (zona.entrarGuerrero(this)) {
                     Log.log(id + " patrulla en " + zona.getNombreZona());
 
+                    centro.esperarSiPausado();
                     Thread.sleep(FuncionesComunes.randomBetween(2000, 3000));
 
                     zona.salirGuerrero(this);
                     Log.log(id + " sale de " + zona.getNombreZona());
                 } else {
                     Log.log(id + " no puede patrullar en " + zona.getNombreZona() + " (llena o en combate), espera...");
+                    centro.esperarSiPausado();
                     Thread.sleep(500);
                 }
             }

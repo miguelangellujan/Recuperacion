@@ -100,43 +100,81 @@ public class CentroUrbano {
 
 
     // Crear Individuos
-    public synchronized void crearAldeano() {
-        if (comida.get() >= 50) {
-            comida.addAndGet(-50);
-            String id = String.format("A%03d", idAldeano.getAndIncrement());
-            Aldeano a = new Aldeano(id, this);
-            a.setEmergencia(emergenciaActiva.get());
-            aldeanos.add(a);
-            a.start();
-            Log.log("Se ha creado el aldeano " + id);
-        } else {
-            Log.log("No hay comida suficiente para crear aldeano.");
+    public void crearAldeano() {
+        synchronized (pausaLock) {
+            while (isPausado()) {
+                try {
+                    pausaLock.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    Log.log("Interrumpido esperando para crear aldeano: " + e.getMessage());
+                    return;
+                }
+            }
+        }
+        synchronized (this) {
+            if (comida.get() >= 50) {
+                comida.addAndGet(-50);
+                String id = String.format("A%03d", idAldeano.getAndIncrement());
+                Aldeano a = new Aldeano(id, this);
+                a.setEmergencia(emergenciaActiva.get());
+                aldeanos.add(a);
+                a.start();
+                Log.log("Se ha creado el aldeano " + id);
+            } else {
+                Log.log("No hay comida suficiente para crear aldeano.");
+            }
         }
     }
 
-    public synchronized void crearGuerrero() {
-        if (comida.get() >= 50 && madera.get() >= 50 && oro.get() >= 80) {
-            comida.addAndGet(-50);
-            madera.addAndGet(-50);
-            oro.addAndGet(-80);
-            String id = String.format("G%03d", idGuerrero.getAndIncrement());
-            Guerrero g = new Guerrero(id, this);
-            guerreros.add(g);
-            g.start();
-            Log.log("Se ha entrenado el guerrero " + id);
-        } else {
-            Log.log("No hay recursos suficientes para crear guerrero.");
+    public void crearGuerrero() {
+        synchronized (pausaLock) {
+            while (isPausado()) {
+                try {
+                    pausaLock.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    Log.log("Interrumpido esperando para crear guerrero: " + e.getMessage());
+                    return;
+                }
+            }
+        }
+        synchronized (this) {
+            if (comida.get() >= 50 && madera.get() >= 50 && oro.get() >= 80) {
+                comida.addAndGet(-50);
+                madera.addAndGet(-50);
+                oro.addAndGet(-80);
+                String id = String.format("G%03d", idGuerrero.getAndIncrement());
+                Guerrero g = new Guerrero(id, this);
+                guerreros.add(g);
+                g.start();
+                Log.log("Se ha entrenado el guerrero " + id);
+            } else {
+                Log.log("No hay recursos suficientes para crear guerrero.");
+            }
         }
     }
 
     public void crearBarbaro() {
-        String id = String.format("B%03d", idBarbaro.getAndIncrement());
-        Barbaro b = new Barbaro(id, this);
-        barbaros.add(b);
-        b.start();
-        Log.log("Se ha generado el bárbaro " + id);
+        synchronized (pausaLock) {
+            while (isPausado()) {
+                try {
+                    pausaLock.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    Log.log("Interrumpido esperando para crear bárbaro: " + e.getMessage());
+                    return;
+                }
+            }
+        }
+        synchronized (this) {
+            String id = String.format("B%03d", idBarbaro.getAndIncrement());
+            Barbaro b = new Barbaro(id, this);
+            barbaros.add(b);
+            b.start();
+            Log.log("Se ha generado el bárbaro " + id);
+        }
     }
-
 
     // Funciones relacionadas con los recursos
     public String seleccionarRecursoAleatorio() {

@@ -28,6 +28,7 @@ public class Barbaro extends Thread {
                 centro.esperarSiPausado();
                 if (!puedeAtacar) {
                     Log.log(id + " descansa en campamento por 40s");
+                    centro.esperarSiPausado();
                     Thread.sleep(40000);
                     puedeAtacar = true;
                 }
@@ -37,6 +38,8 @@ public class Barbaro extends Thread {
                 ZonaPreparacionBarbaros zonaPrep = centro.getZonaPreparacion();
 
                 Zona objetivo = zonaPrep.esperarGrupo(this);
+
+                centro.esperarSiPausado();
                 Log.log(id + " ataca la zona: " + objetivo.getNombreZona());
 
                 centro.esperarSiPausado();
@@ -44,24 +47,33 @@ public class Barbaro extends Thread {
                 boolean huboEnfrentamiento = objetivo.enfrentarABarbaro(this);
 
                 if (huboEnfrentamiento) {
+                    centro.esperarSiPausado();
                     Thread.sleep(FuncionesComunes.randomBetween(500, 1000));
-                    ganoCombate = rnd.nextDouble() < 1.0 - (0.5 + 0.05 * Math.min(5, centro.getGestorMejoras().getNivelArmas()));
+
+                    double probVictoria = 1.0 - (0.5 + 0.05 * Math.min(5, centro.getGestorMejoras().getNivelArmas()));
+                    ganoCombate = rnd.nextDouble() < probVictoria;
+
                     if (ganoCombate) {
                         Log.log(id + " gana su combate en " + objetivo.getNombreZona());
                     } else {
                         Log.log(id + " pierde el combate y se retira al campamento (60s)");
+                        centro.esperarSiPausado();
                         Thread.sleep(60000);
                         continue;
                     }
                 } else {
                     Log.log(id + " no encontró defensores en " + objetivo.getNombreZona());
+                    centro.esperarSiPausado();
                     Thread.sleep(1000);
                 }
 
+                centro.esperarSiPausado();
                 Thread.sleep(1000);
+
                 if (objetivo instanceof AreaRecurso recurso) {
                     recurso.iniciarAtaque(this);
                     recurso.finalizarAtaque(true);
+                    centro.esperarSiPausado();
                     Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
                     recurso.eliminarBarbaro(this);
                 } else if (objetivo instanceof Almacen almacen) {

@@ -101,10 +101,17 @@ public class ServidorController {
                             centro.getPausaLock().wait();
                         } catch (InterruptedException e) {
                             Log.log("Error creando el hilo del aldeano: " + e.getMessage());
+                            Thread.currentThread().interrupt();
+                            return;
                         }
                     }
+                    // Ya no está pausado, podemos crear aldeano
                 }
-                crearAldeano();
+
+                // Antes de crear, verificamos de nuevo para evitar carrera de estado
+                if (!centro.isPausado()) {
+                    crearAldeano();
+                }
             }
         });
         hilosActivos.add(hiloAldeano);
@@ -117,11 +124,16 @@ public class ServidorController {
                         try {
                             centro.getPausaLock().wait();
                         } catch (InterruptedException e) {
-                            Log.log("Error creando el hilo del aldeano: " + e.getMessage());
+                            Log.log("Error creando el hilo del bárbaro: " + e.getMessage());
+                            Thread.currentThread().interrupt();
+                            return;
                         }
                     }
                 }
-                crearBarbaro();
+
+                if (!centro.isPausado()) {
+                    crearBarbaro();
+                }
             }
         });
         hilosActivos.add(hiloBarbaro);
@@ -134,7 +146,9 @@ public class ServidorController {
                         try {
                             centro.getPausaLock().wait();
                         } catch (InterruptedException e) {
-                            Log.log("Error creando el hilo del aldeano: " + e.getMessage());
+                            Log.log("Error actualizando la interfaz: " + e.getMessage());
+                            Thread.currentThread().interrupt();
+                            return;
                         }
                     }
                 }
@@ -143,12 +157,15 @@ public class ServidorController {
                     Thread.sleep(500);
                 } catch (InterruptedException e){
                     Log.log("Error actualizando la interfaz: " + e.getMessage());
+                    Thread.currentThread().interrupt();
+                    return;
                 }
             }
         });
         hilosActivos.add(hiloInterfaz);
         hiloInterfaz.start();
     }
+
 
     // Actualizar la información que aparece en la interfaz
     private void actualizarInterfaz() {

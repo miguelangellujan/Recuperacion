@@ -7,7 +7,6 @@ public class Aldeano extends Thread {
     private boolean emergencia = false;
     private boolean esperandoEnEmergencia = false;
 
-    // Constructor
     public Aldeano(String id, CentroUrbano centro) {
         this.id = id;
         this.centro = centro;
@@ -17,7 +16,6 @@ public class Aldeano extends Thread {
         return id;
     }
 
-    // Emergencia
     private void checkYEsperarEmergencia() throws InterruptedException {
         if (centro.isEmergenciaActiva()) {
             throw new InterruptedException("Emergencia activa, interrumpir para ir a Casa Principal");
@@ -26,17 +24,13 @@ public class Aldeano extends Thread {
 
     public void setEmergencia(boolean estado) {
         emergencia = estado;
-        if (estado) {
-            // Interrumpe cualquier espera o sleep activo para forzar la comprobación de emergencia.
-            this.interrupt();
-        }
+        if (estado) this.interrupt();
     }
 
     public void moverACasaPrincipal() {
         synchronized (this) {
             if(!esperandoEnEmergencia){
                 esperandoEnEmergencia = true;
-
                 centro.getArea("COMIDA").salir(this);
                 centro.getArea("MADERA").salir(this);
                 centro.getArea("ORO").salir(this);
@@ -45,28 +39,21 @@ public class Aldeano extends Thread {
                 centro.getAlmacen("MADERA").salir(this);
                 centro.getAlmacen("ORO").salir(this);
             }
-
             centro.getCasaPrincipal().registrarEntrada(id);
-            Log.log(id + " se ha movido a la Clase Principal por emergencia.");
+            Log.log(id + " se ha movido a la Casa Principal por emergencia.");
         }
     }
 
     private void esperarFinEmergencia() throws InterruptedException {
         esperandoEnEmergencia = true;
-
         moverACasaPrincipal();
 
-        // Espera hasta que la emergencia se desactive.
         synchronized (this) {
             while (centro.isEmergenciaActiva()) {
-                try {
-                    wait(500);
-                } catch (InterruptedException e) {
-                    Log.log("Error en la emergencia: " + e.getMessage());
-                }
+                centro.esperarSiPausado();
+                wait(500);
             }
         }
-
         moverAPlazaCentral();
     }
 
@@ -74,13 +61,11 @@ public class Aldeano extends Thread {
         synchronized (this) {
             if (esperandoEnEmergencia && centro.getCasaPrincipal().estaRegistrado(id)) {
                 esperandoEnEmergencia = false;
-
                 centro.getCasaPrincipal().salir(id);
 
                 if(!centro.getPlazaCentral().estaRegistrado(id)){
                     centro.getPlazaCentral().planificar(id);
                 }
-
                 Log.log(id + " ha salido de la Casa Principal y retoma el ciclo en la Plaza Central.");
             }
         }
@@ -95,7 +80,9 @@ public class Aldeano extends Thread {
 
                 Log.log(id + " entra en CASA PRINCIPAL");
                 centro.getCasaPrincipal().registrarEntrada(id);
+                centro.esperarSiPausado();
                 Thread.sleep(FuncionesComunes.randomBetween(2000, 4000));
+                centro.esperarSiPausado();
                 centro.getCasaPrincipal().salir(id);
 
                 centro.esperarSiPausado();
@@ -103,7 +90,9 @@ public class Aldeano extends Thread {
 
                 Log.log(id + " va a la PLAZA CENTRAL");
                 centro.getPlazaCentral().planificar(id);
+                centro.esperarSiPausado();
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                centro.esperarSiPausado();
                 centro.getPlazaCentral().salir(id);
 
                 String tipo = centro.seleccionarRecursoAleatorio();
@@ -123,16 +112,20 @@ public class Aldeano extends Thread {
                 int nivelHerramientas = Math.min(centro.getGestorMejoras().getNivelHerramientas(), 3);
                 int recolectar = cantidad + (5 * nivelHerramientas);
 
+                centro.esperarSiPausado();
                 Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));
 
                 if (area.fueAtacadoDurante(this)) {
                     Log.log(id + " fue atacado mientras recolectaba en " + tipo);
                     area.salir(this);
+                    centro.esperarSiPausado();
                     centro.getAreaRecuperacion().enviarAldeano(this, 12000, 15000);
                     continue;
                 }
-
+                centro.esperarSiPausado();
                 Log.log(id + " recolecta " + recolectar + " unidades de " + tipo);
+                centro.esperarSiPausado();
+
                 area.salir(this);
 
                 centro.esperarSiPausado();
@@ -140,12 +133,15 @@ public class Aldeano extends Thread {
 
                 Log.log(id + " va a la PLAZA CENTRAL antes de depositar");
                 centro.getPlazaCentral().planificar(id);
+                centro.esperarSiPausado();
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                centro.esperarSiPausado();
                 centro.getPlazaCentral().salir(id);
 
                 centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
+                centro.esperarSiPausado();
                 almacen.depositar(this, recolectar);
 
                 synchronized (area) {
@@ -157,7 +153,9 @@ public class Aldeano extends Thread {
 
                 Log.log(id + " vuelve a la PLAZA CENTRAL");
                 centro.getPlazaCentral().planificar(id);
+                centro.esperarSiPausado();
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                centro.esperarSiPausado();
                 centro.getPlazaCentral().salir(id);
 
             } catch (InterruptedException e) {
@@ -167,7 +165,6 @@ public class Aldeano extends Thread {
                     } catch (InterruptedException ie) {
                         activo = false;
                     }
-                    continue;
                 } else {
                     Log.log(id + " ha sido interrumpido y termina.");
                     activo = false;
