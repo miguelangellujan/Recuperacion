@@ -215,16 +215,19 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
             for (Aldeano a : centro.getAldeanos2()) {
                 if (centro.getCasaPrincipal().estaRegistrado(a.getIdAldeano())) {
                     centro.getCasaPrincipal().salir(a.getIdAldeano());
-                    a.moverAPlazaCentral(); // Los devuelve a PlazaCentral después de la emergencia
+                    a.moverAPlazaCentral();
                 }
 
                 a.setEmergencia(false);
-                synchronized (a) {
-                    a.notify();
-                }
+            }
+
+            synchronized (centro.getLockEmergencia()) {
+                centro.getLockEmergencia().notifyAll();
             }
         }
     }
+
+
 
     // Botón de Pausa
     @Override

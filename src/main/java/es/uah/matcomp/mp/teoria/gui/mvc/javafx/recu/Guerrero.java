@@ -41,10 +41,29 @@ public class Guerrero extends Thread {
     public void run() {
         try {
             centro.esperarSiPausado();
-            Log.log(id + " comienza entrenamiento en el CUARTEL");
-            centro.getCuartel().entrenar(this);
-            Log.log(id + " ha finalizado el entrenamiento y comienza patrullaje");
 
+            // Esperar hasta que haya recursos para entrenar
+            while (!Thread.currentThread().isInterrupted()) {
+                if (centro.getRecurso("MADERA").get() >= 50
+                        && centro.getRecurso("ORO").get() >= 80
+                        && centro.getRecurso("COMIDA").get() >= 50) {
+
+                    // Consumir recursos
+                    centro.restarRecurso("MADERA", 50);
+                    centro.restarRecurso("ORO", 80);
+                    centro.restarRecurso("COMIDA", 50);
+
+                    Log.log(id + " comienza entrenamiento en el CUARTEL");
+                    centro.getCuartel().entrenar(this);
+                    Log.log(id + " ha finalizado el entrenamiento y comienza patrullaje");
+                    break;  // Salir del bucle de espera de recursos
+                } else {
+                    Log.log(id + " esperando recursos para entrenar...");
+                    Thread.sleep(1000); // Espera 1 segundo antes de reintentar
+                }
+            }
+
+            // Patrullaje tras entrenamiento
             while (!Thread.currentThread().isInterrupted()) {
                 centro.esperarSiPausado();
 
@@ -64,7 +83,6 @@ public class Guerrero extends Thread {
                     Thread.sleep(500);
                 }
             }
-
         } catch (InterruptedException e) {
             Log.log(id + " ha sido interrumpido.");
             Thread.currentThread().interrupt();

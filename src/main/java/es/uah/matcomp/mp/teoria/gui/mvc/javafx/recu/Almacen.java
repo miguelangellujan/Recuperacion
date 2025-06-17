@@ -56,6 +56,8 @@ public class Almacen implements Zona {
     }
     //Esto hay que hacerlo
     public void depositar(Aldeano aldeano, int cantidad) throws InterruptedException {
+        centro.esperarSiPausado();
+
         int restante = cantidad;
 
         while (restante > 0) {
@@ -89,14 +91,18 @@ public class Almacen implements Zona {
 
             // Simulación del tiempo de depósito (fuera del lock)
             Thread.sleep(tiempoDeposito);
+            centro.esperarSiPausado();
 
             synchronized (lock) {
                 cantidadActual += aDepositar;
                 restante -= aDepositar;
+                centro.esperarSiPausado();
                 centro.sumarRecurso(tipo, aDepositar);
+                centro.esperarSiPausado();
                 Log.log("El aldeano " + aldeano.getIdAldeano() + " ha depositado " + aDepositar + " de " + tipo + ". Total almacenado: " + cantidadActual);
 
                 if (restante > 0) {
+                    centro.esperarSiPausado();
                     Log.log("El aldeano " + aldeano.getIdAldeano() + " se queda esperando con " + restante + " de " + tipo + " por falta de espacio.");
 
                     // Moverlo de 'depositando' a 'esperando'

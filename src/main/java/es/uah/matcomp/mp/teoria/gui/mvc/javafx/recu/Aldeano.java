@@ -118,7 +118,7 @@ public class Aldeano extends Thread {
                     centro.getAreaRecuperacion().enviarAldeano(this, 12000, 15000);
                     continue;
                 }
-
+                centro.esperarSiPausado();
                 Log.log(id + " recolecta " + recolectar + " unidades de " + tipo);
                 centro.esperarSiPausado();
 
@@ -138,7 +138,7 @@ public class Aldeano extends Thread {
 
                 centro.esperarSiPausado();
                 checkYEsperarEmergencia();
-
+                centro.esperarSiPausado();
                 // Deposita en el almacén correspondiente
                 almacen.depositar(this, recolectar);
 

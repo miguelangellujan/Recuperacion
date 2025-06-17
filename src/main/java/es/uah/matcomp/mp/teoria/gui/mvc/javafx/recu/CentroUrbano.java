@@ -22,6 +22,7 @@ public class CentroUrbano {
 
     private final AreaRecuperacion areaRecuperacion = new AreaRecuperacion();
     private final ZonaPreparacionBarbaros zonaPreparacion = new ZonaPreparacionBarbaros(this);
+    private final ZonaCampamentoBarbaros zonaCampamento = new ZonaCampamentoBarbaros();
 
     private final CasaPrincipal casaPrincipal = new CasaPrincipal();
     private final PlazaCentral plazaCentral = new PlazaCentral();
@@ -37,6 +38,8 @@ public class CentroUrbano {
 
     private final AtomicBoolean pausado = new AtomicBoolean(false);
     private final Object pausaLock = new Object();
+    private final Object emergenciaLock = new Object();
+
 
     // Constructor
     public CentroUrbano() {
@@ -55,6 +58,11 @@ public class CentroUrbano {
     }
 
     // Geters para acceso a variables
+
+    public Object getLockEmergencia() {
+        return emergenciaLock;
+    }
+
     public AreaRecuperacion getAreaRecuperacion() {
         return areaRecuperacion;
     }
@@ -445,13 +453,13 @@ public class CentroUrbano {
 
     public String getBarbarosCampamento() {
         synchronized (barbaros) {
-            List<Barbaro> esperando = zonaPreparacion.getBarbarosEsperando();
             return barbaros.stream()
-                    .filter(b -> !esperando.contains(b) && !b.estaAtacando())
-                    .map(Barbaro :: getIdBarbaro)
+                    .filter(b -> zonaCampamento.equals(b.getZonaAsignada()))
+                    .map(Barbaro::getIdBarbaro)
                     .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
         }
     }
+
 
     public String obtenerIdsCasaPrincipal() {
         return casaPrincipal.obtenerIds();
@@ -464,6 +472,10 @@ public class CentroUrbano {
     public int contarBarbaros() {
         return barbaros.size();
     }
+    public ZonaCampamentoBarbaros getZonaCampamento() {
+        return zonaCampamento;
+    }
+
 
     public List<Aldeano> getAldeanos2(){
         return aldeanos;
