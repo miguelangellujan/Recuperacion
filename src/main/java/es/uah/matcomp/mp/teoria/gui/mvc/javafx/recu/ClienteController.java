@@ -89,7 +89,7 @@ public class ClienteController {
             try {
                 while (!Thread.currentThread().isInterrupted()){
                     Platform.runLater(this :: actualizarInterfaz);
-                    Thread.sleep(3000);
+                    Thread.sleep(100);
                 }
             } catch (Exception e){
                 Log.log("Error al actualizar la interfaz del cliente: " + e.getMessage());
