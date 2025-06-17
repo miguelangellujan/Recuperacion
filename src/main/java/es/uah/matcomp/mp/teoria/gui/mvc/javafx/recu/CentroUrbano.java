@@ -270,6 +270,7 @@ public class CentroUrbano {
                 todos.add(id);
             }
         }
+
         // Área de Recuperación
         todos.addAll(areaRecuperacion.getAldeanosEnRecuperacion());
 
@@ -434,6 +435,7 @@ public class CentroUrbano {
                     .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
         }
     }
+
     public String getBarbarosGranero() {
         synchronized (granero) {
             return granero.getBarbaros().stream()
@@ -441,6 +443,7 @@ public class CentroUrbano {
                     .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
         }
     }
+
     public String getBarbarosCampamento() {
         synchronized (barbaros) {
             List<Barbaro> esperando = zonaPreparacion.getBarbarosEsperando();
@@ -450,26 +453,33 @@ public class CentroUrbano {
                     .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
         }
     }
+
     public String obtenerIdsCasaPrincipal() {
         return casaPrincipal.obtenerIds();
     }
+
     public String obtenerIdsPlazaCentral() {
         return plazaCentral.obtenerIds();
     }
+
     public int contarBarbaros() {
         return barbaros.size();
     }
+
     public List<Aldeano> getAldeanos2(){
         return aldeanos;
     }
+
     // Funciones para el ataque
     public void entrenar(Guerrero g) throws InterruptedException {
         cuartel.entrenar(g);
     }
+
     public Zona obtenerZonaAleatoria() {
         List<Zona> zonas = List.of(granja, bosque, mina, granero, aserradero, tesoreria);
         return zonas.get(new Random().nextInt(zonas.size()));
     }
+
     public Zona seleccionarObjetivo() {
         if (Math.random() < 0.6) {
             List<Zona> almacenes = List.of(granero, aserradero, tesoreria);
@@ -479,9 +489,11 @@ public class CentroUrbano {
             return areas.get(new Random().nextInt(areas.size()));
         }
     }
+
     public Zona obtenerZonaAleatoriaParaPatrulla() {
         return obtenerZonaAleatoria();
     }
+
     public void realizarAtaque(Barbaro b, Zona zona) {
         try {
             zona.enfrentarABarbaro(b);
@@ -489,6 +501,7 @@ public class CentroUrbano {
             throw new RuntimeException(e);
         }
     }
+
     // Pausa
     public void setPausa(boolean enPausa) {
         pausado.set(enPausa);
@@ -505,9 +518,11 @@ public class CentroUrbano {
             }
         }
     }
+
     public boolean isPausado() {
         return pausado.get();
     }
+
     // Emergencia
     public void setEmergencia(boolean estado) {
         for (Aldeano a : aldeanos) {
@@ -517,6 +532,7 @@ public class CentroUrbano {
             }
         }
     }
+
     public boolean isEmergenciaActiva() {
         return emergenciaActiva.get();
     }

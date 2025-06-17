@@ -165,7 +165,7 @@ public class ClienteController {
             boolean estadoActual = interfazRMI.isEmergenciaActiva();
 
             // Actualizamos texto botón
-            btnCampana.setText(estadoActual ? "Detener Emergencia" : "Activar Emergencia");
+            Platform.runLater(() -> btnCampana.setText(estadoActual ? "Detener Emergencia" : "Activar Emergencia"));
         } catch (RemoteException e) {
             Log.log("Error al activar la campana: " + e.getMessage());
         }

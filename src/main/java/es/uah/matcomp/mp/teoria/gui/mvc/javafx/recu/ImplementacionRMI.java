@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRMI {
     private CentroUrbano centro;
 
-    private final AtomicBoolean emergenciaActiva = new AtomicBoolean(false);
+    private boolean emergenciaActiva = false;
 
     private final AtomicBoolean pausado = new AtomicBoolean(false);
 
@@ -177,25 +177,28 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
     public int getCapacidadMaxMadera() throws RemoteException {
         return centro.getAserradero().getCapacidadMaxima();
     }
+
     @Override
     public int getOro() throws RemoteException {
         return centro.getRecurso("ORO").get();
     }
+
     @Override
     public int getCapacidadMaxOro() throws RemoteException {
         return centro.getTesoreria().getCapacidadMaxima();
     }
+
     // Botón de Emergencia
     @Override
     public boolean isEmergenciaActiva() throws RemoteException {
-        return emergenciaActiva.get();
+        return emergenciaActiva;
     }
+
     @Override
     public void activarEmergencia() throws RemoteException {
-        boolean nuevoEstado = !emergenciaActiva.get();
-        emergenciaActiva.set(nuevoEstado);
+        emergenciaActiva = !emergenciaActiva;
 
-        if (nuevoEstado) {
+        if (emergenciaActiva) {
             Log.log("¡Emergencia activada! Los aldeanos regresan a CASA PRINCIPAL.");
 
             centro.getGranero().liberarAldeanos();
@@ -222,11 +225,13 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
             }
         }
     }
+
     // Botón de Pausa
     @Override
     public boolean isPausado() throws RemoteException {
         return centro.isPausado();
     }
+
     @Override
     public void pausarEjecucion() throws RemoteException {
         boolean nuevoEstado = !centro.isPausado();
