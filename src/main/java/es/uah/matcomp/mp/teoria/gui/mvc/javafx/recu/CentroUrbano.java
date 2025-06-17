@@ -519,6 +519,7 @@ public class CentroUrbano {
             }
         }
     }
+
     public void esperarSiPausado() throws InterruptedException {
         synchronized (pausaLock) {
             while (pausado.get()) {
@@ -555,17 +556,14 @@ public class CentroUrbano {
 
             for(Aldeano a : aldeanos){
                 a.setEmergencia(true);
-                a.moverACasaPrincipal();
+                synchronized (a) {
+                    a.notify();
+                }
             }
         } else {
             Log.log("¡Emergencia desactivada! Los aldeanos retoman su trabajo.");
 
             for(Aldeano a : aldeanos){
-                if (casaPrincipal.estaRegistrado(a.getIdAldeano())) {
-                    casaPrincipal.salir(a.getIdAldeano());
-                    a.moverAPlazaCentral(); // Los devuelve a PlazaCentral después de la emergencia
-                }
-
                 a.setEmergencia(false);
                 synchronized (a) {
                     a.notify();

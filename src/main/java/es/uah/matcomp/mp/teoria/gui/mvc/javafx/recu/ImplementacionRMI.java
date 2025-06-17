@@ -196,39 +196,8 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
 
     @Override
     public void activarEmergencia() throws RemoteException {
-        emergenciaActiva = !emergenciaActiva;
-
-        if (emergenciaActiva) {
-            Log.log("¡Emergencia activada! Los aldeanos regresan a CASA PRINCIPAL.");
-
-            centro.getGranero().liberarAldeanos();
-            centro.getAserradero().liberarAldeanos();
-            centro.getTesoreria().liberarAldeanos();
-
-            for (Aldeano a : centro.getAldeanos2()) {
-                a.setEmergencia(true);
-                a.moverACasaPrincipal();
-            }
-        } else {
-            Log.log("¡Emergencia desactivada! Los aldeanos retoman su trabajo.");
-
-            for (Aldeano a : centro.getAldeanos2()) {
-                if (centro.getCasaPrincipal().estaRegistrado(a.getIdAldeano())) {
-                    a.setEmergencia(false);
-                    centro.getCasaPrincipal().salir(a.getIdAldeano());
-                    a.moverAPlazaCentral();
-                }
-
-                a.setEmergencia(false);
-            }
-
-            synchronized (centro.getLockEmergencia()) {
-                centro.getLockEmergencia().notifyAll();
-            }
-        }
+        centro.activarEmergencia();
     }
-
-
 
     // Botón de Pausa
     @Override

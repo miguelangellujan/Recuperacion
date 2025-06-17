@@ -26,18 +26,20 @@ public class Aldeano extends Thread {
         emergencia = estado;
         if (estado) this.interrupt();
     }
+
     private void esperarFinEmergencia() throws InterruptedException {
-        esperandoEnEmergencia = true;
+        Thread.interrupted();
+
         moverACasaPrincipal();
 
         synchronized (this) {
             while (centro.isEmergenciaActiva()) {
-                centro.esperarSiPausado();
                 wait(500);
             }
         }
         moverAPlazaCentral();
     }
+
     public void moverACasaPrincipal() {
         synchronized (this) {
             if (!esperandoEnEmergencia) {
@@ -49,9 +51,9 @@ public class Aldeano extends Thread {
                 centro.getAlmacen("COMIDA").salir(this);
                 centro.getAlmacen("MADERA").salir(this);
                 centro.getAlmacen("ORO").salir(this);
+                centro.getCasaPrincipal().registrarEntrada(id);
+                Log.log(id + " se ha movido a la Casa Principal por emergencia.");
             }
-            centro.getCasaPrincipal().registrarEntrada(id);
-            Log.log(id + " se ha movido a la Casa Principal por emergencia.");
         }
     }
 
