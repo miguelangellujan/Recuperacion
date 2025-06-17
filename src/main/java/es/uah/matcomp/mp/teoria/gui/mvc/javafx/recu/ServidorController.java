@@ -21,25 +21,21 @@ public class ServidorController {
     @FXML
     private Label lblOroRecursos;
     @FXML
-    private Label lblComidaGuerreros;
+    private Button botonGuerreros;
     @FXML
-    private Label lblMaderaGuerreros;
+    private Button botonAldeanos;
     @FXML
-    private Label lblOroGuerreros;
+    private Label lblNivelHerramientas;
     @FXML
-    private Label lblComidaAldeanos;
+    private Button botonHerramientas;
     @FXML
-    private Label lblMaderaHerramientas;
+    private Label lblNivelArmas;
     @FXML
-    private Label lblOroHerramientas;
+    private Button botonArmas;
     @FXML
-    private Label lblComidaArmas;
+    private Label lblNivelAlmacenes;
     @FXML
-    private Label lblOroArmas;
-    @FXML
-    private Label lblOroAlmacenM;
-    @FXML
-    private Label lblMaderaAlmacenM;
+    private Button botonAlmacenes;
     @FXML
     private Label lblZonaPreparacion;
     @FXML
@@ -87,8 +83,19 @@ public class ServidorController {
         }
 
         iniciarHilos();
+
         btnDetener.setOnAction(event -> ejecucion());
         btnCampana.setOnAction(event -> activarCampana());
+
+        botonGuerreros.setOnAction(event -> centro.crearGuerrero());
+
+        botonAldeanos.setOnAction(event -> centro.crearAldeano());
+
+        botonHerramientas.setOnAction(event -> centro.getMejoraHerramientas());
+
+        botonArmas.setOnAction(event -> centro.getMejoraArmas());
+
+        botonAlmacenes.setOnAction(event -> centro.getMejoraAlmacenes());
     }
 
     // Inicializar los hilos donde se crean los individuos
@@ -110,7 +117,7 @@ public class ServidorController {
 
                 // Antes de crear, verificamos de nuevo para evitar carrera de estado
                 if (!centro.isPausado()) {
-                    crearAldeano();
+                    centro.crearAldeano();
                 }
             }
         });
@@ -188,19 +195,13 @@ public class ServidorController {
             lblPlazaCentral.setText(centro.getPlazaCentral().obtenerIds());
             lblAreaRecuperacion.setText(centro.getAreaRecuperacion().obtenerIdsEnRecuperacion());
 
+            lblNivelHerramientas.setText("Nivel: " + centro.getNivelHerramientas());
+            lblNivelArmas.setText("Nivel: " + centro.getNivelArmas());
+            lblNivelAlmacenes.setText("Nivel: " + centro.getNivelAlmacenes());
+
             lblZonaPreparacion.setText(centro.getZonaPreparacion().obtenerIdsEnPreparacion());
             lblCampamentoBarbaro.setText(centro.getBarbarosCampamento());
         });
-    }
-
-    @FXML
-    protected void crearAldeano(){
-        try {
-            Thread.sleep(20000); // cada 20 segundos
-            centro.crearAldeano();
-        } catch (InterruptedException e) {
-            Log.log("Generador de aldeanos interrumpido.");
-        }
     }
 
     @FXML
@@ -213,7 +214,7 @@ public class ServidorController {
                 centro.crearBarbaro();
 
             } catch (InterruptedException e) {
-                Log.log("Generador de bárbaros interrumpido.");
+                Log.log("Generador de bárbaros interrumpido: " + e.getMessage());
                 Thread.currentThread().interrupt();
                 break;
             }

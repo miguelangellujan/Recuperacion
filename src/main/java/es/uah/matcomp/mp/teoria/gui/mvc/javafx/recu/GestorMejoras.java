@@ -13,7 +13,9 @@ public class GestorMejoras {
     }
 
     public int getNivelHerramientas() {return nivelHerramientas;}
+
     public int getNivelArmas() {return nivelArmas;}
+
     public int getNivelAlmacenes() {return nivelAlmacenes;}
 
 
