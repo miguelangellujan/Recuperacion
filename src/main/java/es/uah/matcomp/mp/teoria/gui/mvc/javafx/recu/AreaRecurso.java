@@ -105,11 +105,6 @@ public class AreaRecurso implements Zona {
             }
             esperandoEnCola.remove(a);
 
-            while (recolectando.size() >= 4 || enAtaque) {
-                Log.log(a.getIdAldeano() + " espera para entrar al área de " + tipo +
-                        (enAtaque ? " (está siendo atacada)" : " (área llena)"));
-                puedeEntrarAldeano.await();
-            }
             recolectando.add(a);
             Log.log(a.getIdAldeano() + " ha entrado al área de " + tipo);
 
@@ -127,7 +122,6 @@ public class AreaRecurso implements Zona {
             lockZona.unlock();
         }
     }
-
     // Ataque
     public void iniciarAtaque(Barbaro b) {
         lockZona.lock();

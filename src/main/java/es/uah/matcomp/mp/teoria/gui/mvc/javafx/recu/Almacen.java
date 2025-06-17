@@ -8,14 +8,12 @@ public class Almacen implements Zona {
     private int cantidadActual;
     private int capacidadMaxima;
     private final CentroUrbano centro;
-
     private final AtomicInteger semDeposito = new AtomicInteger(3);
     private final Object lock = new Object();
     private final List<Aldeano> aldeanosDepositando = new ArrayList<>();
     private final List<Aldeano> aldeanosEsperando = new ArrayList<>();
     private final List<Guerrero> guerreros = new ArrayList<>();
     private final Set<Guerrero> guerrerosEnCombate = Collections.synchronizedSet(new HashSet<>());
-
     private final List<Barbaro> barbarosAtacando = new ArrayList<>();
     private AreaRecuperacion areaRecuperacion;
 
@@ -26,7 +24,6 @@ public class Almacen implements Zona {
         this.cantidadActual = 0;
         this.centro = centro;
     }
-
     // Getters
     public int getCantidadActual() {
         return cantidadActual;
@@ -42,12 +39,10 @@ public class Almacen implements Zona {
         guerreros.add(g);
         return true;
     }
-
     @Override
     public void salirGuerrero(Guerrero g) {
         guerreros.remove(g);
     }
-
     @Override
     public String getNombreZona() {
         return "Almacén de " + tipo;
@@ -59,73 +54,66 @@ public class Almacen implements Zona {
         Thread.sleep(1000); // Espera de 1 segundo antes de saquear
         return false;
     }
-
+    //Esto hay que hacerlo
     public void depositar(Aldeano aldeano, int cantidad) throws InterruptedException {
         int restante = cantidad;
-        Random rnd = new Random();
-        synchronized (lock) {
-            try {
-                while (restante > 0) {
-                    // Esperar si el sistema está pausado
+        while (restante > 0) {
+            int tiempoDeposito = 0;
+            int aDepositar = 0;
+
+            synchronized (lock) {
+                // Esperar si el sistema está pausado
+                centro.esperarSiPausado();
+
+                while (cantidadActual == capacidadMaxima) {
+                    if (!aldeanosEsperando.contains(aldeano)) {
+                        aldeanosEsperando.add(aldeano);
+                        Log.log("El almacén de " + tipo + " está lleno. El aldeano " + aldeano.getIdAldeano() + " espera para depositar.");
+                    }
+                    lock.wait(); // espera hasta que haya espacio
                     centro.esperarSiPausado();
-
-                    // Esperar si no hay espacio en el almacén
-                    while (cantidadActual == capacidadMaxima) {
-                        if (!aldeanosEsperando.contains(aldeano)) {
-                            aldeanosEsperando.add(aldeano);
-                            Log.log("El almacén de " + tipo + " está lleno. El aldeano " + aldeano.getIdAldeano() + " espera para depositar.");
-                        }
-                        lock.wait(); // espera hasta que haya espacio
-                        // Verifica pausa tras esperar
-                        centro.esperarSiPausado();
-                    }
-                    // Hay espacio, listo para depositar
-                    aldeanosEsperando.remove(aldeano);
-                    if (!aldeanosDepositando.contains(aldeano)) {
-                        aldeanosDepositando.add(aldeano);
-                    }
-                    int espacio = capacidadMaxima - cantidadActual;
-                    int aDepositar = Math.min(espacio, restante);
-
-                    // Esperar si el sistema está pausado antes de simular depósito
-                    centro.esperarSiPausado();
-
-                    // Simular tiempo aleatorio de depósito entre 2 y 3 segundos
-                    int tiempoDeposito = 2000 + rnd.nextInt(1001);
-                    try {
-                        lock.notifyAll(); // Notificar antes de dormir para evitar deadlocks
-                        Thread.sleep(tiempoDeposito);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        throw e;
-                    }
-
-                    cantidadActual += aDepositar;
-                    restante -= aDepositar;
-
-                    centro.sumarRecurso(tipo, aDepositar);
-                    Log.log("El aldeano " + aldeano.getIdAldeano() + " ha depositado " + aDepositar + " de " + tipo + ". Total almacenado: " + cantidadActual);
-
-                    if (restante > 0) {
-                        Log.log("El aldeano " + aldeano.getIdAldeano() + " se queda esperando con " + restante + " de " + tipo + " por falta de espacio.");
-                        aldeanosDepositando.remove(aldeano);
-                        if (!aldeanosEsperando.contains(aldeano)) {
-                            aldeanosEsperando.add(aldeano);
-                        }
-                    } else {
-                        // Terminó de depositar
-                        aldeanosDepositando.remove(aldeano);
-                    }
-                    // Notificar a otros posibles aldeanos que puedan ahora depositar
-                    lock.notifyAll();
                 }
-            } finally {
-                // Asegura que el aldeano no quede nunca en ninguna lista al terminar o interrumpirse
-                aldeanosDepositando.remove(aldeano);
+
+                // Preparar depósito
                 aldeanosEsperando.remove(aldeano);
+                if (!aldeanosDepositando.contains(aldeano)) {
+                    aldeanosDepositando.add(aldeano);
+                }
+
+                int espacio = capacidadMaxima - cantidadActual;
+                aDepositar = Math.min(espacio, restante);
+                tiempoDeposito = FuncionesComunes.randomBetween(2000,3000); // Simular 2-3s
+
+                lock.notifyAll(); // Avisar antes de soltar lock
+            }
+
+            Thread.sleep(tiempoDeposito);
+
+            synchronized (lock) {
+                cantidadActual += aDepositar;
+                restante -= aDepositar;
+                centro.sumarRecurso(tipo, aDepositar);
+                Log.log("El aldeano " + aldeano.getIdAldeano() + " ha depositado " + aDepositar + " de " + tipo + ". Total almacenado: " + cantidadActual);
+
+                if (restante > 0) {
+                    Log.log("El aldeano " + aldeano.getIdAldeano() + " se queda esperando con " + restante + " de " + tipo + " por falta de espacio.");
+                    aldeanosDepositando.remove(aldeano);
+                    if (!aldeanosEsperando.contains(aldeano)) {
+                        aldeanosEsperando.add(aldeano);
+                    }
+                } else {
+                    aldeanosDepositando.remove(aldeano);
+                }
+                lock.notifyAll();
             }
         }
+        // Limpieza final por si hubo interrupciones
+        synchronized (lock) {
+            aldeanosDepositando.remove(aldeano);
+            aldeanosEsperando.remove(aldeano);
+        }
     }
+
     public void aumentarCapacidad(int cantidad) {
         synchronized (lock) {
             capacidadMaxima += cantidad;
