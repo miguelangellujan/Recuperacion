@@ -27,6 +27,15 @@ public class AreaRecurso implements Zona {
     public AreaRecurso(String tipo) {
         this.tipo = tipo;
     }
+    public String toString(String tipo) {
+        return switch (tipo) {
+            case "ORO" -> "mina";
+            case "MADERA" -> "bosque";
+            case "COMIDA" -> "granja";
+            default -> "área desconocida";
+        };
+    }
+
 
     // Funciones Interface Zona
     @Override
@@ -106,7 +115,7 @@ public class AreaRecurso implements Zona {
             esperandoEnCola.remove(a);
 
             recolectando.add(a);
-            Log.log(a.getIdAldeano() + " ha entrado al área de " + tipo);
+            Log.log(a.getIdAldeano() + " ha entrado a " +toString(tipo));
 
         } finally {
             lockZona.unlock();

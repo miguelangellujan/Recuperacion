@@ -8,7 +8,6 @@ public class Almacen implements Zona {
     private int cantidadActual;
     private int capacidadMaxima;
     private final CentroUrbano centro;
-    private final AtomicInteger semDeposito = new AtomicInteger(3);
     private final Object lock = new Object();
     private final List<Aldeano> aldeanosDepositando = new ArrayList<>();
     private final List<Aldeano> aldeanosEsperando = new ArrayList<>();

@@ -95,7 +95,7 @@ public class Aldeano extends Thread {
                 checkYEsperarEmergencia();
 
                 // Entra en el área de recursos
-                Log.log(id + " intenta entrar en " + centro.getArea(tipo));
+                Log.log(id + " intenta entrar en " + centro.getArea(tipo).toString(tipo));
                 area.entrar(this);
 
                 centro.esperarSiPausado();
@@ -113,7 +113,7 @@ public class Aldeano extends Thread {
 
                 // Verifica si fue atacado
                 if (area.fueAtacadoDurante(this)) {
-                    Log.log(id + " fue atacado mientras recolectaba en " + centro.getArea(tipo));
+                    Log.log(id + " fue atacado mientras recolectaba en " + tipo);
                     area.salir(this);
                     centro.esperarSiPausado();
                     centro.getAreaRecuperacion().enviarAldeano(this, 12000, 15000);
