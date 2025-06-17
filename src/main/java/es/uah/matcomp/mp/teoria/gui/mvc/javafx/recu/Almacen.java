@@ -57,6 +57,7 @@ public class Almacen implements Zona {
     //Esto hay que hacerlo
     public void depositar(Aldeano aldeano, int cantidad) throws InterruptedException {
         int restante = cantidad;
+
         while (restante > 0) {
             int tiempoDeposito = 0;
             int aDepositar = 0;
@@ -65,6 +66,7 @@ public class Almacen implements Zona {
                 // Esperar si el sistema está pausado
                 centro.esperarSiPausado();
 
+                // Esperar si el almacén está lleno
                 while (cantidadActual == capacidadMaxima) {
                     if (!aldeanosEsperando.contains(aldeano)) {
                         aldeanosEsperando.add(aldeano);
@@ -74,19 +76,18 @@ public class Almacen implements Zona {
                     centro.esperarSiPausado();
                 }
 
-                // Preparar depósito
+                // Preparar para depositar
                 aldeanosEsperando.remove(aldeano);
-                if (!aldeanosDepositando.contains(aldeano)) {
-                    aldeanosDepositando.add(aldeano);
-                }
+                aldeanosDepositando.add(aldeano);
 
                 int espacio = capacidadMaxima - cantidadActual;
                 aDepositar = Math.min(espacio, restante);
-                tiempoDeposito = FuncionesComunes.randomBetween(2000,3000); // Simular 2-3s
+                tiempoDeposito = FuncionesComunes.randomBetween(2000, 3000); // Simular 2-3s
 
-                lock.notifyAll(); // Avisar antes de soltar lock
+                lock.notifyAll(); // Avisar a otros hilos antes de soltar el lock
             }
 
+            // Simulación del tiempo de depósito (fuera del lock)
             Thread.sleep(tiempoDeposito);
 
             synchronized (lock) {
@@ -97,16 +98,19 @@ public class Almacen implements Zona {
 
                 if (restante > 0) {
                     Log.log("El aldeano " + aldeano.getIdAldeano() + " se queda esperando con " + restante + " de " + tipo + " por falta de espacio.");
+
+                    // Moverlo de 'depositando' a 'esperando'
                     aldeanosDepositando.remove(aldeano);
-                    if (!aldeanosEsperando.contains(aldeano)) {
-                        aldeanosEsperando.add(aldeano);
-                    }
+                    aldeanosEsperando.add(aldeano);
                 } else {
+                    // Eliminamos del set de depositando
                     aldeanosDepositando.remove(aldeano);
                 }
-                lock.notifyAll();
+
+                lock.notifyAll(); // Despertar posibles aldeanos esperando
             }
         }
+
         // Limpieza final por si hubo interrupciones
         synchronized (lock) {
             aldeanosDepositando.remove(aldeano);

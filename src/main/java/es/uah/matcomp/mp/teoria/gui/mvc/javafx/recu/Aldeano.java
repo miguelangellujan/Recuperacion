@@ -29,7 +29,7 @@ public class Aldeano extends Thread {
 
     public void moverACasaPrincipal() {
         synchronized (this) {
-            if(!esperandoEnEmergencia){
+            if (!esperandoEnEmergencia) {
                 esperandoEnEmergencia = true;
                 centro.getArea("COMIDA").salir(this);
                 centro.getArea("MADERA").salir(this);
@@ -57,13 +57,13 @@ public class Aldeano extends Thread {
         moverAPlazaCentral();
     }
 
-    public void moverAPlazaCentral(){
+    public void moverAPlazaCentral() {
         synchronized (this) {
             if (esperandoEnEmergencia && centro.getCasaPrincipal().estaRegistrado(id)) {
                 esperandoEnEmergencia = false;
                 centro.getCasaPrincipal().salir(id);
 
-                if(!centro.getPlazaCentral().estaRegistrado(id)){
+                if (!centro.getPlazaCentral().estaRegistrado(id)) {
                     centro.getPlazaCentral().planificar(id);
                 }
                 Log.log(id + " ha salido de la Casa Principal y retoma el ciclo en la Plaza Central.");
@@ -78,16 +78,7 @@ public class Aldeano extends Thread {
                 centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
-                Log.log(id + " entra en CASA PRINCIPAL");
-                centro.getCasaPrincipal().registrarEntrada(id);
-                centro.esperarSiPausado();
-                Thread.sleep(FuncionesComunes.randomBetween(2000, 4000));
-                centro.esperarSiPausado();
-                centro.getCasaPrincipal().salir(id);
-
-                centro.esperarSiPausado();
-                checkYEsperarEmergencia();
-
+                // Va a la PLAZA CENTRAL
                 Log.log(id + " va a la PLAZA CENTRAL");
                 centro.getPlazaCentral().planificar(id);
                 centro.esperarSiPausado();
@@ -95,6 +86,7 @@ public class Aldeano extends Thread {
                 centro.esperarSiPausado();
                 centro.getPlazaCentral().salir(id);
 
+                // Selecciona recurso y obtiene referencias
                 String tipo = centro.seleccionarRecursoAleatorio();
                 AreaRecurso area = centro.getArea(tipo);
                 Almacen almacen = centro.getAlmacen(tipo);
@@ -102,19 +94,23 @@ public class Aldeano extends Thread {
                 centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
+                // Entra en el área de recursos
                 Log.log(id + " intenta entrar en " + tipo);
                 area.entrar(this);
 
                 centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
+                // Calcula cantidad recolectada
                 int cantidad = FuncionesComunes.randomBetween(10, 20);
                 int nivelHerramientas = Math.min(centro.getGestorMejoras().getNivelHerramientas(), 3);
                 int recolectar = cantidad + (5 * nivelHerramientas);
 
+                // Recolecta
                 centro.esperarSiPausado();
                 Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));
 
+                // Verifica si fue atacado
                 if (area.fueAtacadoDurante(this)) {
                     Log.log(id + " fue atacado mientras recolectaba en " + tipo);
                     area.salir(this);
@@ -122,15 +118,17 @@ public class Aldeano extends Thread {
                     centro.getAreaRecuperacion().enviarAldeano(this, 12000, 15000);
                     continue;
                 }
-                centro.esperarSiPausado();
+
                 Log.log(id + " recolecta " + recolectar + " unidades de " + tipo);
                 centro.esperarSiPausado();
 
+                // Sale del área
                 area.salir(this);
 
                 centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
+                // Va a la PLAZA CENTRAL antes de depositar
                 Log.log(id + " va a la PLAZA CENTRAL antes de depositar");
                 centro.getPlazaCentral().planificar(id);
                 centro.esperarSiPausado();
@@ -141,16 +139,17 @@ public class Aldeano extends Thread {
                 centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
-                centro.esperarSiPausado();
+                // Deposita en el almacén correspondiente
                 almacen.depositar(this, recolectar);
 
                 synchronized (area) {
-                    area.notifyAll();
+                    area.notifyAll(); // Para desbloquear otros aldeanos si es necesario
                 }
 
                 centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
+                // Vuelve a la PLAZA CENTRAL al terminar el ciclo
                 Log.log(id + " vuelve a la PLAZA CENTRAL");
                 centro.getPlazaCentral().planificar(id);
                 centro.esperarSiPausado();

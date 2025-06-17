@@ -100,29 +100,6 @@ public class ServidorController {
 
     // Inicializar los hilos donde se crean los individuos
     private void iniciarHilos(){
-        Thread hiloAldeano = new Thread(() -> {
-            while (true){
-                synchronized (centro.getPausaLock()) {
-                    while (centro.isPausado()) {
-                        try {
-                            centro.getPausaLock().wait();
-                        } catch (InterruptedException e) {
-                            Log.log("Error creando el hilo del aldeano: " + e.getMessage());
-                            Thread.currentThread().interrupt();
-                            return;
-                        }
-                    }
-                    // Ya no está pausado, podemos crear aldeano
-                }
-
-                // Antes de crear, verificamos de nuevo para evitar carrera de estado
-                if (!centro.isPausado()) {
-                    centro.crearAldeano();
-                }
-            }
-        });
-        hilosActivos.add(hiloAldeano);
-        hiloAldeano.start();
 
         Thread hiloBarbaro = new Thread(() -> {
             while (true){

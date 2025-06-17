@@ -164,10 +164,9 @@ public class CentroUrbano {
             }
         }
         synchronized (this) {
-            if (comida.get() >= 50 && madera.get() >= 50 && oro.get() >= 80) {
-                comida.addAndGet(-50);
-                madera.addAndGet(-50);
-                oro.addAndGet(-80);
+            if (comida.get() >= 80 && oro.get() >= 60) {
+                comida.addAndGet(-80);
+                oro.addAndGet(-60);
                 String id = String.format("G%03d", idGuerrero.getAndIncrement());
                 Guerrero g = new Guerrero(id, this);
                 guerreros.add(g);
