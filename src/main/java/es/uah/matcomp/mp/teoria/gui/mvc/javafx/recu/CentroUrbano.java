@@ -451,15 +451,6 @@ public class CentroUrbano {
         }
     }
 
-    public String getBarbarosCampamento() {
-        synchronized (barbaros) {
-            return barbaros.stream()
-                    .filter(b -> zonaCampamento.equals(b.getZonaAsignada()))
-                    .map(Barbaro::getIdBarbaro)
-                    .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
-        }
-    }
-
 
     public String obtenerIdsCasaPrincipal() {
         return casaPrincipal.obtenerIds();

@@ -177,7 +177,7 @@ public class ServidorController {
             lblNivelAlmacenes.setText("Nivel: " + centro.getNivelAlmacenes());
 
             lblZonaPreparacion.setText(centro.getZonaPreparacion().obtenerIdsEnPreparacion());
-            lblCampamentoBarbaro.setText(centro.getBarbarosCampamento());
+            lblCampamentoBarbaro.setText(centro.getZonaCampamento().obtenerIds());
         });
     }
 

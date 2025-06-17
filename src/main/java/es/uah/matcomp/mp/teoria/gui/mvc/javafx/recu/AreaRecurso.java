@@ -121,7 +121,6 @@ public class AreaRecurso implements Zona {
             lockZona.unlock();
         }
     }
-
     public void salir(Aldeano a) {
         lockZona.lock();
         try {
@@ -144,7 +143,6 @@ public class AreaRecurso implements Zona {
             lockZona.unlock();
         }
     }
-
     public void finalizarAtaque(boolean destruir) {
         lockZona.lock();
         try {
@@ -196,8 +194,6 @@ public class AreaRecurso implements Zona {
         esperandoEnCola.clear();
 
     }
-
-
     public boolean fueAtacadoDurante(Aldeano a) {
         lockZona.lock();
         try {
@@ -211,8 +207,6 @@ public class AreaRecurso implements Zona {
             barbarosAtacando.remove(b);
         }
     }
-
-
     private CentroUrbano getCentroDe(Aldeano a) {
         try {
             java.lang.reflect.Field campo = Aldeano.class.getDeclaredField("centro");
@@ -222,7 +216,6 @@ public class AreaRecurso implements Zona {
             return null;
         }
     }
-
     public String obtenerEstadoAldeanos() {
         lockZona.lock();
         try {

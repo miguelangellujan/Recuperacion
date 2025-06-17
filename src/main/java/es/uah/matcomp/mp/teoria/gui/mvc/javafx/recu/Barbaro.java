@@ -35,7 +35,7 @@ public class Barbaro extends Thread {
             // Bárbaro entra al campamento al crearse
             centro.getZonaCampamento().entrarCampamento(this);
             Log.log(id + " entra al campamento.");
-            Thread.sleep(1000); // pequeña pausa para que se note en el estado
+            Thread.sleep(2000); // pequeña pausa para que se note en el estado
             while (true) {
                 centro.esperarSiPausado();
 

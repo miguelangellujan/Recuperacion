@@ -149,12 +149,13 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
     // Número de Bárbaros en el campamento y en la zona de preparación
     @Override
     public int barbarosZonaPreparacion() throws RemoteException {
-        return centro.getZonaPreparacion().contarBarbarosPreparacion();
+        return centro.getZonaPreparacion().getBarbarosEnPreparacion();
     }
 
     @Override
     public int barbarosCampamento() throws RemoteException {
-        return centro.getBarbarosCampamento().length();
+        String ids = centro.getZonaCampamento().obtenerIds(); // Esto devuelve un String
+        return centro.getZonaCampamento().contarBarbarosEnString(ids);
     }
 
     // Estado de los recursos almacenados (cantidad actual / capacidad máxima)

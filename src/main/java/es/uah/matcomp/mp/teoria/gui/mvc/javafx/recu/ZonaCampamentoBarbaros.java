@@ -24,10 +24,14 @@ public class ZonaCampamentoBarbaros {
                 .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
     }
 
-    public int contar() {
-        return barbarosEnCampamento.size();
+    public int contarBarbarosEnString(String ids) {
+        if (ids == null) return 0;
+        String trimmed = ids.trim().toLowerCase();
+        if (trimmed.isEmpty() || trimmed.equals("ninguno")) return 0;
+        return (int) Arrays.stream(ids.split(","))
+                .filter(s -> !s.trim().isEmpty())
+                .count();
     }
-
     public List<Barbaro> getBarbaros() {
         return new ArrayList<>(barbarosEnCampamento);
     }
