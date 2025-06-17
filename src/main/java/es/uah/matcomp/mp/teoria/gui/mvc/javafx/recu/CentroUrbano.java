@@ -229,12 +229,29 @@ public class CentroUrbano {
 
     // Get Individuos
     public String getAldeanos() {
-        synchronized (aldeanos) {
-            return aldeanos.stream().
-                    map(Aldeano::getIdAldeano).
-                    reduce((a, b) -> a + ", " + b).
-                    orElse("Ninguno");
+        Set<String> todos = new HashSet<>();
+
+        // Casa Principal
+        String[] enCasa = casaPrincipal.obtenerIds().split(", ");
+        for (String id : enCasa) {
+            if (!id.equals("Ninguno")) {
+                todos.add(id);
+            }
         }
+
+        // Plaza Central
+        String[] enPlaza = plazaCentral.obtenerIds().split(", ");
+        for (String id : enPlaza) {
+            if (!id.equals("Ninguno")) {
+                todos.add(id);
+            }
+        }
+        // Área de Recuperación
+        todos.addAll(areaRecuperacion.getAldeanosEnRecuperacion());
+
+        if (todos.isEmpty()) return "Ninguno";
+
+        return String.join(", ", todos);
     }
 
     public String getGuerreros() {
