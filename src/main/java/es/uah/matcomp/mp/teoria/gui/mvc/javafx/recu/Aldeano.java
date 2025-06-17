@@ -44,19 +44,6 @@ public class Aldeano extends Thread {
         }
     }
 
-    private void esperarFinEmergencia() throws InterruptedException {
-        esperandoEnEmergencia = true;
-        moverACasaPrincipal();
-
-        synchronized (this) {
-            while (centro.isEmergenciaActiva()) {
-                centro.esperarSiPausado();
-                wait(500);
-            }
-        }
-        moverAPlazaCentral();
-    }
-
     public void moverAPlazaCentral() {
         synchronized (this) {
             if (esperandoEnEmergencia && centro.getCasaPrincipal().estaRegistrado(id)) {
@@ -108,6 +95,7 @@ public class Aldeano extends Thread {
 
                 // Recolecta
                 centro.esperarSiPausado();
+                checkYEsperarEmergencia();
                 Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));
 
                 // Verifica si fue atacado
@@ -141,6 +129,7 @@ public class Aldeano extends Thread {
                 centro.esperarSiPausado();
                 // Deposita en el almacén correspondiente
                 almacen.depositar(this, recolectar);
+                checkYEsperarEmergencia();
 
                 synchronized (area) {
                     area.notifyAll(); // Para desbloquear otros aldeanos si es necesario
@@ -152,22 +141,15 @@ public class Aldeano extends Thread {
                 // Vuelve a la PLAZA CENTRAL al terminar el ciclo
                 Log.log(id + " vuelve a la PLAZA CENTRAL");
                 centro.getPlazaCentral().planificar(id);
+                checkYEsperarEmergencia();
                 centro.esperarSiPausado();
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
                 centro.esperarSiPausado();
+                checkYEsperarEmergencia();
                 centro.getPlazaCentral().salir(id);
 
             } catch (InterruptedException e) {
-                if (activo && centro.isEmergenciaActiva()) {
-                    try {
-                        esperarFinEmergencia();
-                    } catch (InterruptedException ie) {
-                        activo = false;
-                    }
-                } else {
-                    Log.log(id + " ha sido interrumpido y termina.");
-                    activo = false;
-                }
+                Log.log(id + " fue interrumpido inesperadamente, pero sigue activo.");
             }
         }
     }
