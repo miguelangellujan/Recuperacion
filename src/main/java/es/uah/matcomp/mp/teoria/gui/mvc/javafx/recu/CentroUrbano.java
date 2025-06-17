@@ -482,9 +482,6 @@ public class CentroUrbano {
     }
 
     // Funciones para el ataque
-    public void entrenar(Guerrero g) throws InterruptedException {
-        cuartel.entrenar(g);
-    }
 
     public Zona obtenerZonaAleatoria() {
         List<Zona> zonas = List.of(granja, bosque, mina, granero, aserradero, tesoreria);

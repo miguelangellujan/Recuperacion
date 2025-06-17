@@ -26,7 +26,18 @@ public class Aldeano extends Thread {
         emergencia = estado;
         if (estado) this.interrupt();
     }
+    private void esperarFinEmergencia() throws InterruptedException {
+        esperandoEnEmergencia = true;
+        moverACasaPrincipal();
 
+        synchronized (this) {
+            while (centro.isEmergenciaActiva()) {
+                centro.esperarSiPausado();
+                wait(500);
+            }
+        }
+        moverAPlazaCentral();
+    }
     public void moverACasaPrincipal() {
         synchronized (this) {
             if (!esperandoEnEmergencia) {
@@ -82,7 +93,7 @@ public class Aldeano extends Thread {
                 checkYEsperarEmergencia();
 
                 // Entra en el área de recursos
-                Log.log(id + " intenta entrar en " + tipo);
+                Log.log(id + " intenta entrar en " + centro.getArea(tipo));
                 area.entrar(this);
 
                 centro.esperarSiPausado();
@@ -100,7 +111,7 @@ public class Aldeano extends Thread {
 
                 // Verifica si fue atacado
                 if (area.fueAtacadoDurante(this)) {
-                    Log.log(id + " fue atacado mientras recolectaba en " + tipo);
+                    Log.log(id + " fue atacado mientras recolectaba en " + centro.getArea(tipo));
                     area.salir(this);
                     centro.esperarSiPausado();
                     centro.getAreaRecuperacion().enviarAldeano(this, 12000, 15000);
@@ -149,8 +160,17 @@ public class Aldeano extends Thread {
                 centro.getPlazaCentral().salir(id);
 
             } catch (InterruptedException e) {
+                if (activo && centro.isEmergenciaActiva()) {
+                    try {
+                        esperarFinEmergencia();
+                    } catch (InterruptedException ie) {
+                        activo = false;
+                    }
+                } else {
+                    Log.log(id + " ha sido interrumpido y termina.");
+                    activo = false;
+                }
                 Log.log(id + " fue interrumpido inesperadamente, pero sigue activo.");
             }
         }
-    }
-}
+    }}
