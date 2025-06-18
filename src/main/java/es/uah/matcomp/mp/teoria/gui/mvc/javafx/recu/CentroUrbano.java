@@ -543,8 +543,7 @@ public class CentroUrbano {
 
         if (nuevoEstado) {
             Log.log("¡Emergencia activada! Los aldeanos regresan a CASA PRINCIPAL.");
-
-
+            
             for(Aldeano a : aldeanos){
                 a.setEmergencia(true);
                 synchronized (a) {

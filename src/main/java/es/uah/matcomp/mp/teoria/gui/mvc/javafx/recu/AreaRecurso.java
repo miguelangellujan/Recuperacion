@@ -11,13 +11,13 @@ public class AreaRecurso implements Zona {
     private final List<Barbaro> barbarosAtacando = new ArrayList<>();
     private final AreaRecuperacion areaRecuperacion=new AreaRecuperacion();
 
-
     private final ReentrantLock lockZona = new ReentrantLock(true);
     private final Condition puedeEntrarAldeano = lockZona.newCondition();
 
     private boolean enAtaque = false;
     private boolean destruida = false;
     private boolean enReparacion = false;
+
     private final ReentrantLock lockGuerreros = new ReentrantLock(true);
     private final Condition puedeEntrarGuerrero = lockGuerreros.newCondition();
     private final List<Guerrero> guerrerosDentro = new ArrayList<>();
@@ -27,6 +27,7 @@ public class AreaRecurso implements Zona {
     public AreaRecurso(String tipo) {
         this.tipo = tipo;
     }
+
     public String toString(String tipo) {
         return switch (tipo) {
             case "ORO" -> "mina";
@@ -100,6 +101,7 @@ public class AreaRecurso implements Zona {
             return false;
         }
     }
+
     // Acceso al área de recurso
     public void entrar(Aldeano a) throws InterruptedException {
         lockZona.lock();
@@ -163,10 +165,16 @@ public class AreaRecurso implements Zona {
             lockZona.unlock();
         }
     }
+
     // Ataque
     public void iniciarAtaque(Barbaro b) {
         lockZona.lock();
         try {
+            if (!destruida) {
+                destruida = true;
+                Log.log("El área " + tipo + " ha sido destruida por el bárbaro " + b.getIdBarbaro());
+            }
+
             enAtaque = true;
             synchronized (barbarosAtacando) {
                 barbarosAtacando.add(b);
@@ -176,6 +184,7 @@ public class AreaRecurso implements Zona {
             lockZona.unlock();
         }
     }
+
     public void finalizarAtaque(boolean destruir) {
         lockZona.lock();
         try {
@@ -214,6 +223,7 @@ public class AreaRecurso implements Zona {
             lockGuerreros.unlock();
         }
     }
+
     public synchronized void expulsarAldeanos() {
         for (Aldeano a : recolectando) {
             areaRecuperacion.enviarAldeano(a,12000,15000);
@@ -227,6 +237,7 @@ public class AreaRecurso implements Zona {
         esperandoEnCola.clear();
 
     }
+
     public boolean fueAtacadoDurante(Aldeano a) {
         lockZona.lock();
         try {
@@ -235,11 +246,13 @@ public class AreaRecurso implements Zona {
             lockZona.unlock();
         }
     }
+
     public void eliminarBarbaro(Barbaro b) {
         synchronized (barbarosAtacando) {
             barbarosAtacando.remove(b);
         }
     }
+
     private CentroUrbano getCentroDe(Aldeano a) {
         try {
             java.lang.reflect.Field campo = Aldeano.class.getDeclaredField("centro");
@@ -249,6 +262,7 @@ public class AreaRecurso implements Zona {
             return null;
         }
     }
+
     public String obtenerEstadoAldeanos() {
         lockZona.lock();
         try {
@@ -263,11 +277,13 @@ public class AreaRecurso implements Zona {
                 colaSb.append(a.getIdAldeano()).append(", ");
             }
             if (colaSb.length() > 0) colaSb.setLength(colaSb.length() - 2);
+
             StringBuilder guerr = new StringBuilder();
             for (Guerrero g : getGuerreros()) {
                 guerr.append(g.getIdGuerrero()).append(", ");
             }
             if (guerr.length() > 0) guerr.setLength(guerr.length() - 2);
+
             StringBuilder barb = new StringBuilder();
             for (Barbaro b : getBarbaros()) {
                 barb.append(b.getIdBarbaro()).append(", ");
@@ -280,6 +296,7 @@ public class AreaRecurso implements Zona {
             lockZona.unlock();
         }
     }
+
     public List<Aldeano> getAldeanos() {
         lockZona.lock();
         try {
@@ -302,6 +319,7 @@ public class AreaRecurso implements Zona {
             lockGuerreros.unlock();
         }
     }
+
     public List<Barbaro> getBarbaros() {
         synchronized (barbarosAtacando) {
             return new ArrayList<>(barbarosAtacando);

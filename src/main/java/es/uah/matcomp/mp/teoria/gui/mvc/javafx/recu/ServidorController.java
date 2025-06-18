@@ -178,6 +178,10 @@ public class ServidorController {
 
             lblZonaPreparacion.setText(centro.getZonaPreparacion().obtenerIdsEnPreparacion());
             lblCampamentoBarbaro.setText(centro.getZonaCampamento().obtenerIds());
+
+            String estadoRecuperacion = centro.getAreaRecuperacion().obtenerIdsEnRecuperacion();
+            Log.log("Actualizando interfaz, estado área de recuperación: " + estadoRecuperacion);
+            lblAreaRecuperacion.setText(estadoRecuperacion);
         });
     }
 

@@ -23,6 +23,7 @@ public class Almacen implements Zona {
         this.cantidadActual = 0;
         this.centro = centro;
     }
+
     // Getters
     public int getCantidadActual() {
         return cantidadActual;
@@ -38,10 +39,12 @@ public class Almacen implements Zona {
         guerreros.add(g);
         return true;
     }
+
     @Override
     public void salirGuerrero(Guerrero g) {
         guerreros.remove(g);
     }
+
     @Override
     public String getNombreZona() {
         return "Almacén de " + tipo;
@@ -53,6 +56,7 @@ public class Almacen implements Zona {
         Thread.sleep(1000); // Espera de 1 segundo antes de saquear
         return false;
     }
+
     //Esto hay que hacerlo
     public void depositar(Aldeano aldeano, int cantidad) throws InterruptedException {
         centro.esperarSiPausado();
@@ -120,6 +124,7 @@ public class Almacen implements Zona {
             aldeanosEsperando.remove(aldeano);
         }
     }
+
     public void aumentarCapacidad(int cantidad) {
         synchronized (lock) {
             capacidadMaxima += cantidad;
@@ -131,6 +136,13 @@ public class Almacen implements Zona {
     public void saquear(Barbaro b) {
         agregarBarbaro(b);
 
+        // Simulación del saqueo
+        try {
+            Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+        } catch (InterruptedException e) {
+            Log.log("Error en el saqueo: " + e.getMessage());
+        }
+
         int porcentaje = FuncionesComunes.randomBetween(10, 30);
         int robado;
         synchronized (lock) {
@@ -141,6 +153,12 @@ public class Almacen implements Zona {
         centro.restarRecurso(tipo, robado);
 
         Log.log("¡SAQUEO en " + tipo + "! Se han robado " + robado + " unidades por " + b.getIdBarbaro() + ". Restante: " + cantidadActual);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Log.log("Error en el saqueo: " + e.getMessage());
+        }
 
         eliminarBarbaro(b);
 
@@ -207,6 +225,7 @@ public class Almacen implements Zona {
             aldeanosEsperando.clear();
         }
     }
+
     public synchronized void expulsarAldeanos() {
         for (Aldeano a : aldeanosDepositando) {
             areaRecuperacion.enviarAldeano(a,12000,15000);

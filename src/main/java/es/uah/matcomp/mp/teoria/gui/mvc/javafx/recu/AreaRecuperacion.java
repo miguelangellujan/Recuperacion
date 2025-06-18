@@ -1,5 +1,7 @@
 package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 
+import javafx.application.Platform;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -11,13 +13,18 @@ public class AreaRecuperacion {
         new Thread(() -> {
             try {
                 String id = a.getIdAldeano();
-                enRecuperacion.add(id);
-                Log.log(id + " entra en ÁREA DE RECUPERACIÓN");
+                Platform.runLater(() -> {
+                    enRecuperacion.add(id);
+                    Log.log(id + " entra en ÁREA DE RECUPERACIÓN");
+                });
 
-                Thread.sleep(FuncionesComunes.randomBetween(minMs, maxMs));
+                Thread.sleep(30000);
+                //Thread.sleep(FuncionesComunes.randomBetween(minMs, maxMs));
 
-                Log.log(id + " sale de ÁREA DE RECUPERACIÓN");
-                enRecuperacion.remove(id);
+                Platform.runLater(() -> {
+                    Log.log(id + " sale de ÁREA DE RECUPERACIÓN");
+                    enRecuperacion.remove(id);
+                });
             } catch (InterruptedException e) {
                 Log.log(a.getIdAldeano() + " fue interrumpido en recuperación.");
                 Thread.currentThread().interrupt();
@@ -29,13 +36,17 @@ public class AreaRecuperacion {
         new Thread(() -> {
             try {
                 String id = g.getIdGuerrero();
-                enRecuperacion.add(id);
-                Log.log(id + " entra en ÁREA DE RECUPERACIÓN");
+                Platform.runLater(() -> {
+                    enRecuperacion.add(id);
+                    Log.log(id + " entra en ÁREA DE RECUPERACIÓN");
+                });
 
                 Thread.sleep(FuncionesComunes.randomBetween(minMs, maxMs));
 
-                Log.log(id + " sale de ÁREA DE RECUPERACIÓN");
-                enRecuperacion.remove(id);
+                Platform.runLater(() -> {
+                    Log.log(id + " sale de ÁREA DE RECUPERACIÓN");
+                    enRecuperacion.remove(id);
+                });
             } catch (InterruptedException e) {
                 Log.log(g.getIdGuerrero() + " fue interrumpido en recuperación.");
                 Thread.currentThread().interrupt();
@@ -47,6 +58,7 @@ public class AreaRecuperacion {
         if (enRecuperacion.isEmpty()) return "Área de Recuperación: vacía";
         return "En recuperación: " + String.join(", ", enRecuperacion);
     }
+
     // === FUNCIONES ADICIONALES ===
 
     public List<String> getAldeanosEnRecuperacion() {
