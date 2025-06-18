@@ -103,7 +103,19 @@ public class Aldeano extends Thread {
                 centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
-                // Calcula cantidad recolectada
+                // Verifica si fue atacado
+                if (area.fueAtacadoDurante(this)) {
+                    Log.log(id + " fue atacado mientras recolectaba en " + tipo);
+                    area.salir(this);
+                    centro.esperarSiPausado();
+
+                    // Recuperación: bloquea el hilo entre 12 y 15
+                    centro.getAreaRecuperacion().entrar(this);
+
+                    continue; // vuelve al ciclo principal
+                }
+
+                // Calcula cantidad a recolectar
                 int cantidad = FuncionesComunes.randomBetween(10, 20);
                 int nivelHerramientas = Math.min(centro.getGestorMejoras().getNivelHerramientas(), 3);
                 int recolectar = cantidad + (5 * nivelHerramientas);
@@ -113,35 +125,7 @@ public class Aldeano extends Thread {
                 checkYEsperarEmergencia();
                 Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));
 
-                // Verifica si fue atacado
-                if (area.fueAtacadoDurante(this)) {
-                    Log.log(id + " fue atacado mientras recolectaba en " + tipo);
-                    area.salir(this);
-                    centro.esperarSiPausado();
 
-                    // Registra la entrada del aldeano en el área de recuperación de forma síncrona
-                    CentroUrbano c = centro;
-                    AreaRecuperacion recup = c.getAreaRecuperacion();
-
-                    // Agregar el ID del aldeano a la lista de recuperación
-                    Platform.runLater(() -> {
-                        recup.agregarAldeanoSynch(id); // Supón que tienes un método que simplemente agrega sin lanzar un thread nuevo
-                        Log.log(id + " entra en ÁREA DE RECUPERACIÓN (síncrono). Estado: "
-                                + recup.obtenerIdsEnRecuperacion());
-                    });
-
-                    // El aldeano espera en recuperación, bloqueando su hilo
-                    int tiempoRecuperacion = FuncionesComunes.randomBetween(12000, 15000);
-                    Thread.sleep(tiempoRecuperacion);
-
-                    // Registra la salida del aldeano de la recuperación
-                    Platform.runLater(() -> {
-                        recup.quitarAldeanoSynch(id); // Un método que quita el aldeano
-                        Log.log(id + " sale de ÁREA DE RECUPERACIÓN y va a la Plaza Central. Estado: "
-                                + recup.obtenerIdsEnRecuperacion());
-                    });
-                    continue;
-                }
                 centro.esperarSiPausado();
                 Log.log(id + " recolecta " + recolectar + " unidades de " + tipo);
                 centro.esperarSiPausado();
@@ -163,6 +147,7 @@ public class Aldeano extends Thread {
                 centro.esperarSiPausado();
                 checkYEsperarEmergencia();
                 centro.esperarSiPausado();
+
                 // Deposita en el almacén correspondiente
                 almacen.depositar(this, recolectar);
                 checkYEsperarEmergencia();
@@ -198,4 +183,5 @@ public class Aldeano extends Thread {
                 Log.log(id + " fue interrumpido inesperadamente, pero sigue activo.");
             }
         }
-    }}
+    }
+}

@@ -493,14 +493,6 @@ public class CentroUrbano {
         return obtenerZonaAleatoria();
     }
 
-    public void realizarAtaque(Barbaro b, Zona zona) {
-        try {
-            zona.enfrentarABarbaro(b);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     // Pausa
     public void setPausa(boolean enPausa) {
         pausado.set(enPausa);

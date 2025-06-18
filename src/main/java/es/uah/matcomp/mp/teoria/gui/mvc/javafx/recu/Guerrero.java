@@ -22,7 +22,7 @@ public class Guerrero extends Thread {
 
     public void enviarARecuperacion() {
         Log.log(id + " es enviado al área de recuperación tras ser derrotado");
-        centro.getAreaRecuperacion().enviarGuerrero(this, 10000, 15000);
+        centro.getAreaRecuperacion().entrarGuerrero(this);
     }
 
     public String getIdGuerrero() {

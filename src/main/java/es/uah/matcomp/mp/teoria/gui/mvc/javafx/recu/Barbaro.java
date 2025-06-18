@@ -7,8 +7,8 @@ public class Barbaro extends Thread {
     private final CentroUrbano centro;
     private static final Random rnd = new Random();
     private boolean puedeAtacar = true;
-    private Zona zonaAsignada;
-
+    private final Object lockAtaque = new Object();
+    
     public Barbaro(String id, CentroUrbano centro) {
         this.id = id;
         this.centro = centro;
@@ -21,13 +21,6 @@ public class Barbaro extends Thread {
     public boolean estaAtacando() {
         return !puedeAtacar;
     }
-    public Zona getZonaAsignada() {
-        return zonaAsignada;
-    }
-
-    public void setZonaAsignada(Zona zona) {
-        this.zonaAsignada = zona;
-    }
 
     @Override
     public void run() {
@@ -35,29 +28,27 @@ public class Barbaro extends Thread {
             // El bárbaro entra al campamento al crearse
             centro.getZonaCampamento().entrarCampamento(this);
             Log.log(id + " entra al campamento.");
-            Thread.sleep(2000); // pequeña pausa para que se note en el estado
+            Thread.sleep(2000); // Pequeña pausa inicial
 
             while (true) {
                 centro.esperarSiPausado();
 
-                // Espera activa si no puede atacar
-                while (!puedeAtacar) {
-                    Thread.sleep(500);
-                    centro.esperarSiPausado();
+                synchronized (lockAtaque) {
+                    while (!puedeAtacar) {
+                        lockAtaque.wait();
+                    }
                 }
 
-                // Salir del campamento para dirigirse a la zona de preparación
+                // Salida del campamento hacia zona de preparación
                 centro.getZonaCampamento().salirCampamento(this);
                 Log.log(id + " se dirige a la zona de preparación");
                 ZonaPreparacionBarbaros zonaPrep = centro.getZonaPreparacion();
 
-                // Esperar formación de grupo
+                // Espera a que se forme grupo y recibe objetivo
                 Zona objetivo = zonaPrep.esperarGrupo(this);
-
                 centro.esperarSiPausado();
                 Log.log(id + " ataca la zona: " + objetivo.getNombreZona());
 
-                // Combate
                 boolean ganoCombate = true;
                 boolean huboEnfrentamiento = objetivo.enfrentarABarbaro(this);
 
@@ -72,25 +63,31 @@ public class Barbaro extends Thread {
                         Log.log(id + " gana su combate en " + objetivo.getNombreZona());
                     } else {
                         Log.log(id + " pierde el combate y se retira al campamento (60s)");
-                        puedeAtacar = false;
 
-                        // Entra al campamento tras perder
+                        synchronized (lockAtaque) {
+                            puedeAtacar = false;
+                        }
+
                         centro.getZonaCampamento().entrarCampamento(this);
                         centro.esperarSiPausado();
                         Thread.sleep(60000);
 
-                        puedeAtacar = true;
-                        continue; // Salta el saqueo, vuelve a la zona de preparación
+                        synchronized (lockAtaque) {
+                            puedeAtacar = true;
+                            lockAtaque.notify();
+                        }
+
+                        continue; // Salta el saqueo
                     }
                 } else {
                     Log.log(id + " no encontró defensores en " + objetivo.getNombreZona());
                     centro.esperarSiPausado();
-                    Thread.sleep(1000); // Espera obligatoria sin defensores
+                    Thread.sleep(1000);
                 }
 
-                // Saqueo sin esperar a aldeanos, pero expulsándolos si están dentro
+                // Saqueo de zona
                 if (objetivo instanceof AreaRecurso recurso) {
-                    recurso.expulsarAldeanos();  // Expulsa aldeanos depositando o recolectando al área de recuperación
+                    recurso.expulsarAldeanos();
                     recurso.iniciarAtaque(this);
                     centro.esperarSiPausado();
                     Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
@@ -99,7 +96,7 @@ public class Barbaro extends Thread {
                     Log.log(id + " ha destruido el área de recurso: " + recurso.getNombreZona());
 
                 } else if (objetivo instanceof Almacen almacen) {
-                    almacen.expulsarAldeanos();  // Expulsa aldeanos depositando al área de recuperación
+                    almacen.expulsarAldeanos();
                     centro.esperarSiPausado();
                     Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
                     almacen.saquear(this);
@@ -108,16 +105,20 @@ public class Barbaro extends Thread {
 
                 Log.log(id + " finaliza el ataque en " + objetivo.getNombreZona());
 
-                // Penalización de 40 segundos tras ataque
-                puedeAtacar = false;
-                Log.log(id + " regresa al campamento y espera 40s");
+                // Espera post-ataque de 40s
+                synchronized (lockAtaque) {
+                    puedeAtacar = false;
+                }
 
-                // Entra al campamento tras ganar y espera
+                Log.log(id + " regresa al campamento y espera 40s");
                 centro.getZonaCampamento().entrarCampamento(this);
                 centro.esperarSiPausado();
                 Thread.sleep(40000);
 
-                puedeAtacar = true;
+                synchronized (lockAtaque) {
+                    puedeAtacar = true;
+                    lockAtaque.notify();
+                }
             }
 
         } catch (InterruptedException e) {

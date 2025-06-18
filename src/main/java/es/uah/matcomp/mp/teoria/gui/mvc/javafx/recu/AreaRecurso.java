@@ -23,7 +23,6 @@ public class AreaRecurso implements Zona {
     private final List<Guerrero> guerrerosDentro = new ArrayList<>();
     private final int MAX_GUERREROS = 3;
 
-    // Constructor
     public AreaRecurso(String tipo, CentroUrbano centro) {
         this.tipo = tipo;
         this.centroUrbano = centro;
@@ -38,8 +37,6 @@ public class AreaRecurso implements Zona {
         };
     }
 
-
-    // Funciones Interface Zona
     @Override
     public boolean entrarGuerrero(Guerrero g) throws InterruptedException {
         lockGuerreros.lock();
@@ -78,67 +75,68 @@ public class AreaRecurso implements Zona {
                     g.setLuchando(true);
                     Log.log(b.getIdBarbaro() + " se enfrenta a " + g.getIdGuerrero());
 
-                    double probVictoriaGuerrero = g.getProbabilidadVictoria(); // ej: 0.5 + mejora
+                    double probVictoriaGuerrero = g.getProbabilidadVictoria();
                     double random = Math.random();
 
                     boolean guerreroGana = random < probVictoriaGuerrero;
 
                     if (guerreroGana) {
                         Log.log(g.getIdGuerrero() + " derrota a " + b.getIdBarbaro());
-                        // Aquí podrías llamar a un método para que el bárbaro pierda o salga
-                        // b.serDerrotado(); // si tienes este método
-                        g.setLuchando(false); // Guerrero ya libre para pelear otra vez
-                        return false;  // Indica que bárbaro NO ganó (guerrero ganó)
+                        g.setLuchando(false);
+                        return false;
                     } else {
                         Log.log(b.getIdBarbaro() + " derrota a " + g.getIdGuerrero());
-                        guerrerosDentro.remove(g); // Guerrero derrotado, sale de zona
+                        guerrerosDentro.remove(g);
                         g.enviarARecuperacion();
-                        // No ponemos g.setLuchando(false) porque guerrero ya eliminado de zona
-                        return true; // Indica que bárbaro ganó
+                        return true;
                     }
                 }
             }
-            // No hay guerreros disponibles para pelear
             return false;
         }
     }
 
-    // Acceso al área de recurso
     public void entrar(Aldeano a) throws InterruptedException {
         lockZona.lock();
         try {
+            // Si está destruida y nadie la está reparando, este aldeano la repara
             if (destruida && !enReparacion) {
+                esperandoEnCola.add(a);
                 enReparacion = true;
-                Log.log(a.getIdAldeano() + " no puede entrar, el área está destruida.");
-                int tiempoReparacion = FuncionesComunes.randomBetween(3000, 5000);
+                Log.log(a.getIdAldeano() + " va a reparar el área destruida (" + toString(tipo) + ").");
+
+                // Soltamos el lock para no bloquear mientras duerme
                 lockZona.unlock();
                 try {
-                    Thread.sleep(tiempoReparacion);
+                    Thread.sleep(FuncionesComunes.randomBetween(3000, 5000));
                 } finally {
                     lockZona.lock();
                 }
-
                 destruida = false;
                 enReparacion = false;
-                Log.log(a.getIdAldeano() + " ha terminado la recuperación");
-                recolectando.add(a);
-                puedeEntrarAldeano.signalAll();
+                esperandoEnCola.remove(a);
+
+                Log.log(a.getIdAldeano() + " ha terminado la reparación del área de " + toString(tipo));
+                puedeEntrarAldeano.signalAll(); // Avisamos a los demás
+
+                lockZona.unlock();
+                try {
+                    a.moverACasaPrincipal(); // Va a la casa principal después de reparar y sigue ciclo
+                } finally {
+                    lockZona.lock();
+                }
                 return;
             }
 
-            // Si el área está en reparación (otro aldeano está reparando), espera
-            while (destruida || enReparacion) {
+            // El resto espera si está destruida o en reparación
+            esperandoEnCola.add(a);
+            while (destruida || enReparacion || recolectando.size() >= 3 || enAtaque) {
                 puedeEntrarAldeano.await();
             }
 
-            // Entrada normal cuando área está operativa
-            while (recolectando.size() >= 3 || enAtaque) {
-                puedeEntrarAldeano.await();
-            }
-
+            esperandoEnCola.remove(a);
             recolectando.add(a);
             Log.log(a.getIdAldeano() + " ha entrado a " + toString(tipo));
-
         } finally {
             lockZona.unlock();
         }
@@ -154,7 +152,6 @@ public class AreaRecurso implements Zona {
         }
     }
 
-    // Ataque
     public void iniciarAtaque(Barbaro b) {
         lockZona.lock();
         try {
@@ -183,14 +180,13 @@ public class AreaRecurso implements Zona {
                 Log.log("El área de " + tipo + " ha sido destruida y requiere reparación.");
             }
 
-            // Expulsar aldeanos
             for (Aldeano a : new ArrayList<>(recolectando)) {
                 Log.log(a.getIdAldeano() + " es expulsado del área de " + tipo + " tras el ataque.");
                 salir(a);
                 try {
                     CentroUrbano cu = getCentroDe(a);
                     if (cu != null)
-                        cu.getAreaRecuperacion().enviarAldeano(a, 12000, 15000);
+                        cu.getAreaRecuperacion().entrar(a);
                 } catch (Exception e) {
                     Log.log("Error al expulsar a " + a.getIdAldeano() + ": " + e.getMessage());
                 }
@@ -199,11 +195,11 @@ public class AreaRecurso implements Zona {
         } finally {
             lockZona.unlock();
         }
-        // Limpiar bárbaros que estaban atacando
+
         synchronized (barbarosAtacando) {
             barbarosAtacando.clear();
         }
-        // Notificar a los guerreros
+
         lockGuerreros.lock();
         try {
             puedeEntrarGuerrero.signalAll();
@@ -214,16 +210,15 @@ public class AreaRecurso implements Zona {
 
     public synchronized void expulsarAldeanos() {
         for (Aldeano a : recolectando) {
-            centroUrbano.getAreaRecuperacion().enviarAldeano(a,12000,15000);
+            centroUrbano.getAreaRecuperacion().entrar(a);
             a.interrupt();
         }
         for (Aldeano a : esperandoEnCola) {
-            centroUrbano.getAreaRecuperacion().enviarAldeano(a,12000,15000);
+            centroUrbano.getAreaRecuperacion().entrar(a);
             a.interrupt();
         }
         recolectando.clear();
         esperandoEnCola.clear();
-
     }
 
     public boolean fueAtacadoDurante(Aldeano a) {
@@ -278,8 +273,7 @@ public class AreaRecurso implements Zona {
             }
             if (barb.length() > 0) barb.setLength(barb.length() - 2);
 
-
-            return "Recolectando: "+ dentroSb + "\nEsperando: " + colaSb +"\nGuerreros: "+guerr+"\nBárbaros: "+barb;
+            return "Recolectando: " + dentroSb + "\nEsperando: " + colaSb + "\nGuerreros: " + guerr + "\nBárbaros: " + barb;
         } finally {
             lockZona.unlock();
         }
@@ -288,7 +282,6 @@ public class AreaRecurso implements Zona {
     public List<Aldeano> getAldeanos() {
         lockZona.lock();
         try {
-            // Devuelvo una nueva lista con todos los aldeanos de las tres listas internas
             List<Aldeano> todos = new ArrayList<>();
             todos.addAll(recolectando);
             todos.addAll(esperandoEnCola);
@@ -301,7 +294,6 @@ public class AreaRecurso implements Zona {
     public List<Guerrero> getGuerreros() {
         lockGuerreros.lock();
         try {
-            // Devuelvo copia de la lista de guerreros dentro
             return new ArrayList<>(guerrerosDentro);
         } finally {
             lockGuerreros.unlock();
@@ -313,5 +305,4 @@ public class AreaRecurso implements Zona {
             return new ArrayList<>(barbarosAtacando);
         }
     }
-
 }

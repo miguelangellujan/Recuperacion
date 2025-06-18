@@ -226,18 +226,21 @@ public class Almacen implements Zona {
     }
 
     public synchronized void expulsarAldeanos() {
-        for (Aldeano a : aldeanosDepositando) {
-            centro.getAreaRecuperacion().enviarAldeano(a,12000,15000);
+        List<Aldeano> copiaDepositando = new ArrayList<>(aldeanosDepositando);
+        List<Aldeano> copiaEsperando = new ArrayList<>(aldeanosEsperando);
+
+        for (Aldeano a : copiaDepositando) {
+            centro.getAreaRecuperacion().entrar(a);
             a.interrupt();
         }
-        for (Aldeano a : aldeanosEsperando) {
-            centro.getAreaRecuperacion().enviarAldeano(a,12000,15000);
+        for (Aldeano a : copiaEsperando) {
+            centro.getAreaRecuperacion().entrar(a);
             a.interrupt();
         }
+
         aldeanosDepositando.clear();
         aldeanosEsperando.clear();
     }
-
     public void salir(Aldeano aldeano) {
         synchronized (lock) {
             aldeanosDepositando.remove(aldeano);
