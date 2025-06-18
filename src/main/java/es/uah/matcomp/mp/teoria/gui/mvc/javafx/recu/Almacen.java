@@ -80,7 +80,7 @@ public class Almacen implements Zona {
                 int espacio = capacidadMaxima - cantidadActual;
                 aDepositar = Math.min(espacio, restante);
 
-                // ⚠️ Verificación extra: nunca permitir depositar 0 o negativo
+                // nunca permitir depositar 0 o negativo
                 if (aDepositar <= 0) {
                     // No hay nada que hacer aún, volver a esperar
                     continue;
