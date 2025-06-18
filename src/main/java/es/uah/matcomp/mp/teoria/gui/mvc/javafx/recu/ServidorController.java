@@ -138,7 +138,7 @@ public class ServidorController {
                 }
                 Platform.runLater(this :: actualizarInterfaz);
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(100);
                 } catch (InterruptedException e){
                     Log.log("Error actualizando la interfaz: " + e.getMessage());
                     Thread.currentThread().interrupt();

@@ -121,7 +121,7 @@ public class AreaRecurso implements Zona {
 
                 lockZona.unlock();
                 try {
-                    a.moverACasaPrincipal(); // Va a la casa principal después de reparar y sigue ciclo
+                    a.moverAPlazaCentral(); // Va a la plaza después de reparar y sigue ciclo
                 } finally {
                     lockZona.lock();
                 }
@@ -154,20 +154,14 @@ public class AreaRecurso implements Zona {
     public void iniciarAtaque(Barbaro b) {
         lockZona.lock();
         try {
-            if (!destruida) {
-                destruida = true;
-                Log.log("El área " + tipo + " ha sido destruida por el bárbaro " + b.getIdBarbaro());
-            }
-
             enAtaque = true;
-            synchronized (barbarosAtacando) {
-                barbarosAtacando.add(b);
-            }
+            barbarosAtacando.add(b);
             Log.log("Ataque bárbaro en el área de " + tipo + " por " + b.getIdBarbaro());
         } finally {
             lockZona.unlock();
         }
     }
+
 
     public void finalizarAtaque(boolean destruir) {
         lockZona.lock();
@@ -183,13 +177,18 @@ public class AreaRecurso implements Zona {
                 Log.log(a.getIdAldeano() + " es expulsado del área de " + tipo + " tras el ataque.");
                 salir(a);
                 try {
-                    CentroUrbano cu = getCentroDe(a);
-                    if (cu != null)
-                        cu.getAreaRecuperacion().entrar(a);
+                    getCentroDe(a).getAreaRecuperacion().entrar(a);
                 } catch (Exception e) {
                     Log.log("Error al expulsar a " + a.getIdAldeano() + ": " + e.getMessage());
                 }
             }
+
+            // Aquí debe asegurarse que se vacíe la cola también
+            for (Aldeano a : new ArrayList<>(esperandoEnCola)) {
+                esperandoEnCola.remove(a);
+                getCentroDe(a).getAreaRecuperacion().entrar(a);
+            }
+
             puedeEntrarAldeano.signalAll();
         } finally {
             lockZona.unlock();
@@ -209,12 +208,10 @@ public class AreaRecurso implements Zona {
 
     public synchronized void expulsarAldeanos() {
         for (Aldeano a : recolectando) {
-            centroUrbano.getAreaRecuperacion().entrar(a);
-            a.interrupt();
+            centroUrbano.enviarARecuperacionSegura(a);
         }
         for (Aldeano a : esperandoEnCola) {
-            centroUrbano.getAreaRecuperacion().entrar(a);
-            a.interrupt();
+            centroUrbano.enviarARecuperacionSegura(a);
         }
         recolectando.clear();
         esperandoEnCola.clear();

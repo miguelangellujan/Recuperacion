@@ -230,12 +230,10 @@ public class Almacen implements Zona {
         List<Aldeano> copiaEsperando = new ArrayList<>(aldeanosEsperando);
 
         for (Aldeano a : copiaDepositando) {
-            centro.getAreaRecuperacion().entrar(a);
-            a.interrupt();
+            centro.enviarARecuperacionSegura(a);
         }
         for (Aldeano a : copiaEsperando) {
-            centro.getAreaRecuperacion().entrar(a);
-            a.interrupt();
+            centro.enviarARecuperacionSegura(a);
         }
 
         aldeanosDepositando.clear();
