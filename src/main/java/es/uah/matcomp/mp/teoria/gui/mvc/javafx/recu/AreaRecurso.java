@@ -9,7 +9,7 @@ public class AreaRecurso implements Zona {
     private final List<Aldeano> recolectando = new ArrayList<>();
     private final List<Aldeano> esperandoEnCola = new ArrayList<>();
     private final List<Barbaro> barbarosAtacando = new ArrayList<>();
-    private final AreaRecuperacion areaRecuperacion=new AreaRecuperacion();
+    private final CentroUrbano centroUrbano;
 
     private final ReentrantLock lockZona = new ReentrantLock(true);
     private final Condition puedeEntrarAldeano = lockZona.newCondition();
@@ -24,8 +24,9 @@ public class AreaRecurso implements Zona {
     private final int MAX_GUERREROS = 3;
 
     // Constructor
-    public AreaRecurso(String tipo) {
+    public AreaRecurso(String tipo, CentroUrbano centro) {
         this.tipo = tipo;
+        this.centroUrbano = centro;
     }
 
     public String toString(String tipo) {
@@ -106,47 +107,34 @@ public class AreaRecurso implements Zona {
     public void entrar(Aldeano a) throws InterruptedException {
         lockZona.lock();
         try {
-            if (destruida) {
+            if (destruida && !enReparacion) {
+                enReparacion = true;
                 Log.log(a.getIdAldeano() + " no puede entrar, el área está destruida.");
-                esperandoEnCola.add(a);
-
-                // El aldeano espera a que se repare la zona
-                while (destruida) {
-                    puedeEntrarAldeano.await();
+                int tiempoReparacion = FuncionesComunes.randomBetween(3000, 5000);
+                lockZona.unlock();
+                try {
+                    Thread.sleep(tiempoReparacion);
+                } finally {
+                    lockZona.lock();
                 }
 
-                // Cuando el área ya no está destruida, el primer aldeano que entra debe reparar
-                esperandoEnCola.remove(a);
-
-                // Marcar que el área está en reparación para bloquear entrada a otros aldeanos
-                enReparacion = true;
-
-                lockZona.unlock(); // Liberamos el lock durante la reparación para no bloquear
-                Log.log(a.getIdAldeano() + " comienza la reparación del área (3-5s).");
-                Thread.sleep(FuncionesComunes.randomBetween(3000, 5000));
-                Log.log(a.getIdAldeano() + " ha terminado la reparación y abandona el área sin recolectar.");
-                lockZona.lock();
-
-                // Reparación terminada, se cambia estado y se notifica a otros aldeanos
                 destruida = false;
                 enReparacion = false;
+                Log.log(a.getIdAldeano() + " ha terminado la recuperación");
+                recolectando.add(a);
                 puedeEntrarAldeano.signalAll();
-
-                // El aldeano que reparó no entra a recolectar, sale del método
                 return;
             }
 
             // Si el área está en reparación (otro aldeano está reparando), espera
-            while (enReparacion) {
+            while (destruida || enReparacion) {
                 puedeEntrarAldeano.await();
             }
 
             // Entrada normal cuando área está operativa
-            esperandoEnCola.add(a);
             while (recolectando.size() >= 3 || enAtaque) {
                 puedeEntrarAldeano.await();
             }
-            esperandoEnCola.remove(a);
 
             recolectando.add(a);
             Log.log(a.getIdAldeano() + " ha entrado a " + toString(tipo));
@@ -226,11 +214,11 @@ public class AreaRecurso implements Zona {
 
     public synchronized void expulsarAldeanos() {
         for (Aldeano a : recolectando) {
-            areaRecuperacion.enviarAldeano(a,12000,15000);
+            centroUrbano.getAreaRecuperacion().enviarAldeano(a,12000,15000);
             a.interrupt();
         }
         for (Aldeano a : esperandoEnCola) {
-            areaRecuperacion.enviarAldeano(a,12000,15000);
+            centroUrbano.getAreaRecuperacion().enviarAldeano(a,12000,15000);
             a.interrupt();
         }
         recolectando.clear();

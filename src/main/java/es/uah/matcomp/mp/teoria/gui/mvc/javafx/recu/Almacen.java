@@ -14,7 +14,6 @@ public class Almacen implements Zona {
     private final List<Guerrero> guerreros = new ArrayList<>();
     private final Set<Guerrero> guerrerosEnCombate = Collections.synchronizedSet(new HashSet<>());
     private final List<Barbaro> barbarosAtacando = new ArrayList<>();
-    private final AreaRecuperacion areaRecuperacion=new AreaRecuperacion();
 
     // Constructor
     public Almacen(String tipo, int capacidad, CentroUrbano centro) {
@@ -228,11 +227,11 @@ public class Almacen implements Zona {
 
     public synchronized void expulsarAldeanos() {
         for (Aldeano a : aldeanosDepositando) {
-            areaRecuperacion.enviarAldeano(a,12000,15000);
+            centro.getAreaRecuperacion().enviarAldeano(a,12000,15000);
             a.interrupt();
         }
         for (Aldeano a : aldeanosEsperando) {
-            areaRecuperacion.enviarAldeano(a,12000,15000);
+            centro.getAreaRecuperacion().enviarAldeano(a,12000,15000);
             a.interrupt();
         }
         aldeanosDepositando.clear();

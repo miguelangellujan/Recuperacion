@@ -9,22 +9,25 @@ import java.util.stream.Collectors;
 public class AreaRecuperacion {
     private final List<String> enRecuperacion = new CopyOnWriteArrayList<>();
 
+    public void agregarAldeanoSynch(String id) {
+        enRecuperacion.add(id);
+    }
+
+    public void quitarAldeanoSynch(String id) {
+        enRecuperacion.remove(id);
+    }
+    
     public void enviarAldeano(Aldeano a, int minMs, int maxMs) {
         new Thread(() -> {
             try {
                 String id = a.getIdAldeano();
-                Platform.runLater(() -> {
-                    enRecuperacion.add(id);
-                    Log.log(id + " entra en ÁREA DE RECUPERACIÓN");
-                });
+                enRecuperacion.add(id);
+                Log.log(id + " entra en ÁREA DE RECUPERACIÓN");
 
-                Thread.sleep(30000);
-                //Thread.sleep(FuncionesComunes.randomBetween(minMs, maxMs));
+                Thread.sleep(FuncionesComunes.randomBetween(minMs, maxMs));
 
-                Platform.runLater(() -> {
-                    Log.log(id + " sale de ÁREA DE RECUPERACIÓN");
-                    enRecuperacion.remove(id);
-                });
+                Log.log(id + " sale de ÁREA DE RECUPERACIÓN");
+                enRecuperacion.remove(id);
             } catch (InterruptedException e) {
                 Log.log(a.getIdAldeano() + " fue interrumpido en recuperación.");
                 Thread.currentThread().interrupt();

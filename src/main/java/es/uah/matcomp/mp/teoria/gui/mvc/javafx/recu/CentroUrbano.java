@@ -12,9 +12,9 @@ public class CentroUrbano {
     private final AtomicInteger idGuerrero = new AtomicInteger(1);
     private final AtomicInteger idBarbaro = new AtomicInteger(1);
 
-    private final AreaRecurso granja = new AreaRecurso("COMIDA");
-    private final AreaRecurso bosque = new AreaRecurso("MADERA");
-    private final AreaRecurso mina = new AreaRecurso("ORO");
+    private final AreaRecurso granja = new AreaRecurso("COMIDA", this);
+    private final AreaRecurso bosque = new AreaRecurso("MADERA", this);
+    private final AreaRecurso mina = new AreaRecurso("ORO", this);
 
     private final Almacen granero = new Almacen("COMIDA", 200, this);
     private final Almacen aserradero = new Almacen("MADERA", 150, this);
@@ -543,7 +543,7 @@ public class CentroUrbano {
 
         if (nuevoEstado) {
             Log.log("¡Emergencia activada! Los aldeanos regresan a CASA PRINCIPAL.");
-            
+
             for(Aldeano a : aldeanos){
                 a.setEmergencia(true);
                 synchronized (a) {

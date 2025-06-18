@@ -1,5 +1,7 @@
 package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 
+import javafx.application.Platform;
+
 public class Aldeano extends Thread {
     private final String id;
     private final CentroUrbano centro;
@@ -116,7 +118,28 @@ public class Aldeano extends Thread {
                     Log.log(id + " fue atacado mientras recolectaba en " + tipo);
                     area.salir(this);
                     centro.esperarSiPausado();
-                    centro.getAreaRecuperacion().enviarAldeano(this, 12000, 15000);
+
+                    // Registra la entrada del aldeano en el área de recuperación de forma síncrona
+                    CentroUrbano c = centro;
+                    AreaRecuperacion recup = c.getAreaRecuperacion();
+
+                    // Agregar el ID del aldeano a la lista de recuperación
+                    Platform.runLater(() -> {
+                        recup.agregarAldeanoSynch(id); // Supón que tienes un método que simplemente agrega sin lanzar un thread nuevo
+                        Log.log(id + " entra en ÁREA DE RECUPERACIÓN (síncrono). Estado: "
+                                + recup.obtenerIdsEnRecuperacion());
+                    });
+
+                    // El aldeano espera en recuperación, bloqueando su hilo
+                    int tiempoRecuperacion = FuncionesComunes.randomBetween(12000, 15000);
+                    Thread.sleep(tiempoRecuperacion);
+
+                    // Registra la salida del aldeano de la recuperación
+                    Platform.runLater(() -> {
+                        recup.quitarAldeanoSynch(id); // Un método que quita el aldeano
+                        Log.log(id + " sale de ÁREA DE RECUPERACIÓN y va a la Plaza Central. Estado: "
+                                + recup.obtenerIdsEnRecuperacion());
+                    });
                     continue;
                 }
                 centro.esperarSiPausado();
