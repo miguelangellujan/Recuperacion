@@ -141,7 +141,6 @@ public class AreaRecurso implements Zona {
             lockZona.unlock();
         }
     }
-
     public void salir(Aldeano a) {
         lockZona.lock();
         try {
