@@ -32,14 +32,15 @@ public class Barbaro extends Thread {
     @Override
     public void run() {
         try {
-            // Bárbaro entra al campamento al crearse
+            // El bárbaro entra al campamento al crearse
             centro.getZonaCampamento().entrarCampamento(this);
             Log.log(id + " entra al campamento.");
             Thread.sleep(2000); // pequeña pausa para que se note en el estado
+
             while (true) {
                 centro.esperarSiPausado();
 
-                // Espera si no puede atacar aún
+                // Espera activa si no puede atacar
                 while (!puedeAtacar) {
                     Thread.sleep(500);
                     centro.esperarSiPausado();
@@ -87,20 +88,18 @@ public class Barbaro extends Thread {
                     Thread.sleep(1000); // Espera obligatoria sin defensores
                 }
 
-                // Saqueo
-                centro.esperarSiPausado();
-                Thread.sleep(1000); // Observación previa
-
+                // Saqueo sin esperar a aldeanos, pero expulsándolos si están dentro
                 if (objetivo instanceof AreaRecurso recurso) {
+                    recurso.expulsarAldeanos();  // Expulsa aldeanos depositando o recolectando al área de recuperación
                     recurso.iniciarAtaque(this);
-                    recurso.expulsarAldeanos();
                     centro.esperarSiPausado();
                     Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
                     recurso.finalizarAtaque(true);
                     recurso.eliminarBarbaro(this);
                     Log.log(id + " ha destruido el área de recurso: " + recurso.getNombreZona());
+
                 } else if (objetivo instanceof Almacen almacen) {
-                    almacen.expulsarAldeanos();
+                    almacen.expulsarAldeanos();  // Expulsa aldeanos depositando al área de recuperación
                     centro.esperarSiPausado();
                     Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
                     almacen.saquear(this);
@@ -109,7 +108,7 @@ public class Barbaro extends Thread {
 
                 Log.log(id + " finaliza el ataque en " + objetivo.getNombreZona());
 
-                // Penalización de 40s tras ataque
+                // Penalización de 40 segundos tras ataque
                 puedeAtacar = false;
                 Log.log(id + " regresa al campamento y espera 40s");
 

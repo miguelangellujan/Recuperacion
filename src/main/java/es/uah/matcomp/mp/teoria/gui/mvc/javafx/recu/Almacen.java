@@ -14,7 +14,7 @@ public class Almacen implements Zona {
     private final List<Guerrero> guerreros = new ArrayList<>();
     private final Set<Guerrero> guerrerosEnCombate = Collections.synchronizedSet(new HashSet<>());
     private final List<Barbaro> barbarosAtacando = new ArrayList<>();
-    private AreaRecuperacion areaRecuperacion;
+    private final AreaRecuperacion areaRecuperacion=new AreaRecuperacion();
 
     // Constructor
     public Almacen(String tipo, int capacidad, CentroUrbano centro) {
@@ -64,65 +64,62 @@ public class Almacen implements Zona {
             int aDepositar = 0;
 
             synchronized (lock) {
-                // Esperar si el sistema está pausado
                 centro.esperarSiPausado();
 
                 // Esperar si el almacén está lleno
-                while (cantidadActual == capacidadMaxima) {
+                while (cantidadActual >= capacidadMaxima) {
                     if (!aldeanosEsperando.contains(aldeano)) {
                         aldeanosEsperando.add(aldeano);
                         Log.log("El almacén de " + tipo + " está lleno. El aldeano " + aldeano.getIdAldeano() + " espera para depositar.");
                     }
-                    lock.wait(); // espera hasta que haya espacio
+                    lock.wait();
                     centro.esperarSiPausado();
                 }
 
-                // Preparar para depositar
-                aldeanosEsperando.remove(aldeano);
-                aldeanosDepositando.add(aldeano);
-
+                // Calcular cuánto se puede depositar
                 int espacio = capacidadMaxima - cantidadActual;
                 aDepositar = Math.min(espacio, restante);
-                tiempoDeposito = FuncionesComunes.randomBetween(2000, 3000); // Simular 2-3s
 
-                lock.notifyAll(); // Avisar a otros hilos antes de soltar el lock
+                // ⚠️ Verificación extra: nunca permitir depositar 0 o negativo
+                if (aDepositar <= 0) {
+                    // No hay nada que hacer aún, volver a esperar
+                    continue;
+                }
+
+                // Preparar depósito
+                aldeanosEsperando.remove(aldeano);
+                aldeanosDepositando.add(aldeano);
+                tiempoDeposito = FuncionesComunes.randomBetween(2000, 3000);
             }
 
-            // Simulación del tiempo de depósito (fuera del lock)
+            // Simular el tiempo fuera del lock
             Thread.sleep(tiempoDeposito);
             centro.esperarSiPausado();
 
             synchronized (lock) {
                 cantidadActual += aDepositar;
                 restante -= aDepositar;
-                centro.esperarSiPausado();
                 centro.sumarRecurso(tipo, aDepositar);
-                centro.esperarSiPausado();
+
                 Log.log("El aldeano " + aldeano.getIdAldeano() + " ha depositado " + aDepositar + " de " + tipo + ". Total almacenado: " + cantidadActual);
 
                 if (restante > 0) {
-                    centro.esperarSiPausado();
                     Log.log("El aldeano " + aldeano.getIdAldeano() + " se queda esperando con " + restante + " de " + tipo + " por falta de espacio.");
-
-                    // Moverlo de 'depositando' a 'esperando'
                     aldeanosDepositando.remove(aldeano);
                     aldeanosEsperando.add(aldeano);
                 } else {
-                    // Eliminamos del set de depositando
                     aldeanosDepositando.remove(aldeano);
                 }
 
-                lock.notifyAll(); // Despertar posibles aldeanos esperando
+                lock.notifyAll();
             }
         }
 
-        // Limpieza final por si hubo interrupciones
         synchronized (lock) {
             aldeanosDepositando.remove(aldeano);
             aldeanosEsperando.remove(aldeano);
         }
     }
-
     public void aumentarCapacidad(int cantidad) {
         synchronized (lock) {
             capacidadMaxima += cantidad;
@@ -244,7 +241,9 @@ public class Almacen implements Zona {
         }
     }
 
-    public synchronized List<Barbaro> getBarbaros() {
-        return new ArrayList<>(barbarosAtacando);
+    public List<Barbaro> getBarbaros() {
+        synchronized (lock) {
+            return new ArrayList<>(barbarosAtacando);
+        }
     }
 }

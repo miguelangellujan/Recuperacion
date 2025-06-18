@@ -481,10 +481,10 @@ public class CentroUrbano {
 
     public Zona seleccionarObjetivo() {
         if (Math.random() < 0.6) {
-            List<Zona> almacenes = List.of(granero, aserradero, tesoreria);
+            List<Almacen> almacenes = List.of(granero, aserradero, tesoreria);
             return almacenes.get(new Random().nextInt(almacenes.size()));
         } else {
-            List<Zona> areas = List.of(granja, bosque, mina);
+            List<AreaRecurso> areas = List.of(granja, bosque, mina);
             return areas.get(new Random().nextInt(areas.size()));
         }
     }

@@ -106,9 +106,8 @@ public class AreaRecurso implements Zona {
         try {
             if (destruida) {
                 Log.log(a.getIdAldeano() + " no puede entrar, el área está destruida.");
-                return;
+                esperandoEnCola.add(a);
             }
-            esperandoEnCola.add(a);
             while (recolectando.size() >= 3 || enAtaque) {
                 puedeEntrarAldeano.await();
             }
