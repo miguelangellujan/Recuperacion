@@ -8,7 +8,7 @@ public class Barbaro extends Thread {
     private static final Random rnd = new Random();
     private boolean puedeAtacar = true;
     private final Object lockAtaque = new Object();
-    
+
     public Barbaro(String id, CentroUrbano centro) {
         this.id = id;
         this.centro = centro;
@@ -33,6 +33,7 @@ public class Barbaro extends Thread {
             while (true) {
                 centro.esperarSiPausado();
 
+                // Espera pasiva hasta poder atacar
                 synchronized (lockAtaque) {
                     while (!puedeAtacar) {
                         lockAtaque.wait();
@@ -68,6 +69,9 @@ public class Barbaro extends Thread {
                             puedeAtacar = false;
                         }
 
+                        // Eliminar del grupo si perdió
+                        zonaPrep.eliminarDelGrupo(this);
+
                         centro.getZonaCampamento().entrarCampamento(this);
                         centro.esperarSiPausado();
                         Thread.sleep(60000);
@@ -77,7 +81,7 @@ public class Barbaro extends Thread {
                             lockAtaque.notify();
                         }
 
-                        continue; // Salta el saqueo
+                        continue;
                     }
                 } else {
                     Log.log(id + " no encontró defensores en " + objetivo.getNombreZona());
@@ -85,7 +89,7 @@ public class Barbaro extends Thread {
                     Thread.sleep(1000);
                 }
 
-                // Saqueo de zona
+                // Saqueo
                 if (objetivo instanceof AreaRecurso recurso) {
                     recurso.expulsarAldeanos();
                     recurso.iniciarAtaque(this);
@@ -103,9 +107,11 @@ public class Barbaro extends Thread {
                     Log.log(id + " ha saqueado el almacén: " + almacen.getNombreZona());
                 }
 
+                // Eliminar del grupo actual tras el ataque exitoso
+                zonaPrep.eliminarDelGrupo(this);
                 Log.log(id + " finaliza el ataque en " + objetivo.getNombreZona());
 
-                // Espera post-ataque de 40s
+                // Descanso 40 segundos en campamento
                 synchronized (lockAtaque) {
                     puedeAtacar = false;
                 }

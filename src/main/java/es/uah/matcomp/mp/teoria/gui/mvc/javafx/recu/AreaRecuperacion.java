@@ -44,12 +44,17 @@ public class AreaRecuperacion {
     }
     public void entrarGuerrero(Guerrero g) {
         String id = g.getIdGuerrero();
+        boolean primeraVez = false;
 
         synchronized (lock) {
             if (!guerreroenRecuperacion.contains(id)) {
                 guerreroenRecuperacion.add(id);
-                Platform.runLater(() -> Log.log(id + " entra en ÁREA DE RECUPERACIÓN. Estado: " + obtenerIdsEnRecuperacion()));
+                primeraVez = true;
             }
+        }
+
+        if (primeraVez) {
+            Platform.runLater(() -> Log.log(id + " entra en ÁREA DE RECUPERACIÓN. Estado: " + obtenerIdsEnRecuperacion()));
         }
 
         try {
@@ -61,9 +66,9 @@ public class AreaRecuperacion {
 
         synchronized (lock) {
             guerreroenRecuperacion.remove(id);
-            Platform.runLater(() -> Log.log(id + " sale de ÁREA DE RECUPERACIÓN. Estado: " + obtenerIdsEnRecuperacion()));
-            lock.notifyAll();
         }
+
+        Platform.runLater(() -> Log.log(id + " sale de ÁREA DE RECUPERACIÓN. Estado: " + obtenerIdsEnRecuperacion()));
     }
 
     public String obtenerIdsEnRecuperacion() {

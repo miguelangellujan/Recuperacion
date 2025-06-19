@@ -31,10 +31,10 @@ public class Guerrero extends Thread {
 
     public double getProbabilidadVictoria() {
         int nivelArmas = centro.getGestorMejoras().getNivelArmas();
-        double probBase = 0.40; // 40%
+        double probBase = 0.5; // 50%
         double incremento = 0.05; // 5% por nivel
         double probTotal = probBase + (nivelArmas * incremento);
-        return Math.min(probTotal, 0.70); // máximo 70%
+        return Math.min(probTotal, 0.75); // máximo 75%, empieza en 50% y 5% más por nivel
     }
 
     @Override

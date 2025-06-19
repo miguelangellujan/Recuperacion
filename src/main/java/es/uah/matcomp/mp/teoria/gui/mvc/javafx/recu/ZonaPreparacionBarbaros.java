@@ -2,17 +2,14 @@ package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-
 public class ZonaPreparacionBarbaros {
     private final List<Barbaro> esperando = new ArrayList<>();
     private final Object lock = new Object();
     private final Random rnd = new Random();
     private final AtomicInteger barbarosTotales = new AtomicInteger(0);
     private long ultimoAtaque = 0;
-
     private Zona objetivoGrupoActual = null;
     private final Set<Barbaro> grupoActual = new HashSet<>();
-
     private final CentroUrbano centro;
 
     // Constructor
@@ -26,18 +23,10 @@ public class ZonaPreparacionBarbaros {
         }
     }
 
-    public List<Barbaro> getBarbarosEsperando() {
-        return esperando;
-    }
-
     public String obtenerIdsEnPreparacion(){
         synchronized (lock){
             return esperando.stream().map(Barbaro :: getIdBarbaro).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
         }
-    }
-
-    public int contarBarbarosPreparacion(){
-        return obtenerIdsEnPreparacion().length();
     }
 
     public Zona esperarGrupo(Barbaro b) throws InterruptedException {
@@ -65,13 +54,19 @@ public class ZonaPreparacionBarbaros {
 
                     lock.notifyAll(); // Despertar a todos los bárbaros para que revisen si están en el grupo
                 } else {
-                    lock.wait(); // Espera pasiva: se reanuda solo si se hace notifyAll()
+                    lock.wait(); // Espera pasiva,se reanuda solo si se hace notifyAll()
                 }
             }
 
             return objetivoGrupoActual;
         }
     }
+    public void eliminarDelGrupo(Barbaro b) {
+        synchronized (lock) {
+            grupoActual.remove(b);
+        }
+    }
+
 
 
 

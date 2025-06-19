@@ -262,13 +262,13 @@ public class AreaRecurso implements Zona {
             if (colaSb.length() > 0) colaSb.setLength(colaSb.length() - 2);
 
             StringBuilder guerr = new StringBuilder();
-            for (Guerrero g : getGuerreros()) {
+            for (Guerrero g : guerrerosDentro) {
                 guerr.append(g.getIdGuerrero()).append(", ");
             }
             if (guerr.length() > 0) guerr.setLength(guerr.length() - 2);
 
             StringBuilder barb = new StringBuilder();
-            for (Barbaro b : getBarbaros()) {
+            for (Barbaro b : barbarosAtacando) {
                 barb.append(b.getIdBarbaro()).append(", ");
             }
             if (barb.length() > 0) barb.setLength(barb.length() - 2);

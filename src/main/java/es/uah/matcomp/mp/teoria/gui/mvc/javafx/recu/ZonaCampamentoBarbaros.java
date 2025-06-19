@@ -14,9 +14,6 @@ public class ZonaCampamentoBarbaros {
         barbarosEnCampamento.remove(b);
     }
 
-    public boolean estaEnCampamento(Barbaro b) {
-        return barbarosEnCampamento.contains(b);
-    }
 
     public String obtenerIds() {
         return barbarosEnCampamento.stream()

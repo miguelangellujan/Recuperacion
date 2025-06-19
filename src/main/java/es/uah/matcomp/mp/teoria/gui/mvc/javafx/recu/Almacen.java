@@ -12,7 +12,6 @@ public class Almacen implements Zona {
     private final List<Aldeano> aldeanosDepositando = new ArrayList<>();
     private final List<Aldeano> aldeanosEsperando = new ArrayList<>();
     private final List<Guerrero> guerreros = new ArrayList<>();
-    private final Set<Guerrero> guerrerosEnCombate = Collections.synchronizedSet(new HashSet<>());
     private final List<Barbaro> barbarosAtacando = new ArrayList<>();
 
     // Constructor
@@ -23,11 +22,7 @@ public class Almacen implements Zona {
         this.centro = centro;
     }
 
-    // Getters
-    public int getCantidadActual() {
-        return cantidadActual;
-    }
-
+    // Getter
     public int getCapacidadMaxima() {
         return capacidadMaxima;
     }
@@ -38,7 +33,6 @@ public class Almacen implements Zona {
         guerreros.add(g);
         return true;
     }
-
     @Override
     public void salirGuerrero(Guerrero g) {
         guerreros.remove(g);
@@ -51,12 +45,40 @@ public class Almacen implements Zona {
 
     @Override
     public boolean enfrentarABarbaro(Barbaro b) throws InterruptedException {
-        // No hay defensores en un almacén. El bárbaro pasa directamente al saqueo.
-        Thread.sleep(1000); // Espera de 1 segundo antes de saquear
-        return false;
-    }
+        synchronized (guerreros) {
+            List<Guerrero> defensoresDisponibles = new ArrayList<>();
+            for (Guerrero g : guerreros) {
+                if (!g.estaLuchando()) {
+                    defensoresDisponibles.add(g);
+                }
+            }
+            if (defensoresDisponibles.isEmpty()) {
+                // No hay defensores, espera 1 segundo y sigue al saqueo
+                Thread.sleep(1000);
+                return true; //continuar al saqueo
+            }
+            // Elegir uno aleatorio disponible
+            Guerrero defensor = defensoresDisponibles.get(new Random().nextInt(defensoresDisponibles.size()));
+            defensor.setLuchando(true);
+            Log.log(b.getIdBarbaro() + " se enfrenta a " + defensor.getIdGuerrero());
 
-    //Esto hay que hacerlo
+            Thread.sleep(FuncionesComunes.randomBetween(500, 1000));
+
+            double probVictoriaBarbaro = 0.5 - (0.05 * Math.min(5, centro.getGestorMejoras().getNivelArmas()));
+            boolean ganaBarbaro = Math.random() < probVictoriaBarbaro;
+
+            if (ganaBarbaro) {
+                Log.log(b.getIdBarbaro() + " derrota a " + defensor.getIdGuerrero());
+                guerreros.remove(defensor);
+                defensor.enviarARecuperacion();
+                return true;
+            } else {
+                Log.log(defensor.getIdGuerrero() + " derrota a " + b.getIdBarbaro());
+                defensor.setLuchando(false);
+                return false;
+            }
+        }
+    }
     public void depositar(Aldeano aldeano, int cantidad) throws InterruptedException {
         centro.esperarSiPausado();
 
@@ -158,22 +180,15 @@ public class Almacen implements Zona {
         } catch (InterruptedException e) {
             Log.log("Error en el saqueo: " + e.getMessage());
         }
-
         eliminarBarbaro(b);
 
-        int comida = centro.getRecurso("COMIDA").get();
-        int madera = centro.getRecurso("MADERA").get();
-        int oro = centro.getRecurso("ORO").get();
-        Log.log("ESTADO RECURSOS => Comida: " + comida + ", Madera: " + madera + ", Oro: " + oro);
     }
-
     public void añadirInicial(int cantidad) {
         synchronized (lock) {
             cantidadActual = Math.min(cantidad, capacidadMaxima);
             Log.log("Almacén de " + tipo + " inicializado con " + cantidadActual);
         }
     }
-
     public List<Aldeano> getAldeanos() {
         synchronized (lock) {
             List<Aldeano> todosAldeanos = new ArrayList<>();
@@ -182,7 +197,6 @@ public class Almacen implements Zona {
             return todosAldeanos;
         }
     }
-
     public List<Guerrero> getGuerreros() {
         return guerreros;
     }
@@ -202,13 +216,13 @@ public class Almacen implements Zona {
             if (esperando.length() > 0) esperando.setLength(esperando.length() - 2);
 
             StringBuilder guerr = new StringBuilder();
-            for (Guerrero g : getGuerreros()) {
+            for (Guerrero g : guerreros) {
                 guerr.append(g.getIdGuerrero()).append(", ");
             }
             if (guerr.length() > 0) guerr.setLength(guerr.length() - 2);
 
             StringBuilder barb = new StringBuilder();
-            for (Barbaro b : getBarbaros()) {
+            for (Barbaro b : barbarosAtacando) {
                 barb.append(b.getIdBarbaro()).append(", ");
             }
             if (barb.length() > 0) barb.setLength(barb.length() - 2);
@@ -216,14 +230,7 @@ public class Almacen implements Zona {
             return "Depositando: " + dentro + "\nEsperando: " + esperando + "\nGuerreros: " + guerr + "\nBárbaros: " + barb;
         }
     }
-
     // Sacar a los aldeanos del almacén cuando se pulsa el botón de alarma
-    public void liberarAldeanos() {
-        synchronized (lock) {
-            aldeanosDepositando.clear();
-            aldeanosEsperando.clear();
-        }
-    }
 
     public synchronized void expulsarAldeanos() {
         List<Aldeano> copiaDepositando = new ArrayList<>(aldeanosDepositando);
