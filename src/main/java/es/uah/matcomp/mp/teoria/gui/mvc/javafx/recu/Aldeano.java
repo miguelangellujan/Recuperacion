@@ -73,18 +73,6 @@ public class Aldeano extends Thread {
         }
     }
 
-    public void moverAAreaRecuperacion() {
-        synchronized (this) {
-            if (!esperandoEnEmergencia) {
-                esperandoEnEmergencia = true;
-
-                centro.getAreaRecuperacion().entrar(this);
-                Log.log(id + " se ha movido al ÁREA DE RECUPERACIÓN");
-            }
-        }
-    }
-
-
     @Override
     public void run() {
         while (activo) {
@@ -129,6 +117,7 @@ public class Aldeano extends Thread {
 
                 centro.esperarSiPausado();
                 Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));
+                centro.esperarSiPausado();
                 Log.log(id + " recolecta " + recolectar + " unidades de " + tipo);
                 area.salir(this);
 
@@ -160,10 +149,14 @@ public class Aldeano extends Thread {
             } catch (InterruptedException e) {
                 if (centro.isEmergenciaActiva()) {
                     Log.log(id + " fue interrumpido y se dirige a la CASA PRINCIPAL por emergencia.");
-                    moverACasaPrincipal();
+                    try {
+                        esperarFinEmergencia(); // Espera bloqueante a que termine la emergencia
+                    } catch (InterruptedException ex) {
+                        // Si se interrumpe durante la espera, puede ser ignorado
+                    }
                 } else {
                     Log.log(id + " fue interrumpido y se dirige al ÁREA DE RECUPERACIÓN por combate.");
-                    centro.getAreaRecuperacion().entrar(this); // Recuperación bloqueante
+                    centro.getAreaRecuperacion().entrar(this);
                 }
             }
         }

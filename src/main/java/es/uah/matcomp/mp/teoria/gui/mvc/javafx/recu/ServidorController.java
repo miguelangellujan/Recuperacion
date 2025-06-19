@@ -77,7 +77,6 @@ public class ServidorController {
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.rebind("AgeOfThreadsService", servidor);
 
-            Log.log("Servidor Age of Threads Arrancado");
         } catch (IOException e){
             Log.log("Error en el servidor: " + e.getMessage());
         }

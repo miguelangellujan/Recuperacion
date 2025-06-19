@@ -33,6 +33,7 @@ public class ZonaPreparacionBarbaros {
         synchronized (lock) {
             barbarosTotales.incrementAndGet();
             esperando.add(b);
+            centro.esperarSiPausado();
             Log.log(b.getIdBarbaro() + " se une a la zona de preparación");
 
             while (!grupoActual.contains(b)) {
@@ -47,9 +48,10 @@ public class ZonaPreparacionBarbaros {
                     esperando.removeAll(grupo);
                     grupoActual.clear();
                     grupoActual.addAll(grupo);
+                    centro.esperarSiPausado();
                     objetivoGrupoActual = seleccionarObjetivoGrupo();
                     ultimoAtaque = ahora;
-
+                    centro.esperarSiPausado();
                     Log.log("Grupo de " + grupo.size() + " bárbaros se dirige a " + objetivoGrupoActual.getNombreZona());
 
                     lock.notifyAll(); // Despertar a todos los bárbaros para que revisen si están en el grupo

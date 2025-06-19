@@ -14,7 +14,6 @@ public class ZonaCampamentoBarbaros {
         barbarosEnCampamento.remove(b);
     }
 
-
     public String obtenerIds() {
         return barbarosEnCampamento.stream()
                 .map(Barbaro::getIdBarbaro)
@@ -28,9 +27,6 @@ public class ZonaCampamentoBarbaros {
         return (int) Arrays.stream(ids.split(","))
                 .filter(s -> !s.trim().isEmpty())
                 .count();
-    }
-    public List<Barbaro> getBarbaros() {
-        return new ArrayList<>(barbarosEnCampamento);
     }
 }
 

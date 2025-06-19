@@ -24,7 +24,9 @@ public class Almacen implements Zona {
 
     // Getter
     public int getCapacidadMaxima() {
-        return capacidadMaxima;
+        synchronized (lock) {
+            return capacidadMaxima;
+        }
     }
 
     // Funciones Interface Zona

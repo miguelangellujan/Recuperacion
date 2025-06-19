@@ -54,7 +54,6 @@ public class GestorMejoras {
             Log.log("No hay recursos suficientes para mejorar armas.");
         }
     }
-
     public synchronized void aplicarMejoraAlmacenes() {
         int costoMadera = 150;
         int costoOro = 50;

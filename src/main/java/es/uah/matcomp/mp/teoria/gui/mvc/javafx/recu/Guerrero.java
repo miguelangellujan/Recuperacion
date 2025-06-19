@@ -59,10 +59,9 @@ public class Guerrero extends Thread {
                     break;  // Salir del bucle de espera de recursos
                 } else {
                     Log.log(id + " esperando recursos para entrenar...");
-                    Thread.sleep(1000); // Espera 1 segundo antes de reintentar
+                    Thread.sleep(2000); // Espera 1 segundo antes de reintentar
                 }
             }
-
             // Patrullaje tras entrenamiento
             while (!Thread.currentThread().isInterrupted()) {
                 centro.esperarSiPausado();
@@ -76,8 +75,10 @@ public class Guerrero extends Thread {
                     Thread.sleep(FuncionesComunes.randomBetween(2000, 3000));
 
                     zona.salirGuerrero(this);
+                    centro.esperarSiPausado();
                     Log.log(id + " sale de " + zona.getNombreZona());
                 } else {
+                    centro.esperarSiPausado();
                     Log.log(id + " no puede patrullar en " + zona.getNombreZona() + " (llena o en combate), espera...");
                     centro.esperarSiPausado();
                     Thread.sleep(500);
