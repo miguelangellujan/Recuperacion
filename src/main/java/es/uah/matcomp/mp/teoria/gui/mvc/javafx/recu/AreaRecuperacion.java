@@ -26,21 +26,21 @@ public class AreaRecuperacion {
         }
 
         if (primeraVez) {
-            Log.log(id + " entra en ÁREA DE RECUPERACIÓN. Estado: " + obtenerIdsEnRecuperacion());
+            Log.log(id + " entra en ÁREA DE RECUPERACIÓN");
         }
 
         try {
             Thread.sleep(FuncionesComunes.randomBetween(12000, 15000));
         } catch (InterruptedException e) {
             Log.log(id + " fue interrumpido durante la recuperación.");
-            // Puedes decidir si restauras el estado con Thread.currentThread().interrupt();
         }
 
         synchronized (lock) {
             enRecuperacion.remove(id);
-            Log.log(id + " sale de ÁREA DE RECUPERACIÓN. Estado: " + obtenerIdsEnRecuperacion());
+            Log.log(id + " sale de ÁREA DE RECUPERACIÓN");
             lock.notifyAll();
         }
+        a.moverAPlazaCentral();
     }
     public void entrarGuerrero(Guerrero g) {
         String id = g.getIdGuerrero();

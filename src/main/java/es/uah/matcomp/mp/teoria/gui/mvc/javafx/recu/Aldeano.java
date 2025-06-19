@@ -73,6 +73,18 @@ public class Aldeano extends Thread {
         }
     }
 
+    public void moverAAreaRecuperacion() {
+        synchronized (this) {
+            if (!esperandoEnEmergencia) {
+                esperandoEnEmergencia = true;
+
+                centro.getAreaRecuperacion().entrar(this);
+                Log.log(id + " se ha movido al ÁREA DE RECUPERACIÓN");
+            }
+        }
+    }
+
+
     @Override
     public void run() {
         while (activo) {
@@ -85,10 +97,9 @@ public class Aldeano extends Thread {
                 centro.getPlazaCentral().planificar(id);
                 centro.esperarSiPausado();
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
-                centro.esperarSiPausado();
                 centro.getPlazaCentral().salir(id);
 
-                // Selecciona recurso y obtiene referencias
+                // Selecciona recurso
                 String tipo = centro.seleccionarRecursoAleatorio();
                 AreaRecurso area = centro.getArea(tipo);
                 Almacen almacen = centro.getAlmacen(tipo);
@@ -107,80 +118,53 @@ public class Aldeano extends Thread {
                 if (area.fueAtacadoDurante(this)) {
                     Log.log(id + " fue atacado mientras recolectaba en " + tipo);
                     area.salir(this);
-                    centro.esperarSiPausado();
-
-                    // Recuperación: bloquea el hilo entre 12 y 15
-                    centro.getAreaRecuperacion().entrar(this);
-
-                    continue; // vuelve al ciclo principal
+                    centro.getAreaRecuperacion().entrar(this); // ← bloquea correctamente y luego sigue
+                    continue;
                 }
 
-                // Calcula cantidad a recolectar
+                // Recolecta
                 int cantidad = FuncionesComunes.randomBetween(10, 20);
                 int nivelHerramientas = Math.min(centro.getGestorMejoras().getNivelHerramientas(), 3);
                 int recolectar = cantidad + (5 * nivelHerramientas);
 
-                // Recolecta
                 centro.esperarSiPausado();
-                checkYEsperarEmergencia();
                 Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));
-
-
-                centro.esperarSiPausado();
                 Log.log(id + " recolecta " + recolectar + " unidades de " + tipo);
-                centro.esperarSiPausado();
-
-                // Sale del área
                 area.salir(this);
 
                 centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
-                // Va a la PLAZA CENTRAL antes de depositar
+                // Va a la plaza antes de depositar
                 Log.log(id + " va a la PLAZA CENTRAL antes de depositar");
                 centro.getPlazaCentral().planificar(id);
-                centro.esperarSiPausado();
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
-                centro.esperarSiPausado();
                 centro.getPlazaCentral().salir(id);
 
-                centro.esperarSiPausado();
-                checkYEsperarEmergencia();
-                centro.esperarSiPausado();
-
-                // Deposita en el almacén correspondiente
+                // Deposita
                 almacen.depositar(this, recolectar);
-                checkYEsperarEmergencia();
 
                 synchronized (area) {
-                    area.notifyAll(); // Para desbloquear otros aldeanos si es necesario
+                    area.notifyAll();
                 }
 
                 centro.esperarSiPausado();
                 checkYEsperarEmergencia();
 
-                // Vuelve a la PLAZA CENTRAL al terminar el ciclo
+                // Vuelve a la PLAZA CENTRAL
                 Log.log(id + " vuelve a la PLAZA CENTRAL");
                 centro.getPlazaCentral().planificar(id);
-                checkYEsperarEmergencia();
-                centro.esperarSiPausado();
                 Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
-                centro.esperarSiPausado();
-                checkYEsperarEmergencia();
                 centro.getPlazaCentral().salir(id);
 
             } catch (InterruptedException e) {
-                if (activo && centro.isEmergenciaActiva()) {
-                    try {
-                        esperarFinEmergencia();
-                    } catch (InterruptedException ie) {
-                        activo = false;
-                    }
+                if (centro.isEmergenciaActiva()) {
+                    Log.log(id + " fue interrumpido y se dirige a la CASA PRINCIPAL por emergencia.");
+                    moverACasaPrincipal();
                 } else {
-                    Log.log(id + " ha sido interrumpido y termina.");
-                    activo = false;
+                    Log.log(id + " fue interrumpido y se dirige al ÁREA DE RECUPERACIÓN por combate.");
+                    centro.getAreaRecuperacion().entrar(this); // Recuperación bloqueante
                 }
-                Log.log(id + " fue interrumpido inesperadamente, pero sigue activo.");
             }
         }
     }

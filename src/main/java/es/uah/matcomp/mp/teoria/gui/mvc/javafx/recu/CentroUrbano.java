@@ -450,30 +450,7 @@ public class CentroUrbano {
                     .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
         }
     }
-    public void enviarARecuperacionSegura(Aldeano a) {
-        getArea("COMIDA").salir(a);
-        getArea("MADERA").salir(a);
-        getArea("ORO").salir(a);
-        getPlazaCentral().salir(a.getIdAldeano());
-        getAlmacen("COMIDA").salir(a);
-        getAlmacen("MADERA").salir(a);
-        getAlmacen("ORO").salir(a);
-        getCasaPrincipal().salir(a.getIdAldeano());
-        getAreaRecuperacion().entrar(a);
-    }
 
-
-    public String obtenerIdsCasaPrincipal() {
-        return casaPrincipal.obtenerIds();
-    }
-
-    public String obtenerIdsPlazaCentral() {
-        return plazaCentral.obtenerIds();
-    }
-
-    public int contarBarbaros() {
-        return barbaros.size();
-    }
     public ZonaCampamentoBarbaros getZonaCampamento() {
         return zonaCampamento;
     }

@@ -51,8 +51,9 @@ public class ZonaPreparacionBarbaros {
                 int tamanioGrupo = 3 + (totalCreados / 10);
                 long ahora = System.currentTimeMillis();
 
-                if (esperando.size() >= tamanioGrupo && ahora - ultimoAtaque >= 10_000) {
-                    // Formar un nuevo grupo de ataque
+                // Solo formar un nuevo grupo si aún no hay uno activo
+                if (grupoActual.isEmpty() && esperando.size() >= tamanioGrupo && ahora - ultimoAtaque >= 10_000) {
+                    // Crear el nuevo grupo de ataque
                     List<Barbaro> grupo = new ArrayList<>(esperando.subList(0, tamanioGrupo));
                     esperando.removeAll(grupo);
                     grupoActual.clear();
@@ -62,15 +63,16 @@ public class ZonaPreparacionBarbaros {
 
                     Log.log("Grupo de " + grupo.size() + " bárbaros se dirige a " + objetivoGrupoActual.getNombreZona());
 
-                    lock.notifyAll(); // Notificar a todos los bárbaros
+                    lock.notifyAll(); // Despertar a todos los bárbaros para que revisen si están en el grupo
                 } else {
-                    lock.wait(500);
+                    lock.wait(); // Espera pasiva: se reanuda solo si se hace notifyAll()
                 }
             }
 
             return objetivoGrupoActual;
         }
     }
+
 
 
     private Zona seleccionarObjetivoGrupo() {

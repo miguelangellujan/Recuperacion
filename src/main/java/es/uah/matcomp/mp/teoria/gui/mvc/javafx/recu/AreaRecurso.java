@@ -9,7 +9,7 @@ public class AreaRecurso implements Zona {
     private final List<Aldeano> recolectando = new ArrayList<>();
     private final List<Aldeano> esperandoEnCola = new ArrayList<>();
     private final List<Barbaro> barbarosAtacando = new ArrayList<>();
-    private final CentroUrbano centroUrbano;
+    private CentroUrbano centro;
 
     private final ReentrantLock lockZona = new ReentrantLock(true);
     private final Condition puedeEntrarAldeano = lockZona.newCondition();
@@ -25,7 +25,7 @@ public class AreaRecurso implements Zona {
 
     public AreaRecurso(String tipo, CentroUrbano centro) {
         this.tipo = tipo;
-        this.centroUrbano = centro;
+        this.centro = centro;
     }
 
     public String toString(String tipo) {
@@ -207,15 +207,19 @@ public class AreaRecurso implements Zona {
     }
 
     public synchronized void expulsarAldeanos() {
-        for (Aldeano a : recolectando) {
-            centroUrbano.enviarARecuperacionSegura(a);
+        List<Aldeano> copiarecolectando = new ArrayList<>(recolectando);
+        List<Aldeano> copiaEsperando = new ArrayList<>(esperandoEnCola);
+
+            for (Aldeano a : copiarecolectando) {
+                a.interrupt();
+            }
+            for (Aldeano a : copiaEsperando) {
+                a.interrupt();
+            }
+
+            recolectando.clear();
+            esperandoEnCola.clear();
         }
-        for (Aldeano a : esperandoEnCola) {
-            centroUrbano.enviarARecuperacionSegura(a);
-        }
-        recolectando.clear();
-        esperandoEnCola.clear();
-    }
 
     public boolean fueAtacadoDurante(Aldeano a) {
         lockZona.lock();
