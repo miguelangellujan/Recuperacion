@@ -41,7 +41,7 @@ public class Guerrero extends Thread {
     public void run() {
         try {
             centro.esperarSiPausado();
-
+            centro.getCuartel().entrar(this);// Entra primero al cuartel y hasta que no hay suficientes recursos no empieza
             // Esperar hasta que haya recursos para entrenar
             while (!Thread.currentThread().isInterrupted()) {
                 Almacen comida = centro.getGranero();

@@ -54,7 +54,7 @@ public class AreaRecuperacion {
         }
 
         if (primeraVez) {
-            Platform.runLater(() -> Log.log(id + " entra en ÁREA DE RECUPERACIÓN. Estado: " + obtenerIdsEnRecuperacion()));
+            Platform.runLater(() -> Log.log(id + " entra en ÁREA DE RECUPERACIÓN"));
         }
 
         try {
@@ -67,8 +67,7 @@ public class AreaRecuperacion {
         synchronized (lock) {
             guerreroenRecuperacion.remove(id);
         }
-
-        Platform.runLater(() -> Log.log(id + " sale de ÁREA DE RECUPERACIÓN. Estado: " + obtenerIdsEnRecuperacion()));
+        Platform.runLater(() -> Log.log(id + " sale de ÁREA DE RECUPERACIÓN"));
     }
 
     public String obtenerIdsEnRecuperacion() {
@@ -77,7 +76,6 @@ public class AreaRecuperacion {
             return String.join(", ", enRecuperacion) + (guerreroenRecuperacion.isEmpty() ? "" : ", " + String.join(", ", guerreroenRecuperacion));
         }
     }
-
     public List<String> getAldeanosEnRecuperacion() {
         synchronized (lock) {
             return enRecuperacion.stream()

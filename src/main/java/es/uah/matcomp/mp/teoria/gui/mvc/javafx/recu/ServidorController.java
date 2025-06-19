@@ -167,7 +167,7 @@ public class ServidorController {
             lblTesoreria.setText(centro.getAlmacen("ORO").obtenerEstadoAldeanos());
 
             lblCasaPrincipal.setText(centro.getCasaPrincipal().obtenerIds());
-            lblCuartel.setText(centro.getGuerreros());
+            lblCuartel.setText(centro.getGuerrerosEnCuartel());
             lblPlazaCentral.setText(centro.getPlazaCentral().obtenerIds());
             lblAreaRecuperacion.setText(centro.getAreaRecuperacion().obtenerIdsEnRecuperacion());
 

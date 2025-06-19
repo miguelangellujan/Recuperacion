@@ -288,16 +288,6 @@ public class CentroUrbano {
                     orElse("Ninguno");
         }
     }
-
-    public String getBarbaros() {
-        synchronized (barbaros) {
-            return barbaros.stream().
-                    map(Barbaro::getIdBarbaro).
-                    reduce((a, b) -> a + ", " + b).
-                    orElse("Ninguno");
-        }
-    }
-
     public String getAldeanosMina() {
         synchronized (mina) {
             return mina.getAldeanos().stream()
@@ -506,6 +496,9 @@ public class CentroUrbano {
             }
         }
     }
+    public String getGuerrerosEnCuartel() {
+        return cuartel.obtenerGuerrerosEntrenando();
+    }
 
     public boolean isEmergenciaActiva() {
         return emergenciaActiva.get();
@@ -537,7 +530,7 @@ public class CentroUrbano {
     }
 
     // Clases
-    public static class CasaPrincipal {
+    public class CasaPrincipal {
         private final List<String> aldeanosEnCasa = Collections.synchronizedList(new ArrayList<>());
 
         public void registrarEntrada(String idAldeano) {
@@ -561,7 +554,6 @@ public class CentroUrbano {
                 return aldeanosEnCasa.contains(idAldeano);
             }
         }
-
         public String obtenerIds() {
             synchronized (aldeanosEnCasa) {
                 return aldeanosEnCasa.isEmpty() ? "Ninguno" : String.join(", ", aldeanosEnCasa);
@@ -569,7 +561,7 @@ public class CentroUrbano {
         }
     }
 
-    public static class PlazaCentral {
+    public class PlazaCentral {
         private final List<String> aldeanosEnPlaza = Collections.synchronizedList(new ArrayList<>());
 
         public void planificar(String idAldeano) {
@@ -599,11 +591,39 @@ public class CentroUrbano {
         }
     }
 
-    public static class Cuartel {
+    public class Cuartel {
+        private final List<Guerrero> enEntrenamiento = Collections.synchronizedList(new ArrayList<>());
+
+        public void entrar(Guerrero g) {
+            synchronized (enEntrenamiento) {
+                if (!enEntrenamiento.contains(g)) {
+                    enEntrenamiento.add(g);
+                    Log.log("El guerrero " + g.getIdGuerrero() + " entra al Cuartel.");
+                }
+            }
+        }
+
         public void entrenar(Guerrero g) throws InterruptedException {
             Log.log("El guerrero " + g.getIdGuerrero() + " se entrena en el Cuartel.");
             Thread.sleep(5000 + (int) (Math.random() * 3000)); // Entre 5 y 8 segundos
             Log.log("El guerrero " + g.getIdGuerrero() + " ha finalizado su entrenamiento.");
+            salir(g); // salir al finalizar
+        }
+
+        public void salir(Guerrero g) {
+            synchronized (enEntrenamiento) {
+                enEntrenamiento.remove(g);
+                Log.log("El guerrero " + g.getIdGuerrero() + " ha salido del Cuartel.");
+            }
+        }
+
+        public String obtenerGuerrerosEntrenando() {
+            synchronized (enEntrenamiento) {
+                return enEntrenamiento.stream()
+                        .map(Guerrero::getIdGuerrero)
+                        .reduce((a, b) -> a + ", " + b)
+                        .orElse("Ninguno");
+            }
         }
     }
 }
