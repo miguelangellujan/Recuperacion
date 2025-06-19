@@ -24,58 +24,86 @@ public class GestorMejoras {
     public synchronized void aplicarMejoraHerramientas() {
         int costoMadera = 120;
         int costoOro = 80;
+
         if (nivelHerramientas >= 3) {
             Log.log("Se alcanzó el nivel máximo de mejora en herramientas.");
             return;
         }
-        if (centro.getRecurso("MADERA").get() >= costoMadera && centro.getRecurso("ORO").get() >= costoOro) {
-            centro.restarRecurso("MADERA", costoMadera);
-            centro.restarRecurso("ORO", costoOro);
-            nivelHerramientas++;
-            Log.log("Mejora de herramientas aplicada al nivel " + nivelHerramientas);
-        } else {
-            Log.log("No hay recursos suficientes para mejorar herramientas.");
+
+        Almacen madera = centro.getAserradero();
+        Almacen oro = centro.getTesoreria();
+
+        synchronized (madera) {
+            synchronized (oro) {
+                if (madera.getCantidadActual() >= costoMadera && oro.getCantidadActual() >= costoOro) {
+                    madera.consumir(costoMadera);
+                    oro.consumir(costoOro);
+                    nivelHerramientas++;
+                    Log.log("Mejora de herramientas aplicada al nivel " + nivelHerramientas);
+                } else {
+                    Log.log("No hay recursos suficientes para mejorar herramientas.");
+                }
+            }
         }
     }
 
     public synchronized void aplicarMejoraArmas() {
         int costoComida = 150;
         int costoOro = 100;
+
         if (nivelArmas >= 5) {
             Log.log("Se alcanzó el nivel máximo de mejora en armas.");
             return;
         }
-        if (centro.getRecurso("COMIDA").get() >= costoComida && centro.getRecurso("ORO").get() >= costoOro) {
-            centro.restarRecurso("COMIDA", costoComida);
-            centro.restarRecurso("ORO", costoOro);
-            nivelArmas++;
-            Log.log("Mejora de armas aplicada al nivel " + nivelArmas);
-        } else {
-            Log.log("No hay recursos suficientes para mejorar armas.");
+
+        Almacen comida = centro.getGranero();
+        Almacen oro = centro.getTesoreria();
+
+        synchronized (comida) {
+            synchronized (oro) {
+                if (comida.getCantidadActual() >= costoComida && oro.getCantidadActual() >= costoOro) {
+                    comida.consumir(costoComida);
+                    oro.consumir(costoOro);
+                    nivelArmas++;
+                    Log.log("Mejora de armas aplicada al nivel " + nivelArmas);
+                } else {
+                    Log.log("No hay recursos suficientes para mejorar armas.");
+                }
+            }
         }
     }
+
     public synchronized void aplicarMejoraAlmacenes() {
         int costoMadera = 150;
         int costoOro = 50;
+
         if (nivelAlmacenes >= 3) {
             Log.log("Se alcanzó el nivel máximo de mejora en almacenes.");
             return;
         }
 
-        if (centro.getRecurso("MADERA").get() >= costoMadera && centro.getRecurso("ORO").get() >= costoOro) {
-            centro.restarRecurso("MADERA", costoMadera);
-            centro.restarRecurso("ORO", costoOro);
-            nivelAlmacenes++;
+        Almacen madera = centro.getAserradero();
+        Almacen oro = centro.getTesoreria();
 
-            for (Almacen almacen : centro.getAlmacenes()) {
-                almacen.aumentarCapacidad(100);
-                Log.log("Capacidad aumentada en " + almacen.getNombreZona() + " al nivel " + nivelAlmacenes);
+        synchronized (madera) {
+            synchronized (oro) {
+                if (madera.getCantidadActual() >= costoMadera && oro.getCantidadActual() >= costoOro) {
+                    madera.consumir(costoMadera);
+                    oro.consumir(costoOro);
+                    nivelAlmacenes++;
+
+                    for (Almacen almacen : centro.getAlmacenes()) {
+                        almacen.aumentarCapacidad(100);
+                        Log.log("Capacidad aumentada en " + almacen.getNombreZona() + " al nivel " + nivelAlmacenes);
+                    }
+
+                    Log.log("Mejora de almacenes aplicada al nivel " + nivelAlmacenes);
+                } else {
+                    Log.log("No hay recursos suficientes para mejorar almacenes.");
+                }
             }
-
-            Log.log("Mejora de almacenes aplicada al nivel " + nivelAlmacenes);
-        } else {
-            Log.log("No hay recursos suficientes para mejorar almacenes.");
         }
     }
+
 
 }

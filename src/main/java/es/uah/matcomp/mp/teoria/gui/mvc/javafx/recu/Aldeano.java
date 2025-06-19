@@ -84,7 +84,7 @@ public class Aldeano extends Thread {
                 Log.log(id + " va a la PLAZA CENTRAL");
                 centro.getPlazaCentral().planificar(id);
                 centro.esperarSiPausado();
-                Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                Thread.sleep(FuncionesComunes.Tiempoaleatorio(1000, 2000));
                 centro.getPlazaCentral().salir(id);
 
                 // Selecciona recurso
@@ -111,12 +111,12 @@ public class Aldeano extends Thread {
                 }
 
                 // Recolecta
-                int cantidad = FuncionesComunes.randomBetween(10, 20);
+                int cantidad = FuncionesComunes.Tiempoaleatorio(10, 20);
                 int nivelHerramientas = Math.min(centro.getGestorMejoras().getNivelHerramientas(), 3);
                 int recolectar = cantidad + (5 * nivelHerramientas);
 
                 centro.esperarSiPausado();
-                Thread.sleep(FuncionesComunes.randomBetween(5000, 10000));
+                Thread.sleep(FuncionesComunes.Tiempoaleatorio(5000, 10000));
                 centro.esperarSiPausado();
                 Log.log(id + " recolecta " + recolectar + " unidades de " + tipo);
                 area.salir(this);
@@ -127,7 +127,7 @@ public class Aldeano extends Thread {
                 // Va a la plaza antes de depositar
                 Log.log(id + " va a la PLAZA CENTRAL antes de depositar");
                 centro.getPlazaCentral().planificar(id);
-                Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                Thread.sleep(FuncionesComunes.Tiempoaleatorio(1000, 2000));
                 centro.getPlazaCentral().salir(id);
 
                 // Deposita
@@ -143,7 +143,7 @@ public class Aldeano extends Thread {
                 // Vuelve a la PLAZA CENTRAL
                 Log.log(id + " vuelve a la PLAZA CENTRAL");
                 centro.getPlazaCentral().planificar(id);
-                Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                Thread.sleep(FuncionesComunes.Tiempoaleatorio(1000, 2000));
                 centro.getPlazaCentral().salir(id);
 
             } catch (InterruptedException e) {

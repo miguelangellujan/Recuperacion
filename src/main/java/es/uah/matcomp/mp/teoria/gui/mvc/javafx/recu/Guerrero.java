@@ -44,24 +44,34 @@ public class Guerrero extends Thread {
 
             // Esperar hasta que haya recursos para entrenar
             while (!Thread.currentThread().isInterrupted()) {
-                if (centro.getRecurso("MADERA").get() >= 50
-                        && centro.getRecurso("ORO").get() >= 80
-                        && centro.getRecurso("COMIDA").get() >= 50) {
+                Almacen comida = centro.getGranero();
+                Almacen madera = centro.getAserradero();
+                Almacen oro = centro.getTesoreria();
 
-                    // Consumir recursos
-                    centro.restarRecurso("MADERA", 50);
-                    centro.restarRecurso("ORO", 80);
-                    centro.restarRecurso("COMIDA", 50);
+                synchronized (comida) {
+                    synchronized (madera) {
+                        synchronized (oro) {
+                            if (comida.getCantidadActual() >= 50
+                                    && madera.getCantidadActual() >= 50
+                                    && oro.getCantidadActual() >= 80) {
 
-                    Log.log(id + " comienza entrenamiento en el CUARTEL");
-                    centro.getCuartel().entrenar(this);
-                    Log.log(id + " ha finalizado el entrenamiento y comienza patrullaje");
-                    break;  // Salir del bucle de espera de recursos
-                } else {
-                    Log.log(id + " esperando recursos para entrenar...");
-                    Thread.sleep(2000); // Espera 1 segundo antes de reintentar
+                                comida.consumir(50);
+                                madera.consumir(50);
+                                oro.consumir(80);
+
+                                Log.log(id + " comienza entrenamiento en el CUARTEL");
+                                centro.getCuartel().entrenar(this);
+                                Log.log(id + " ha finalizado el entrenamiento y comienza patrullaje");
+                                break;
+                            }
+                        }
+                    }
                 }
+
+                Log.log(id + " esperando recursos para entrenar...");
+                Thread.sleep(2000);
             }
+
             // Patrullaje tras entrenamiento
             while (!Thread.currentThread().isInterrupted()) {
                 centro.esperarSiPausado();
@@ -72,7 +82,7 @@ public class Guerrero extends Thread {
                     Log.log(id + " patrulla en " + zona.getNombreZona());
 
                     centro.esperarSiPausado();
-                    Thread.sleep(FuncionesComunes.randomBetween(2000, 3000));
+                    Thread.sleep(FuncionesComunes.Tiempoaleatorio(2000, 3000));
 
                     zona.salirGuerrero(this);
                     centro.esperarSiPausado();

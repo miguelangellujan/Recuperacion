@@ -144,9 +144,15 @@ public class CentroUrbano {
                 }
             }
         }
+
+        Almacen almacenComida = getGranero();
+
         synchronized (this) {
-            if (comida.get() >= 50) {
-                comida.addAndGet(-50);
+            if (almacenComida.getCantidadActual() >= 50) {
+                almacenComida.consumir(50);  // sin try-catch si no lanza excepción
+
+                comida.set(almacenComida.getCantidadActual());
+
                 String id = String.format("A%03d", idAldeano.getAndIncrement());
                 Aldeano a = new Aldeano(id, this);
                 a.setEmergencia(emergenciaActiva.get());
@@ -158,7 +164,6 @@ public class CentroUrbano {
             }
         }
     }
-
     public void crearGuerrero() {
         synchronized (pausaLock) {
             while (isPausado()) {
@@ -171,10 +176,18 @@ public class CentroUrbano {
                 }
             }
         }
+
+        Almacen almacenComida = getGranero();
+        Almacen almacenOro = getTesoreria();
+
         synchronized (this) {
-            if (comida.get() >= 80 && oro.get() >= 60) {
-                comida.addAndGet(-80);
-                oro.addAndGet(-60);
+            if (almacenComida.getCantidadActual() >= 80 && almacenOro.getCantidadActual() >= 60) {
+                almacenComida.consumir(80);  // asumiendo que consumir no lanza InterruptedException
+                almacenOro.consumir(60);
+
+                comida.set(almacenComida.getCantidadActual());
+                oro.set(almacenOro.getCantidadActual());
+
                 String id = String.format("G%03d", idGuerrero.getAndIncrement());
                 Guerrero g = new Guerrero(id, this);
                 guerreros.add(g);
@@ -185,7 +198,6 @@ public class CentroUrbano {
             }
         }
     }
-
     public void crearBarbaro() {
         synchronized (pausaLock) {
             while (isPausado()) {
@@ -232,32 +244,14 @@ public class CentroUrbano {
     }
 
     public AtomicInteger getRecurso(String tipo) {
-        return switch (tipo.toUpperCase()) {
-            case "COMIDA" -> comida;
-            case "MADERA" -> madera;
-            case "ORO" -> oro;
+        int valor = switch (tipo.toUpperCase()) {
+            case "COMIDA" -> granero.getCantidadActual();
+            case "MADERA" -> aserradero.getCantidadActual();
+            case "ORO" -> tesoreria.getCantidadActual();
             default -> throw new IllegalArgumentException("Recurso inválido: " + tipo);
         };
+        return new AtomicInteger(valor);
     }
-
-    public void sumarRecurso(String tipo, int cantidad) {
-        switch (tipo) {
-            case "COMIDA" -> comida.updateAndGet(current -> Math.min(current + cantidad, granero.getCapacidadMaxima()));
-            case "MADERA" -> madera.updateAndGet(current -> Math.min(current + cantidad, aserradero.getCapacidadMaxima()));
-            case "ORO" -> oro.updateAndGet(current -> Math.min(current + cantidad, tesoreria.getCapacidadMaxima()));
-            default -> throw new IllegalArgumentException("Tipo de recurso inválido: " + tipo);
-        }
-    }
-
-    public void restarRecurso(String tipo, int cantidad) {
-        switch (tipo) {
-            case "COMIDA" -> comida.updateAndGet(current -> Math.max(current - cantidad, 0));
-            case "MADERA" -> madera.updateAndGet(current -> Math.max(current - cantidad, 0));
-            case "ORO" -> oro.updateAndGet(current -> Math.max(current - cantidad, 0));
-            default -> throw new IllegalArgumentException("Tipo de recurso inválido: " + tipo);
-        }
-    }
-
     // Get Individuos
     public String getAldeanos() {
         Set<String> todos = new HashSet<>();

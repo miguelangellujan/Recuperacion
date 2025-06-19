@@ -13,8 +13,8 @@ public class Almacen implements Zona {
     private final List<Aldeano> aldeanosEsperando = new ArrayList<>();
     private final List<Guerrero> guerreros = new ArrayList<>();
     private final List<Barbaro> barbarosAtacando = new ArrayList<>();
+    private final Random random = new Random();
 
-    // Constructor
     public Almacen(String tipo, int capacidad, CentroUrbano centro) {
         this.tipo = tipo;
         this.capacidadMaxima = capacidad;
@@ -22,20 +22,23 @@ public class Almacen implements Zona {
         this.centro = centro;
     }
 
-    // Getter
     public int getCapacidadMaxima() {
         synchronized (lock) {
             return capacidadMaxima;
         }
     }
+    public int getCantidadActual() {
+        synchronized (lock) {
+            return cantidadActual;
+        }
+    }
 
-    // Funciones Interface Zona
-    @Override
+    // --- Interfaz Zona ---
     public boolean entrarGuerrero(Guerrero g) throws InterruptedException {
         guerreros.add(g);
         return true;
     }
-    @Override
+
     public void salirGuerrero(Guerrero g) {
         guerreros.remove(g);
     }
@@ -55,16 +58,15 @@ public class Almacen implements Zona {
                 }
             }
             if (defensoresDisponibles.isEmpty()) {
-                // No hay defensores, espera 1 segundo y sigue al saqueo
                 Thread.sleep(1000);
-                return true; //continuar al saqueo
+                return true;
             }
-            // Elegir uno aleatorio disponible
+
             Guerrero defensor = defensoresDisponibles.get(new Random().nextInt(defensoresDisponibles.size()));
             defensor.setLuchando(true);
             Log.log(b.getIdBarbaro() + " se enfrenta a " + defensor.getIdGuerrero());
 
-            Thread.sleep(FuncionesComunes.randomBetween(500, 1000));
+            Thread.sleep(FuncionesComunes.Tiempoaleatorio(500, 1000));
 
             double probVictoriaBarbaro = 0.5 - (0.05 * Math.min(5, centro.getGestorMejoras().getNivelArmas()));
             boolean ganaBarbaro = Math.random() < probVictoriaBarbaro;
@@ -82,62 +84,76 @@ public class Almacen implements Zona {
         }
     }
     public void depositar(Aldeano aldeano, int cantidad) throws InterruptedException {
+        if (cantidad <= 0) {
+            Log.log("Error: intento de depositar cantidad no positiva: " + cantidad);
+            return;
+        }
+
         centro.esperarSiPausado();
 
         int restante = cantidad;
 
         while (restante > 0) {
-            int tiempoDeposito = 0;
-            int aDepositar = 0;
+            int tiempoDeposito;
+            int aDepositar;
 
             synchronized (lock) {
                 centro.esperarSiPausado();
 
-                // Esperar si el almacén está lleno
-                while (cantidadActual >= capacidadMaxima) {
+                // Recalcular espacio siempre dentro del synchronized justo antes de depositar
+                int espacio = capacidadMaxima - cantidadActual;
+
+                // Esperar mientras no haya espacio para depositar
+                while (espacio == 0) {
                     if (!aldeanosEsperando.contains(aldeano)) {
                         aldeanosEsperando.add(aldeano);
                         Log.log("El almacén de " + tipo + " está lleno. El aldeano " + aldeano.getIdAldeano() + " espera para depositar.");
                     }
                     lock.wait();
                     centro.esperarSiPausado();
+                    espacio = capacidadMaxima - cantidadActual; // recalcular después del wait
                 }
 
-                // Calcular cuánto se puede depositar
-                int espacio = capacidadMaxima - cantidadActual;
+                // Ahora calcular cuánto se puede depositar sin pasarse del maximo
                 aDepositar = Math.min(espacio, restante);
 
-                // nunca permitir depositar 0 o negativo
+                // Esta defensa es por si acaso
                 if (aDepositar <= 0) {
-                    // No hay nada que hacer aún, volver a esperar
-                    continue;
+                    aDepositar = 0;
                 }
 
-                // Preparar depósito
                 aldeanosEsperando.remove(aldeano);
-                aldeanosDepositando.add(aldeano);
-                tiempoDeposito = FuncionesComunes.randomBetween(2000, 3000);
+                if (!aldeanosDepositando.contains(aldeano)) {
+                    aldeanosDepositando.add(aldeano);
+                }
+
+                tiempoDeposito = FuncionesComunes.Tiempoaleatorio(2000, 3000);
             }
 
-            // Simular el tiempo fuera del lock
             Thread.sleep(tiempoDeposito);
             centro.esperarSiPausado();
 
             synchronized (lock) {
+                // Volver a validar que no se pase (por si otro hilo cambió cantidadActual entre medias)
+                int espacio = capacidadMaxima - cantidadActual;
+                if (aDepositar > espacio) {
+                    aDepositar = espacio;
+                }
+
                 cantidadActual += aDepositar;
                 restante -= aDepositar;
-                centro.sumarRecurso(tipo, aDepositar);
 
                 Log.log("El aldeano " + aldeano.getIdAldeano() + " ha depositado " + aDepositar + " de " + tipo + ". Total almacenado: " + cantidadActual);
 
                 if (restante > 0) {
                     Log.log("El aldeano " + aldeano.getIdAldeano() + " se queda esperando con " + restante + " de " + tipo + " por falta de espacio.");
                     aldeanosDepositando.remove(aldeano);
-                    aldeanosEsperando.add(aldeano);
+                    if (!aldeanosEsperando.contains(aldeano)) {
+                        aldeanosEsperando.add(aldeano);
+                    }
                 } else {
                     aldeanosDepositando.remove(aldeano);
                 }
-
                 lock.notifyAll();
             }
         }
@@ -145,6 +161,16 @@ public class Almacen implements Zona {
         synchronized (lock) {
             aldeanosDepositando.remove(aldeano);
             aldeanosEsperando.remove(aldeano);
+            lock.notifyAll();
+        }
+    }
+    public void consumir(int cantidad) {
+        synchronized (lock) {
+            if (cantidadActual >= cantidad) {
+                cantidadActual -= cantidad;
+            } else {
+                throw new IllegalStateException("Intento de consumir más de lo disponible en " + tipo);
+            }
         }
     }
 
@@ -152,28 +178,24 @@ public class Almacen implements Zona {
         synchronized (lock) {
             capacidadMaxima += cantidad;
             Log.log("Capacidad de " + tipo + " aumentada a " + capacidadMaxima);
-            lock.notifyAll(); // Avisamos a los aldeanos por si ahora hay hueco
+            lock.notifyAll();
         }
     }
-
     public void saquear(Barbaro b) {
         agregarBarbaro(b);
-
-        // Simulación del saqueo
         try {
-            Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+            Thread.sleep(FuncionesComunes.Tiempoaleatorio(1000, 2000));
         } catch (InterruptedException e) {
             Log.log("Error en el saqueo: " + e.getMessage());
         }
 
-        int porcentaje = FuncionesComunes.randomBetween(10, 30);
+        int porcentaje = 10 + random.nextInt(21);
         int robado;
+
         synchronized (lock) {
             robado = (cantidadActual * porcentaje) / 100;
             cantidadActual -= robado;
         }
-
-        centro.restarRecurso(tipo, robado);
 
         Log.log("¡SAQUEO en " + tipo + "! Se han robado " + robado + " unidades por " + b.getIdBarbaro() + ". Restante: " + cantidadActual);
 
@@ -183,14 +205,17 @@ public class Almacen implements Zona {
             Log.log("Error en el saqueo: " + e.getMessage());
         }
         eliminarBarbaro(b);
-
     }
+
+
+
     public void añadirInicial(int cantidad) {
         synchronized (lock) {
             cantidadActual = Math.min(cantidad, capacidadMaxima);
             Log.log("Almacén de " + tipo + " inicializado con " + cantidadActual);
         }
     }
+
     public List<Aldeano> getAldeanos() {
         synchronized (lock) {
             List<Aldeano> todosAldeanos = new ArrayList<>();
@@ -199,6 +224,7 @@ public class Almacen implements Zona {
             return todosAldeanos;
         }
     }
+
     public List<Guerrero> getGuerreros() {
         return guerreros;
     }
@@ -232,7 +258,6 @@ public class Almacen implements Zona {
             return "Depositando: " + dentro + "\nEsperando: " + esperando + "\nGuerreros: " + guerr + "\nBárbaros: " + barb;
         }
     }
-    // Sacar a los aldeanos del almacén cuando se pulsa el botón de alarma
 
     public synchronized void expulsarAldeanos() {
         List<Aldeano> copiaDepositando = new ArrayList<>(aldeanosDepositando);
@@ -248,6 +273,7 @@ public class Almacen implements Zona {
         aldeanosDepositando.clear();
         aldeanosEsperando.clear();
     }
+
     public void salir(Aldeano aldeano) {
         synchronized (lock) {
             aldeanosDepositando.remove(aldeano);

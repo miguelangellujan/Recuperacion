@@ -36,7 +36,6 @@ public class AreaRecurso implements Zona {
             default -> "área desconocida";
         };
     }
-
     @Override
     public boolean entrarGuerrero(Guerrero g) throws InterruptedException {
         lockGuerreros.lock();
@@ -50,7 +49,6 @@ public class AreaRecurso implements Zona {
             lockGuerreros.unlock();
         }
     }
-
     @Override
     public void salirGuerrero(Guerrero g) {
         lockGuerreros.lock();
@@ -108,7 +106,7 @@ public class AreaRecurso implements Zona {
                 // Soltamos el lock para no bloquear mientras duerme
                 lockZona.unlock();
                 try {
-                    Thread.sleep(FuncionesComunes.randomBetween(3000, 5000));
+                    Thread.sleep(FuncionesComunes.Tiempoaleatorio(3000, 5000));
                 } finally {
                     lockZona.lock();
                 }

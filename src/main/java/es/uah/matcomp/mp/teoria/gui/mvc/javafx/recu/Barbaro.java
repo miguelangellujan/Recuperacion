@@ -52,7 +52,7 @@ public class Barbaro extends Thread {
                 boolean huboEnfrentamiento = objetivo.enfrentarABarbaro(this);
                 if (huboEnfrentamiento) {
                     centro.esperarSiPausado();
-                    Thread.sleep(FuncionesComunes.randomBetween(500, 1000));
+                    Thread.sleep(FuncionesComunes.Tiempoaleatorio(500, 1000));
 
                     double probVictoria = 1.0 - (0.5 + 0.05 * Math.min(5, centro.getGestorMejoras().getNivelArmas()));
                     ganoCombate = rnd.nextDouble() < probVictoria;
@@ -96,7 +96,7 @@ public class Barbaro extends Thread {
                     centro.esperarSiPausado();
                     recurso.iniciarAtaque(this);
                     centro.esperarSiPausado();
-                    Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                    Thread.sleep(FuncionesComunes.Tiempoaleatorio(1000, 2000));
                     centro.esperarSiPausado();
                     recurso.finalizarAtaque(true);
                     centro.esperarSiPausado();
@@ -107,7 +107,7 @@ public class Barbaro extends Thread {
                 } else if (objetivo instanceof Almacen almacen) {
                     almacen.expulsarAldeanos();
                     centro.esperarSiPausado();
-                    Thread.sleep(FuncionesComunes.randomBetween(1000, 2000));
+                    Thread.sleep(FuncionesComunes.Tiempoaleatorio(1000, 2000));
                     centro.esperarSiPausado();
                     almacen.saquear(this);
                     centro.esperarSiPausado();

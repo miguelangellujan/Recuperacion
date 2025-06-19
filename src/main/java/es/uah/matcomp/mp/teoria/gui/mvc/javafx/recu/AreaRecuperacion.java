@@ -30,7 +30,7 @@ public class AreaRecuperacion {
         }
 
         try {
-            Thread.sleep(FuncionesComunes.randomBetween(12000, 15000));
+            Thread.sleep(FuncionesComunes.Tiempoaleatorio(12000, 15000));
         } catch (InterruptedException e) {
             Log.log(id + " fue interrumpido durante la recuperación.");
         }
@@ -58,7 +58,7 @@ public class AreaRecuperacion {
         }
 
         try {
-            Thread.sleep(FuncionesComunes.randomBetween(10000, 15000));
+            Thread.sleep(FuncionesComunes.Tiempoaleatorio(10000, 15000));
         } catch (InterruptedException e) {
             Log.log(id + " fue interrumpido en recuperación.");
             Thread.currentThread().interrupt();
