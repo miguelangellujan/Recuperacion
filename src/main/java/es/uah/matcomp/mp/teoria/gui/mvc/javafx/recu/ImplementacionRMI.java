@@ -9,8 +9,6 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
 
     private boolean emergenciaActiva = false;
 
-    private final AtomicBoolean pausado = new AtomicBoolean(false);
-
     public ImplementacionRMI(CentroUrbano centroUrbano) throws RemoteException {
         this.centro = centroUrbano;
     }

@@ -138,7 +138,7 @@ public class ClienteController {
         }
     }
 
-    // Funciones para el funcionamiento del botón de pausa
+    // Funciones botón de pausa
     @FXML
     private void ejecucion(){
         try {
@@ -154,7 +154,7 @@ public class ClienteController {
         }
     }
 
-    // Función para el botón de la emergencia
+    // Función botón de la emergencia
     @FXML
     private void activarCampana() {
         try {

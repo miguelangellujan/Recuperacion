@@ -84,27 +84,5 @@ public class AreaRecuperacion {
         }
     }
 
-    public List<String> getGuerrerosEnRecuperacion() {
-        synchronized (lock) {
-            return guerreroenRecuperacion.stream()
-                    .filter(id -> id.startsWith("Guerrero"))
-                    .collect(Collectors.toList());
-        }
-    }
 
-    public int contarAldeanosEnRecuperacion() {
-        synchronized (lock) {
-            return (int) enRecuperacion.stream()
-                    .filter(id -> id.startsWith("Aldeano"))
-                    .count();
-        }
-    }
-
-    public int contarGuerrerosEnRecuperacion() {
-        synchronized (lock) {
-            return (int) guerreroenRecuperacion.stream()
-                    .filter(id -> id.startsWith("Guerrero"))
-                    .count();
-        }
-    }
 }

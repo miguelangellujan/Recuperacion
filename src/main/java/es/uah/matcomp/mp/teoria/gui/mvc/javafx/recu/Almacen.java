@@ -1,7 +1,6 @@
 package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Almacen implements Zona {
     private final String tipo;

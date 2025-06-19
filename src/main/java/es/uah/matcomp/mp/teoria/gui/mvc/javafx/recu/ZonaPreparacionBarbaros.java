@@ -69,9 +69,6 @@ public class ZonaPreparacionBarbaros {
         }
     }
 
-
-
-
     private Zona seleccionarObjetivoGrupo() {
         List<Zona> almacenes = List.of(
                 centro.getAlmacen("COMIDA"),

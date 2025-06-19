@@ -57,11 +57,7 @@ public class CentroUrbano {
         }
     }
 
-    // Geters para acceso a variables
-
-    public Object getLockEmergencia() {
-        return emergenciaLock;
-    }
+    // Getters
 
     public AreaRecuperacion getAreaRecuperacion() {
         return areaRecuperacion;
@@ -434,33 +430,16 @@ public class CentroUrbano {
                     .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
         }
     }
-
     public ZonaCampamentoBarbaros getZonaCampamento() {
         return zonaCampamento;
     }
 
-
-    public List<Aldeano> getAldeanos2(){
-        return aldeanos;
-    }
-
-    // Funciones para el ataque
+    // Funciones para ataque
 
     public Zona obtenerZonaAleatoria() {
         List<Zona> zonas = List.of(granja, bosque, mina, granero, aserradero, tesoreria);
         return zonas.get(new Random().nextInt(zonas.size()));
     }
-
-    public Zona seleccionarObjetivo() {
-        if (Math.random() < 0.6) {
-            List<Almacen> almacenes = List.of(granero, aserradero, tesoreria);
-            return almacenes.get(new Random().nextInt(almacenes.size()));
-        } else {
-            List<AreaRecurso> areas = List.of(granja, bosque, mina);
-            return areas.get(new Random().nextInt(areas.size()));
-        }
-    }
-
     public Zona obtenerZonaAleatoriaParaPatrulla() {
         return obtenerZonaAleatoria();
     }
@@ -474,7 +453,6 @@ public class CentroUrbano {
             }
         }
     }
-
     public void esperarSiPausado() throws InterruptedException {
         synchronized (pausaLock) {
             while (pausado.get()) {
@@ -482,24 +460,14 @@ public class CentroUrbano {
             }
         }
     }
-
     public boolean isPausado() {
         return pausado.get();
     }
 
-    // Emergencia
-    public void setEmergencia(boolean estado) {
-        for (Aldeano a : aldeanos) {
-            a.setEmergencia(estado);  // Esto interrumpe a los aldeanos (mira la clase Aldeano)
-            synchronized (a) {
-                a.notify();  // Despierta a los aldeanos si están esperando
-            }
-        }
-    }
     public String getGuerrerosEnCuartel() {
         return cuartel.obtenerGuerrerosEntrenando();
     }
-
+    // Emergencia
     public boolean isEmergenciaActiva() {
         return emergenciaActiva.get();
     }

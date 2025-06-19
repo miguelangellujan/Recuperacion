@@ -149,7 +149,6 @@ public class ServidorController {
         hiloInterfaz.start();
     }
 
-
     // Actualizar la información que aparece en la interfaz
     private void actualizarInterfaz() {
 
