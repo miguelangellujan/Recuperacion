@@ -248,6 +248,7 @@ public class CentroUrbano {
         };
         return new AtomicInteger(valor);
     }
+
     // Get Individuos
     public String getAldeanos() {
         Set<String> todos = new HashSet<>();
@@ -422,6 +423,7 @@ public class CentroUrbano {
                     .reduce((a, b) -> a + ", " + b).orElse("Ninguno");
         }
     }
+
     public ZonaCampamentoBarbaros getZonaCampamento() {
         return zonaCampamento;
     }
@@ -432,6 +434,7 @@ public class CentroUrbano {
         List<Zona> zonas = List.of(granja, bosque, mina, granero, aserradero, tesoreria);
         return zonas.get(new Random().nextInt(zonas.size()));
     }
+
     public Zona obtenerZonaAleatoriaParaPatrulla() {
         return obtenerZonaAleatoria();
     }
@@ -445,6 +448,7 @@ public class CentroUrbano {
             }
         }
     }
+
     public void esperarSiPausado() throws InterruptedException {
         synchronized (pausaLock) {
             while (pausado.get()) {
@@ -452,6 +456,7 @@ public class CentroUrbano {
             }
         }
     }
+
     public boolean isPausado() {
         return pausado.get();
     }
@@ -459,6 +464,7 @@ public class CentroUrbano {
     public String getGuerrerosEnCuartel() {
         return cuartel.obtenerGuerrerosEntrenando();
     }
+
     // Emergencia
     public boolean isEmergenciaActiva() {
         return emergenciaActiva.get();

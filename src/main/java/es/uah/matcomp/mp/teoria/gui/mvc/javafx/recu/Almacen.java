@@ -26,6 +26,7 @@ public class Almacen implements Zona {
             return capacidadMaxima;
         }
     }
+
     public int getCantidadActual() {
         synchronized (lock) {
             return cantidadActual;
@@ -82,6 +83,7 @@ public class Almacen implements Zona {
             }
         }
     }
+
     public void depositar(Aldeano aldeano, int cantidad) throws InterruptedException {
         if (cantidad <= 0) {
             Log.log("Error: intento de depositar cantidad no positiva: " + cantidad);
@@ -180,6 +182,7 @@ public class Almacen implements Zona {
             lock.notifyAll();
         }
     }
+
     public void saquear(Barbaro b) {
         agregarBarbaro(b);
         try {
@@ -205,8 +208,6 @@ public class Almacen implements Zona {
         }
         eliminarBarbaro(b);
     }
-
-
 
     public void añadirInicial(int cantidad) {
         synchronized (lock) {

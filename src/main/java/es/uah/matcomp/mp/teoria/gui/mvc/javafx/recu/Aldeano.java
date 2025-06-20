@@ -1,4 +1,5 @@
 package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
+
 public class Aldeano extends Thread {
     private final String id;
     private final CentroUrbano centro;

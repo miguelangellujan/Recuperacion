@@ -41,6 +41,7 @@ public class AreaRecuperacion {
         }
         a.moverAPlazaCentral();
     }
+
     public void entrarGuerrero(Guerrero g) {
         String id = g.getIdGuerrero();
         boolean primeraVez = false;
@@ -75,6 +76,7 @@ public class AreaRecuperacion {
             return String.join(", ", enRecuperacion) + (guerreroenRecuperacion.isEmpty() ? "" : ", " + String.join(", ", guerreroenRecuperacion));
         }
     }
+
     public List<String> getAldeanosEnRecuperacion() {
         synchronized (lock) {
             return enRecuperacion.stream()
@@ -82,6 +84,4 @@ public class AreaRecuperacion {
                     .collect(Collectors.toList());
         }
     }
-
-
 }

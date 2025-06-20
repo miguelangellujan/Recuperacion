@@ -36,6 +36,7 @@ public class AreaRecurso implements Zona {
             default -> "área desconocida";
         };
     }
+
     @Override
     public boolean entrarGuerrero(Guerrero g) throws InterruptedException {
         lockGuerreros.lock();
@@ -49,6 +50,7 @@ public class AreaRecurso implements Zona {
             lockGuerreros.unlock();
         }
     }
+
     @Override
     public void salirGuerrero(Guerrero g) {
         lockGuerreros.lock();
@@ -139,6 +141,7 @@ public class AreaRecurso implements Zona {
             lockZona.unlock();
         }
     }
+
     public void salir(Aldeano a) {
         lockZona.lock();
         try {
@@ -159,7 +162,6 @@ public class AreaRecurso implements Zona {
             lockZona.unlock();
         }
     }
-
 
     public void finalizarAtaque(boolean destruir) {
         lockZona.lock();
@@ -217,7 +219,7 @@ public class AreaRecurso implements Zona {
 
             recolectando.clear();
             esperandoEnCola.clear();
-        }
+    }
 
     public boolean fueAtacadoDurante(Aldeano a) {
         lockZona.lock();

@@ -18,7 +18,6 @@ public class GestorMejoras {
 
     public int getNivelAlmacenes() {return nivelAlmacenes;}
 
-
     //Funciones asociadas a la interfaz
 
     public synchronized void aplicarMejoraHerramientas() {
@@ -104,6 +103,4 @@ public class GestorMejoras {
             }
         }
     }
-
-
 }

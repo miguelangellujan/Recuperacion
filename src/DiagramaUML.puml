@@ -1,0 +1,523 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class Aldeano
+class Almacen
+class AreaRecuperacion
+class AreaRecurso
+class Barbaro
+class CentroUrbano
+class CasaPrincipal
+class PlazaCentral
+class Cuartel
+class ClienteController
+class FuncionesComunes
+class GestorMejoras
+class Guerrero
+class ImplementacionRMI
+interface InterfazRMI
+class Log
+class CerrarLogger
+class MainCliente
+class MainServidor
+class SerivdorController
+interface Zona
+class ZonaCampamentoBarbaros
+class ZonaPreparacionBarbaros
+
+class Aldeano {
+-id : String
+-centro : CentroUrbano
+-activo = true : volatile boolean
+-emergencia = false : boolean
+-esperandoEnEmergencia = false : boolean
++Aldeano(id : String, centro : CentroUrbano)
++getIdAldeano() : String
+-checkYEsperarEmergencia()
++setEmergencia(estado : boolean)
+-esperarFinEmergencia()
++moverACasaPrincipal()
++moverAPlazaCentrak()
++run()
+}
+
+class Almacen {
+-tipo : String
+-cantidadActual : int
+-capacidadMaxima : int
+-centro : CentroUrbano
+-lock : Object
+-aldeanosDepositando : List<Aldeano>
+-aldeanosEsperando : List<Aldeano>
+-guerreros : List<Guerrero>
+-barbarosAtacando : List<Barbaro>
+-random : Random
++Almacen(tipo : String, capacidad : int, centro : CentroUrbano)
++getCapacidadMaxima() : int
++getCantidadActual() : int
++entrarGuerrero(g : Guerrero) : boolean
++salirGuerrero(g : Guerrero)
++getNombreZona() : String
++enfrentarABarbaro(b : Barbaro)
++depositar(aldeano : Aldeano, cantidad : int)
++aumentarCapacidad(cantidad : int)
++saquear(b : Barbaro)
++añadirInicial(cantidad : int)
++getAldeanos() : List<Aldeano>
++getGuerreros() : List<Guerrero>
++obtenerEstadoAldeanos() : String
++expulsarAldeanos()
++salir(aldeano : Aldeano)
++agregarBarbaro(b : Barbaro)
++eliminarBarbaro(b : Barbaro)
++getBarbaros() : List<Barbaro>
+}
+
+class AreaRecuperacion {
+-enRecuperacion : Set<String>
+-guerrerosEnRecuperacion : Set<String>
+-lock : Object
++entrar(a : Aldeano)
++entrarGuerrero(g : Guerrero)
++obtenerIdsEnRecuperacion() : String
++getAldeanosEnRecuperacion() : List<String>
+}
+
+class AreaRecurso {
+-tipo : String
+-recolectando : List<Aldeano>
+-esperandoEnCola : List<Aldeano>
+-barbarosAtacando : List<Barbaro>
+-centro : CentroUrbano
+-lockZona : ReentrantLock
+-puedeEntrarAldeano : Condition
+-enAtaque = false : boolean
+-destruida = false : boolean
+-enReparacion = false : boolean
+-lockGuerreros : ReentrantLock
+-puedeEntrarGuerrero : Condition
+-guerrerosDentro : List<Guerrero>
+-MAX_GUERREROS = 3 : int
++AreaRecurso(tipo : String, centro : CentroUrbano)
++toString(tipo : String) : String
++entrarGuerrero(g : Guerrero) : boolean
++salirGuerrero(g : Guerrero)
++getNombreZona() : String
++enfrentarABarbaro(b : Barbaro) : boolean
++entrar(a : Aldeano)
++salir(a : Aldeano)
++iniciarAtaque(b : Barbaro)
++finalizarAtaque(destruir : boolean)
++expulsarAldeanos()
++fueAtacadoDurante(a : Aldeano) : boolean
++eliminarBarbaro(b : Barbaro)
+-getCentroDe(a : Aldeano) : CentroUrbano
++obtenerEstadoAldeanos() : String
++getAldeanos() : List<Aldeano>
++getGuerreros() : List<Guerrero>
++getBarbaros : List<Barbaro>
+}
+
+class Barbaro {
+-id : String
+-centro : CentroUrbano
+-rand : Random
+-puedeAtacar = true : boolean
+-lockAtaque : Object
++Barbaro(id : String, centro : CentroUrbano)
++getIdBarbaro() : String
++run()
+}
+
+class CentroUrbano {
+-comida : AtomicInteger
+-madera : AtomicInteger
+-oro : AtomicInteger
+-idAldeano : AtomicInteger
+-idGuerrero : AtomicInteger
+-idBarbaro : AtomicInteger
+-granja : AreaRecurso
+-bosque : AreaRecurso
+-mina : AreaRecurso
+-granero : Almacen
+-aserradero : Almacen
+-tesoreria : Almacen
+-casaPrincipal : CasaPrincipal
+-plazaCentral : PlazaCentral
+-cuartel : Cuartel
+-aldeanos : List<Almacen>
+-guerreros : List<Guerrero>
+-barbaros : List<Barbaro>
+-gestorMejoras : GestorMejoras
+-emergenciaActiva : AtomicBoolean
+-pausado : AtomicBoolean
+-pausaLock : Object
+-emergenciaLock : Object
++CentroUrbano()
++getAreaRecuperacion() : AreaRecuperacion
++getGestorMejoras() : GestorMejoras
++getNivelHerramientas() : int
++getNivelArmas() : int
++getNivelAlmacenes() : int
++getMejoraHerramientas()
++getMejoraArmas()
++getMejoraAlmacenes()
++getZonaPreparacion() : ZonaPreparacionBarbaros
++getCasaPrincipal() : CasaPrincipal
++getPlazaCentral() : PlazaCentral
++getCuartel() : Cuartel
++getGranero() : Almacen
++getAserradero() : Almacen
++getTesoreria() : Almacen
++getPausaLock() : Object
++getAlmacenes() : List<Almacen>
++crearAldeano()
++crearGuerrero()
++crearBarbaro()
++seleccionRecurssioAleatorio() : String
++getArea(tipo : String) : AreaRecurso
++getAlmacen(tipo : String) : Almacen
++getRecurso(tipo : String) : AtomicInteger
++getAldeanos() : String
++getAldeanosMina() : String
++getGuerrerosMina() : String
++getBarbarosMina() : String
++getAldeanosBosque() : String
++getGuerrerosBosque() : String
++getBarbarosBosque() : String
++getAldeanosGranja() : String
++getGuerrerosGranja() : String
++getBarbarosGranja() : String
++getAldeanosTesoreria() : String
++getGuerrerosTesoreria() : String
++getBarbarosTesoreria() : String
++getAldeanosAserradero() : String
++getGuerrerosAserradero() : String
++getBarbarosAserradero() : String
++gerAldeanosGranero() : String
++getGuerrerosGranero() : String
++getBarbarosGranero() : String
++getZonaCampamento() : ZonaCampamentoBarbaros
++obtenerZonaAleatoria() : Zona
++obtenerZonaAleatoriaParaPatrulla() : Zona
++setPausa(enPausa : boolean)
++esperarSiPausado()
++isPausado() : boolean
++getGuerrerosEnCuartel() : String
++isEmergenciaActiva() : boolean
++activarEmergencia()
+}
+
+class CasaPrincipal {
+-aldeanosEnCasa : List<String>
++registrarEntrada(idAldeano : String)
++salir(idAldeano : String)
++estaRegistrado(idAldeano : String)
++obtenerIds() : String
+}
+
+class PlazaCentral {
+-aldeanosEnPlaza : List<String>
++planificar(idAldeano : String)
++salir(idAldeano : String)
++estaRegistrado(idAldeano : String) : boolean
++obtenerIds() : String
+}
+
+class Cuartel {
+-enEntrenamiento : List<Guerrero>
++entrar(g : Guerrero)
++entrenar(g : Guerrero)
++salir(g : Guerrero)
++obtenerGuerrerosEntrenando() : String
+}
+
+class ClienteController {
+-AldeanosMina : TextField
+-GuerrerosMina : TextField
+-BarbarosMina : TextField
+-AldeanosBosque : TextField
+-GuerrerosBosque : TextField
+-BarbarosBosque : TextField
+-AldeanosGranja : TextField
+-GuerrerosGranja : TextField
+-BarbarosGranja : TextField
+-AldeanosTesoreria : TextField
+-GuerrerosTesoreria : TextField
+-BarbarosTesoreria : TextField
+-AldeanosAserradero : TextField
+-GuerrerosAserradero : TextField
+-BarbarosAserradero : TextField
+-AldeanosGranero : TextField
+-GuerrerosGranero : TextField
+-BarbarosGranero : TextField
+-ZonaPreparacionBarbaros : TextField
+-CampamentoBarbaros : TextField
+-AldeanosCentroUrbano : TextField
+-GuerrerosCentroUrbano : TextField
+-lblComida : Label
+-lblMadera : Label
+-lblOro : Label
+-btnDetener : Button
+-btnCampana : Button
+-hilo : Thread
+-interfazRMI : InterfazRMI
+-enPausa = false : boolean
++initialize()
+-inicializarActualizacion()
+-actualizarInterfaz()
+-ejecucion()
+-activarCampana()
+}
+
+class FuncionesComunes {
+-rnd : Random
++Tiempoaleatorio(min : int, max : int) : int
+}
+
+class GestorMejoras {
+-nivelHerramientas = 0 : int
+-nivelArmas = 0 : int
+-nivelAlmacenes = 0 : int
+-centro : CentroUrbano
++gestorMejoras(centro : CentroUrbano)
++getNivelHerramientas() : int
++getNivelArmas() : int
++getNivelAlmacenes() : int
++aplicarMejoraHerramientas()
++aplicarMejoraArmas()
++aplicarMejoraAlmacenes()
+}
+
+class Guerrero {
+-id : String
+-centro : CentroUrbano
+-luchando : AtomicBoolean
++Guerrero(id : String, centro : CentroUrbano)
++estaLuchando() : boolean
++setLuchando() : boolean
++enviarARecuperacion()
++getIdGuerrero() : String
++getProbabilidadVictoria() : double
++run()
+}
+
+class ImplementacionRMI {
+-centro : CentroUrbano
+-emergenciaActiva = false : boolean
++aldeanosCentroUrbano() : int
++guerrerosCentroUrbano() : int
++aldeanosMina() : int
++guerrerosMina() : int
++barbarosMina() : int
++aldeanosBosque() : int
++guerrerosBosque() : int
++barbarosBosque() : int
++aldeanosGranja() : int
++guerrerosGranja() : int
++barbarosGranja() : int
++aldeanosTesoreria() : int
++guerrerosTesoreria() : int
++barbarosTesoreria() : int
++aldeanosAserradero() : int
++guerrerosAserradero() : int
++barbarosAserradero() : int
++aldeanosGranero() : int
++guerrerosGranero() : int
++barbarosGranero() : int
++barbarosZonaPreparacion() : int
++barbarosCampamento() : int
++getComida() : int
++getCapacidadMaxComida() : int
++getMadera() : int
++getCapacidadMaxMadera() : int
++getOro() : int
++getCapacidadMaxOro() : int
++isEmergenciaActiva() : boolean
++activarEmergencia()
++isPausado() : boolean
++pausarEjecucion()
+}
+
+interface InterfazRMI {
+aldeanosCentroUrbano() : int
+guerrerosCentroUrbano() : int
+aldeanosMina() : int
+guerrerosMina() : int
+barbarosMina() : int
+aldeanosBosque() : int
+guerrerosBosque() : int
+barbarosBosque() : int
+aldeanosGranja() : int
+guerrerosGranja() : int
+barbarosGranja() : int
+aldeanosTesoreria() : int
+guerrerosTesoreria() : int
+barbarosTesoreria() : int
+aldeanosAserradero() : int
+guerrerosAserradero() : int
+barbarosAserradero() : int
+aldeanosGranero() : int
+guerrerosGranero() : int
+barbarosGranero() : int
+barbarosZonaPreparacion() : int
+barbarosCampamento() : int
+getComida() : int
+getCapacidadMaxComida() : int
+getMadera() : int
+getCapacidadMaxMadera() : int
+getOro() : int
+getCapacidadMaxOro() : int
+isEmergenciaActiva() : boolean
+activarEmergencia()
+isPausado() : boolean
+pausarEjecucion()
+}
+
+class Log {
+-writer : PrintWriter
++log(mensaje : String)
+}
+
+class CerrarLogger {
++run()
+}
+
+class MainCliente {
++start(stage : Stage)
++main(args : String[])
+}
+
+class MainServidor {
++start(stage : Stage)
++main(args : String[])
+}
+
+class SerivdorController {
+-lblComidaRecursos : Label
+-lblMaderaRecursos : Label
+-lblOroRecursos : Label
+-botonGuerreros : Button
+-botonAldeanos : Button
+-lblNivelHerramientas : Label
+-botonHerramientas : Button
+-lblNivelArmas : Label
+-botonArmas : Button
+-lblNivelAlmacenes : Label
+-botonAlmacenes : Button
+-lblZonaPreparacion : Label
+-lblCampamentoBarbaro : Label
+-lblMina : Label
+-lblBosque : Label
+-lblGranja : Label
+-lblTesoreria : Label
+-lblAserradero : Label
+-lblGranero : Label
+-lblCuartel : Label
+-lblPlazaCentral : Label
+-lblAreaRecuperacion : Label
+-lblCasaPrincipal : Label
+-btnDetener : Button
+-btnCampana : Button
+-centro : CentroUrbano
+-hilosActivos : List<Thread>
+-enPausa = false : boolean
++initialize()
+-iniciarHilos()
+-actualizarInterfaz()
+#crearBarbaro()
+-ejecucion()
+-activarCampana()
+}
+
+interface Zona {
+entrarGuerrero(g : Guerrero) : boolean
+salirGuerrero(g : Guerrero)
+getNombreZona() : String
+enfrentarABarbaro(b : Barbaro) : boolean
+}
+
+class ZonaCampamentoBarbaros {
+-barbarosEnCampamento : Set<Barbaro>
++entrarCampamento(b : Barbaro)
++salirCampamento(b : Barbaro)
++obtenerIds() : String
++contarBarbarosEnString(ids : String) : int
+}
+
+class ZonaPreparacionBarbaros {
+-esperando : List<Barbaro>
+-lock : Object
+-rnd : Random
+-barbarosTotales : AtomicInteger
+-ultimoAtaque = 0 : long
+-objetivoGrupalActual : Zona
+-grupoActual : Set<Barbaro>
+-centro : CentroUrbano
++ZonaPreparacionBarbaros(centro : CentroUrbano)
++getBarbarosEnPreparacion() : int
++obtenerIdsEnPreparacion() : String
++esperarGrupo(b : Barbaro) : Zona
++eliminarDelGrupo(b : Barbaro)
+-seleccionarObjetivoGrupo() : Zona
+}
+
+Aldeano --> CentroUrbano
+Guerrero --> CentroUrbano
+Barbaro --> CentroUrbano
+ClienteController --> InterfazRMI
+SerivdorController --> CentroUrbano
+GestorMejoras --> CentroUrbano
+ZonaPreparacionBarbaros --> CentroUrbano
+ImplementacionRMI --> CentroUrbano
+SerivdorController --> ImplementacionRMI
+MainServidor --> SerivdorController
+MainCliente --> ClienteController
+ClienteController --> CentroUrbano
+ImplementacionRMI --> InterfazRMI
+
+CentroUrbano *-- Aldeano
+CentroUrbano *-- Guerrero
+CentroUrbano *-- Barbaro
+CentroUrbano *-- AreaRecurso
+CentroUrbano *-- Almacen
+CentroUrbano *-- CasaPrincipal
+CentroUrbano *-- PlazaCentral
+CentroUrbano *-- Cuartel
+CentroUrbano *-- GestorMejoras
+CentroUrbano *-- AreaRecuperacion
+CentroUrbano *-- ZonaCampamentoBarbaros
+CentroUrbano *-- ZonaPreparacionBarbaros
+Log *-- CerrarLogger
+
+AreaRecurso o-- Aldeano
+AreaRecurso o-- Guerrero
+AreaRecurso o-- Barbaro
+
+Almacen o-- Aldeano
+Almacen o-- Guerrero
+Almacen o-- Barbaro
+
+ZonaCampamentoBarbaros o-- Barbaro
+ZonaPreparacionBarbaros o-- Barbaro
+
+Cuartel o-- Guerrero
+CasaPrincipal o-- Aldeano
+PlazaCentral o-- Aldeano
+AreaRecuperacion o-- Aldeano
+AreaRecuperacion o-- Guerrero
+
+Zona <|.. Almacen
+Zona <|.. AreaRecurso
+InterfazRMI <|.. ImplementacionRMI
+Remote <|.. InterfazRMI
+
+Thread <|-- Aldeano
+Thread <|-- Guerrero
+Thread <|-- Barbaro
+Application <|-- MainServidor
+Application <|-- MainCliente
+Thread <|-- CerrarLogger
+UnicastRemoteObject <|-- ImplementacionRMI
+
+@enduml
