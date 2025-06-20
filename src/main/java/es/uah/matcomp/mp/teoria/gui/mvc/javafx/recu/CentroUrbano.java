@@ -276,14 +276,6 @@ public class CentroUrbano {
         return String.join(", ", todos);
     }
 
-    public String getGuerreros() {
-        synchronized (guerreros) {
-            return guerreros.stream().
-                    map(Guerrero::getIdGuerrero).
-                    reduce((a, b) -> a + ", " + b).
-                    orElse("Ninguno");
-        }
-    }
     public String getAldeanosMina() {
         synchronized (mina) {
             return mina.getAldeanos().stream()

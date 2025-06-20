@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 public class AreaRecuperacion {
     private final Set<String> enRecuperacion = Collections.synchronizedSet(new HashSet<>());
     private final Set<String> guerreroenRecuperacion = Collections.synchronizedSet(new HashSet<>());
-
     private final Object lock = new Object();
 
     public void entrar(Aldeano a) {

@@ -2,6 +2,7 @@ package es.uah.matcomp.mp.teoria.gui.mvc.javafx.recu;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
 public class ZonaPreparacionBarbaros {
     private final List<Barbaro> esperando = new ArrayList<>();
     private final Object lock = new Object();
@@ -12,20 +13,22 @@ public class ZonaPreparacionBarbaros {
     private final Set<Barbaro> grupoActual = new HashSet<>();
     private final CentroUrbano centro;
 
-    // Constructor
     public ZonaPreparacionBarbaros(CentroUrbano centro) {
         this.centro = centro;
     }
 
-    public int getBarbarosEnPreparacion(){
-        synchronized (lock){
+    public int getBarbarosEnPreparacion() {
+        synchronized (lock) {
             return esperando.size();
         }
     }
 
-    public String obtenerIdsEnPreparacion(){
-        synchronized (lock){
-            return esperando.stream().map(Barbaro :: getIdBarbaro).reduce((a, b) -> a + ", " + b).orElse("Ninguno");
+    public String obtenerIdsEnPreparacion() {
+        synchronized (lock) {
+            return esperando.stream()
+                    .map(Barbaro::getIdBarbaro)
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("Ninguno");
         }
     }
 
@@ -36,36 +39,51 @@ public class ZonaPreparacionBarbaros {
             centro.esperarSiPausado();
             Log.log(b.getIdBarbaro() + " se une a la zona de preparación");
 
-            while (!grupoActual.contains(b)) {
+            while (true) {
+                centro.esperarSiPausado();
+
+                // Si el bárbaro ya ha sido asignado, salir
+                if (grupoActual.contains(b)) {
+                    return objetivoGrupoActual;
+                }
+
+                // Calcular condiciones del grupo
                 int totalCreados = barbarosTotales.get();
                 int tamanioGrupo = 3 + (totalCreados / 10);
                 long ahora = System.currentTimeMillis();
 
-                // Solo formar un nuevo grupo si aún no hay uno activo
-                if (grupoActual.isEmpty() && esperando.size() >= tamanioGrupo && ahora - ultimoAtaque >= 10_000) {
-                    // Crear el nuevo grupo de ataque
+                // Limpiar grupo de bárbaros inactivos/interrumpidos por seguridad
+                grupoActual.removeIf(barb -> !barb.isAlive() || barb.isInterrupted());
+
+                // Verificar si se puede formar nuevo grupo
+                if (grupoActual.isEmpty()
+                        && esperando.size() >= tamanioGrupo
+                        && ahora - ultimoAtaque >= 10_000) {
+
                     List<Barbaro> grupo = new ArrayList<>(esperando.subList(0, tamanioGrupo));
                     esperando.removeAll(grupo);
                     grupoActual.clear();
                     grupoActual.addAll(grupo);
-                    centro.esperarSiPausado();
+
                     objetivoGrupoActual = seleccionarObjetivoGrupo();
                     ultimoAtaque = ahora;
-                    centro.esperarSiPausado();
+
                     Log.log("Grupo de " + grupo.size() + " bárbaros se dirige a " + objetivoGrupoActual.getNombreZona());
 
-                    lock.notifyAll(); // Despertar a todos los bárbaros para que revisen si están en el grupo
+                    lock.notifyAll(); // Despertar a todos los bárbaros en espera
                 } else {
-                    lock.wait(); // Espera pasiva,se reanuda solo si se hace notifyAll()
+                    lock.wait(2000); // Espera con timeout para reevaluar periódicamente
                 }
             }
-
-            return objetivoGrupoActual;
         }
     }
+
     public void eliminarDelGrupo(Barbaro b) {
         synchronized (lock) {
             grupoActual.remove(b);
+            if (grupoActual.isEmpty()) {
+                lock.notifyAll(); // Permitir formar un nuevo grupo
+            }
         }
     }
 

@@ -22,7 +22,7 @@ public class ImplementacionRMI extends UnicastRemoteObject implements InterfazRM
 
     @Override
     public int guerrerosCentroUrbano() throws RemoteException {
-        String guerreros = centro.getGuerreros();
+        String guerreros = centro.getGuerrerosEnCuartel();
         return guerreros.equals("Ninguno") ? 0 : guerreros.split(", ").length;
     }
 
